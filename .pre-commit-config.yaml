@@ -1,0 +1,8 @@
+repos:
+  - repo: local
+    hooks:
+      - id: check-default-commit-msg
+        name: "Validate 'QB-XX' format in commit message"
+        entry: bash -c 'if ! grep -qE "^QB-[0-9]+" "$1"; then echo "Error -> Commit message must start with QB-XX (e.g., QB-81)"; exit 1; fi' --
+        language: system
+        stages: [commit-msg]
