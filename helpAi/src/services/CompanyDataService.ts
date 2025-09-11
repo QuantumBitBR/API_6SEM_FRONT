@@ -6,11 +6,15 @@ interface Company{
     ticket_count: number;
 }
 
-class CompanyDataService{
+interface CompaniesResponse {
+    data: Company[];
+}
+
+export class CompanyDataService{
     async getCompanyData(): Promise<Company[]>{
         try {
-            const response: AxiosResponse<Company[]> = await api.get<Company[]>("/tickets/tickets-by-company")
-            return response.data;
+            const response: AxiosResponse<CompaniesResponse> = await api.get<CompaniesResponse>("/tickets/tickets-by-company")
+            return response.data.data;
         } catch (error) {
             console.error("Error fetching company data:", error);
             return [];
