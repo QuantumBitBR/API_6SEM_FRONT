@@ -2,7 +2,7 @@ import { api } from "./apiConfig";
 import type { AxiosResponse } from "axios";
 
 interface Status {
-  status_name: string; 
+  status_name: string;
   ticket_count: number;
 }
 
