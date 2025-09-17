@@ -4,8 +4,8 @@
     <div class="tabela-src">
       <template v-if="tags.length != 0">
         <DataTable :value="tags" removableSort stripedRows scrollHeight="18rem">
-          <Column field="nomeProduto" sortable header="Produto" />
-          <Column field="quantidade" sortable header="Quantidade Tickets" />
+          <Column field="product_name" sortable header="Produto" />
+          <Column field="ticket_count" sortable header="Quantidade Tickets" />
         </DataTable>
       </template>
 
@@ -19,26 +19,30 @@
 <script>
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
+import { ProductDataService } from '@/services/ProductDataService';
 
 export default {
   name: 'TagTable',
   components: { DataTable, Column },
   data() {
     return {
-      // MOCK DATA
-      tags: [
-        { nomeProduto: 'A', quantidade: 5 },
-        { nomeProduto: 'B', quantidade: 12 },
-        { nomeProduto: 'C', quantidade: 8 },
-        { nomeProduto: 'D', quantidade: 3 },
-        { nomeProduto: 'E', quantidade: 7 },
-      ],
-      selectedUser: { idUsuario: 1, nome: 'André' }, // mock
-      selectedProject: { id: 101, nome: 'Projeto X' }, // mock
+      tags: [],
     };
   },
+  methods:{
+    async loadData(){
+      try{
+        const service = new ProductDataService();
+        const products = await service.getProductData();
+
+        this.tags = products;
+      }catch(err){
+        console.error("Error to get data:", err);
+      }
+    }
+  },
   mounted() {
-    console.log('Mock tags:', this.tags);
+    this.loadData();
   },
 };
 </script>
