@@ -185,6 +185,10 @@ export default defineComponent({
 
 <style scoped>
 .full-width-card {
+  border-radius: 12px;
+  padding: 5px;
+  background-color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   width: 100%;
   padding: 8px;
 }
