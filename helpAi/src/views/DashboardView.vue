@@ -1,18 +1,20 @@
 <template>
   <div>
     <div>
-      <TicketsPerCompany/>
-      <TicketsPerProduct/>
+      >
+      <TicketsByStatus/>
+      
     </div>
   </div>
 </template>
 <script lang="ts">
-import TicketsPerProduct from '@/components/TicketsPerProduct.vue';
-import TicketsPerCompany from '../components/TicketsPerCompany.vue';
+
+import TicketsByStatus from '@/components/TicketsByStatus.vue';
+
   export default {
     components:{
-      TicketsPerProduct,
-      TicketsPerCompany,
+      TicketsByStatus,
+      
     }
 
   }
@@ -20,3 +22,4 @@ import TicketsPerCompany from '../components/TicketsPerCompany.vue';
 <style lang="css">
 
 </style>
+
