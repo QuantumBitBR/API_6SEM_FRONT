@@ -1,14 +1,16 @@
 <template>
-    <div class="full-card">
+    <div v-if="loading" class="loading">
+        <Skeleton width="100%" height="320px"></Skeleton>
+    </div>
+    <div v-else="" class="full-card">
         <div class="card">
             <div class="card-header">
                 <h2>Tickets por Categoria</h2>
             </div>
             <div class="card-body">
-                <div v-if="chartData" class="chart-wrapper">
+                <div class="chart-wrapper">
                     <Chart type="bar" :data="chartData" :options="chartOptions" />
                 </div>
-                <div v-else="">Carregando dados...</div>
             </div>
         </div>
     </div>
@@ -16,22 +18,28 @@
 
 <script>
 import { CategoryDataService } from '@/services/CategoryDataService';
+import { Skeleton } from 'primevue';
 import Chart from 'primevue/chart';
 export default {
     components: {
-        Chart
+        Chart,
+        Skeleton
     },
     data() {
         return {
             categoryData: null,
             chartData: null,
             chartOptions: null,
+            loading: true,
         }
     },
     async mounted() {
         await this.getChartData();
-        this.chartData = this.setChartData();
-        this.chartOptions = this.setChartOptions();
+        if(this.categoryData){
+            this.chartData = this.setChartData();
+            this.chartOptions = this.setChartOptions();
+        }
+        this.loading = false;
     },
     methods: {
         async getChartData() {
