@@ -1,5 +1,8 @@
 <template>
-  <div class="full-width-card">
+  <div v-if="loading" class="loading">
+    <Skeleton width="100%" height="320px"></Skeleton>
+  </div>
+  <div v-else="" class="full-width-card">
     <div class="card">
       <div class="card-header">
         <h2>Tickets por Empresa</h2>
@@ -29,6 +32,7 @@ import {
 } from "chart.js";
 import { Bar } from "vue-chartjs";
 import { CompanyDataService } from "@/services/CompanyDataService";
+import { Skeleton } from "primevue";
 
 
 function getTankWidth(
@@ -111,9 +115,11 @@ export default defineComponent({
   name: "TicketsPerCompany",
   components: {
     BarChart: Bar,
+    Skeleton,
   },
   data() {
     return {
+      loading: true,
       chartData: null as ChartData<"bar"> | null,
       chartOptions: {
         responsive: true,
@@ -172,6 +178,7 @@ export default defineComponent({
             },
           ],
         };
+        this.loading = false;
       } catch (error) {
         console.error("Error loading company data:", error);
       }
