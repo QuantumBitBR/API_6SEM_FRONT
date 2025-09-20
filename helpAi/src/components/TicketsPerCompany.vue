@@ -5,7 +5,7 @@
     <div v-else="" class="full-card">
         <div class="card">
             <div class="card-header">
-                <h2>Tickets por Compania</h2>
+                <h2>Tickets por Companhia</h2>
             </div>
             <div class="card-body">
                 <div class="chart-wrapper">

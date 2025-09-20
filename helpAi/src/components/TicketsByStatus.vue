@@ -1,5 +1,8 @@
 <template>
-  <div class="container">
+  <div v-if="loading" class="loading">
+    <Skeleton width="100%" height="320px" />
+  </div>
+  <div v-else class="full-card">
     <Card class="custom-card">
       <template #title>
         <div class="flex align-items-center">
@@ -8,25 +11,8 @@
         </div>
       </template>
       <template #content>
-        <div v-if="!isLoading && chartData" class="chart-container">
-          <Doughnut :data="chartData" :options="chartOptions" />
-        </div>
-        <div v-else-if="isLoading" class="loading-container">
-          <ProgressSpinner
-            style="width: 40px; height: 40px"
-            strokeWidth="4"
-            animationDuration=".5s" />
-          <div class="loading-text">Carregando dados...</div>
-        </div>
-        <div v-else class="error-container">
-          <i class="pi pi-exclamation-triangle" style="font-size: 2rem; color: #ef4444"></i>
-          <div class="error-text">Erro ao carregar dados</div>
-          <Button
-            label="Tentar novamente"
-            icon="pi pi-refresh"
-            @click="fetchData"
-            class="mt-3"
-            outlined />
+        <div class="chart-container">
+          <Doughnut v-if="chartData" :data="chartData" :options="chartOptions" />
         </div>
       </template>
     </Card>
@@ -35,6 +21,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, Ref } from 'vue';
+import { Skeleton } from 'primevue';
 import { Doughnut } from 'vue-chartjs';
 import {
   Chart as ChartJS,
@@ -46,19 +33,12 @@ import {
   ChartOptions
 } from 'chart.js';
 import Card from 'primevue/card';
-import ProgressSpinner from 'primevue/progressspinner';
-import Button from 'primevue/button';
-
-
-// Importando o service real
 import { StatusDataService } from '@/services/StatusDataService';
 
-// Register Chart.js components
 ChartJS.register(Title, Tooltip, Legend, ArcElement);
 
 const chartData: Ref<ChartData<'doughnut'> | null> = ref(null);
-const isLoading = ref(true);
-const error = ref<string | null>(null);
+const loading = ref(true);
 
 const chartOptions: ChartOptions<'doughnut'> = {
   responsive: true,
@@ -75,14 +55,11 @@ const chartOptions: ChartOptions<'doughnut'> = {
     },
     tooltip: {
       callbacks: {
-        label: function(context) {
+        label: function (context) {
           const label = context.label || '';
           const value = context.raw as number || 0;
           const total = (context.dataset.data as number[]).reduce((a, b) => a + b, 0);
-          if (total === 0) {
-            return `${label}: ${value} (0%)`;
-          }
-          const percentage = Math.round((value / total) * 100);
+          const percentage = total === 0 ? 0 : Math.round((value / total) * 100);
           return `${label}: ${value} (${percentage}%)`;
         }
       }
@@ -91,32 +68,31 @@ const chartOptions: ChartOptions<'doughnut'> = {
   cutout: '60%'
 };
 
-// Instância do service
 const statusService = new StatusDataService();
 
 const fetchData = async () => {
-  isLoading.value = true;
-  error.value = null;
+  loading.value = true;
 
   try {
     const data = await statusService.getStatusData();
 
     if (data.length === 0) {
-      error.value = 'Nenhum dado disponível';
+      chartData.value = null;
       return;
     }
 
     chartData.value = {
-      labels: data.map(s => s.status_name + ` ${s.ticket_count}%`),
+      labels: data.map(s => `${s.status_name} ${s.ticket_count}%`),
+
       datasets: [
         {
           data: data.map(s => s.ticket_count),
           backgroundColor: [
-            '#3498db', // Azul
-            '#2980b9', // Azul escuro
-            '#74b9ff', // Azul claro
-            '#2c3e50', // Azul ardósia
-            '#5dade2'  // Azul médio
+            '#3498db',
+            '#2980b9',
+            '#74b9ff',
+            '#2c3e50',
+            '#5dade2'
           ],
           borderWidth: 0,
           hoverOffset: 12
@@ -125,10 +101,9 @@ const fetchData = async () => {
     };
   } catch (err) {
     console.error('Erro ao carregar dados:', err);
-    error.value = 'Falha ao buscar dados do servidor.';
     chartData.value = null;
   } finally {
-    isLoading.value = false;
+    loading.value = false;
   }
 };
 
@@ -141,7 +116,7 @@ onMounted(() => {
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'SnowUI, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 }
 
 .custom-card {
@@ -176,33 +151,10 @@ onMounted(() => {
   padding: 1rem;
 }
 
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-}
-
-.loading-text {
-  margin-top: 12px;
-  color: #6c757d;
-  font-size: 14px;
-}
-
-.error-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  padding: 1rem;
-}
-
-.error-text {
-  margin-top: 12px;
-  color: #ef4444;
-  font-size: 14px;
+.loading {
+  margin: auto;
+  color: #666;
   text-align: center;
+  padding: 16px 0;
 }
 </style>
