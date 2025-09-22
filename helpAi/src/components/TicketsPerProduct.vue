@@ -1,7 +1,10 @@
 <!-- components/TagTable.vue -->
 <template>
   <div>
-    <div class="tabela-src">
+    <div v-if="loading" class="loading">
+      <Skeleton width="100%" height="288px"></Skeleton>
+    </div>
+    <div v-else="" class="tabela-src">
       <template v-if="tags.length != 0">
         <DataTable :value="tags" removableSort stripedRows scrollHeight="18rem">
           <Column field="product_name" sortable header="Produto" />
@@ -20,12 +23,14 @@
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import { ProductDataService } from '@/services/ProductDataService';
+import { Skeleton } from 'primevue';
 
 export default {
   name: 'TagTable',
-  components: { DataTable, Column },
+  components: { DataTable, Column, Skeleton },
   data() {
     return {
+      loading: true,
       tags: [],
     };
   },
@@ -36,6 +41,7 @@ export default {
         const products = await service.getProductData();
 
         this.tags = products;
+        this.loading = false;
       }catch(err){
         console.error("Error to get data:", err);
       }

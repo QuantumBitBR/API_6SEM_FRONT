@@ -5,7 +5,7 @@
     <div v-else="" class="full-card">
         <div class="card">
             <div class="card-header">
-                <h2>Tickets por Companhia</h2>
+                <h2>Tickets por Categoria</h2>
             </div>
             <div class="card-body">
                 <div class="chart-wrapper">
@@ -16,8 +16,8 @@
     </div>
 </template>
 
-<script lang="js">
-import { CompanyDataService } from '@/services/CompanyDataService';
+<script>
+import { CategoryDataService } from '@/services/CategoryDataService';
 import { Skeleton } from 'primevue';
 import Chart from 'primevue/chart';
 export default {
@@ -27,7 +27,7 @@ export default {
     },
     data() {
         return {
-            companyData: null,
+            categoryData: null,
             chartData: null,
             chartOptions: null,
             loading: true,
@@ -35,7 +35,7 @@ export default {
     },
     async mounted() {
         await this.getChartData();
-        if(this.companyData){
+        if(this.categoryData){
             this.chartData = this.setChartData();
             this.chartOptions = this.setChartOptions();
         }
@@ -44,19 +44,19 @@ export default {
     methods: {
         async getChartData() {
             try {
-                const service = new CompanyDataService();
-                const data = await service.getCompanyData();
+                const service = new CategoryDataService();
+                const data = await service.getCategoryData();
 
-                this.companyData = data;
+                this.categoryData = data;
             } catch (err) {
                 console.error("An error occurred to get data:", err);
             }
         },
         setChartData() {
-            const companies = this.companyData.map(item => item.company_name);
-            const tickets = this.companyData.map(item => item.ticket_count);
+            const categories = this.categoryData.map(item => item.category_name);
+            const tickets = this.categoryData.map(item => item.ticket_count);
             return {
-                labels: companies,
+                labels: categories,
                 datasets: [
                     {
                         data: tickets,
@@ -167,6 +167,6 @@ export default {
     margin: auto;
     color: #666;
     text-align: center;
-    padding: 16px;
+    padding: 16px 0;
 }
 </style>
