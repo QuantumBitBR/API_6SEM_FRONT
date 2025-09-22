@@ -1,6 +1,7 @@
 <template>
   <div>
     <div>
+      <TicketsByStatus/>
       <TicketsPerCompany/>
       <TicketsPerProduct/>
       <TicketsPerCategory/>
@@ -8,14 +9,17 @@
   </div>
 </template>
 <script lang="ts">
+
+import TicketsByStatus from '@/components/TicketsByStatus.vue';
 import TicketsPerProduct from '@/components/TicketsPerProduct.vue';
 import TicketsPerCompany from '../components/TicketsPerCompany.vue';
 import TicketsPerCategory from '@/components/TicketsPerCategory.vue';
   export default {
     components:{
-      TicketsPerProduct,
+      TicketsByStatus,
       TicketsPerCompany,
-      TicketsPerCategory
+      TicketsPerCategory,
+      TicketsPerProduct
     }
 
   }
@@ -23,3 +27,4 @@ import TicketsPerCategory from '@/components/TicketsPerCategory.vue';
 <style lang="css">
 
 </style>
+
