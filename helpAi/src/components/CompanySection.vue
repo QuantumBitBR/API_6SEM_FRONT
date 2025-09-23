@@ -17,13 +17,11 @@
       >
         <span class="user-name">{{ user }}</span>
         <button 
-          class="delete-btn"
-          @click="$emit('confirm-delete', user)"
+          class="delete-btn" 
+          @click="$emit('confirm-delete', user)" 
           :disabled="deletingUser === user"
-          :title="'Excluir ' + user"
-        >
-          <i class="pi pi-trash" v-if="deletingUser !== user"></i>
-          <i class="pi pi-spinner pi-spin" v-else></i>
+          >
+          <img src="../images/lixeira.png" alt="Excluir" class="trash-icon" />
         </button>
       </div>
     </div>
@@ -39,7 +37,7 @@ export default {
       required: true
     },
     deletingUser: {
-      type: String, // Ou o tipo correto do ID/nome do usuário
+      type: String,
       default: null
     }
   },
@@ -114,21 +112,18 @@ export default {
 }
 
 .delete-btn {
-  background: none;
   border: none;
-  color: #dc3545;
   cursor: pointer;
   padding: 6px;
   border-radius: 3px;
   transition: all 0.2s ease;
+  background-color: transparent;
 }
 
-.delete-btn:hover {
-  background-color: #f8d7da;
+.trash-icon{
+  width: 20px;
+  height: 20px;
+  justify-content: center;
 }
 
-.delete-btn:disabled {
-  color: #ccc;
-  cursor: not-allowed;
-}
 </style>

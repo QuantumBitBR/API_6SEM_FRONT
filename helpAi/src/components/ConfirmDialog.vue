@@ -42,7 +42,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 2000; /* Um z-index alto para ficar acima de todos os outros elementos, incluindo o modal principal */
+  z-index: 2000; 
 }
 
 .confirm-dialog {

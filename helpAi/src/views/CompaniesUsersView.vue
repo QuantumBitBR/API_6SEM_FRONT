@@ -1,30 +1,23 @@
 <template>
-  <div class="modal-overlay" @click.self="$emit('close')">
-    <div v-if="loading" class="loading-container">
-      <Skeleton class="full-card-skeleton"></Skeleton>
+  <div v-if="loading" class="loading-full-screen">
+    <Skeleton class="full-card-skeleton"></Skeleton>
+  </div>
+  <div v-else class="card">
+    <div class="card-header">
+      <h2>Empresas e Usuários</h2>
     </div>
-    <div v-else class="modal-container">
-      <div class="card">
-        <div class="card-header">
-          <h2>Empresas e Usuários</h2>
-          <button class="close-button" @click="$emit('close')">
-            <img src="../images/xclose.jpg" alt="Fechar" class="close-icon" />
-          </button>
-        </div>
-        <div class="card-body">
-          <div v-if="companiesData.length === 0" class="no-data">
-            <p>Nenhuma empresa encontrada</p>
-          </div>
-          <div v-else class="companies-container">
-            <CompanySection
-              v-for="company in companiesData"
-              :key="company.company_name"
-              :company="company"
-              :deletingUser="deletingUser"
-              @confirm-delete="confirmDeleteUser"
-            />
-          </div>
-        </div>
+    <div class="card-body">
+      <div v-if="companiesData.length === 0" class="no-data">
+        <p>Nenhuma empresa encontrada</p>
+      </div>
+      <div v-else class="companies-container">
+        <CompanySection
+          v-for="company in companiesData"
+          :key="company.company_name"
+          :company="company"
+          :deletingUser="deletingUser"
+          @confirm-delete="confirmDeleteUser"
+        />
       </div>
     </div>
   </div>
@@ -41,8 +34,8 @@
 <script>
 import { CompaniesUsersDataService } from '@/services/CompaniesUsersDataService';
 import { Skeleton } from 'primevue';
-import CompanySection from '@/components/CompanySection.vue'; // Importe o componente menor
-import ConfirmDialog from '@/components/ConfirmDialog.vue'; // Importe o componente de diálogo
+import CompanySection from '@/components/CompanySection.vue'; 
+import ConfirmDialog from '@/components/ConfirmDialog.vue'; 
 
 export default {
   name: 'CompaniesUsersView',
@@ -94,10 +87,8 @@ export default {
       this.deletingUser = this.userToDelete;
       
       try {
-        // Simulação de delay para a requisição de exclusão
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-        // Lógica de exclusão no front-end
         this.companiesData = this.companiesData.map(company => ({
           ...company,
           users: company.users.filter(user => user !== this.userToDelete)
@@ -115,25 +106,6 @@ export default {
 </script>
 
 <style scoped>
-/* Estilos para o modal e o card principal */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-container {
-  max-width: 900px;
-  width: 100%;
-  margin: 20px;
-}
 
 .loading-container {
   width: 100%;
@@ -147,17 +119,17 @@ export default {
 }
 
 .card {
-  border-radius: 12px;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
   background-color: #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  min-height: 320px;
+  box-shadow: none;
   display: flex;
   flex-direction: column;
 }
 
 .card-header {
   padding: 10px 12px;
-  border-bottom: 1px solid #eee;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -170,22 +142,13 @@ export default {
   font-weight: 600;
 }
 
-.close-button {
-  background: none;
-  border: none;
-  font-size: 1.2rem;
-  cursor: pointer;
-  color: #666;
-}
-
 .card-body {
   padding: 8px;
   flex: 1;
 }
 
 .companies-container {
-  max-height: 400px; /* Ajuste a altura conforme necessário */
-  overflow-y: auto;
+  max-height: 700px;
   padding: 8px;
 }
 
@@ -196,21 +159,21 @@ export default {
   font-style: italic;
 }
 
-.close-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0; 
+.user-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; 
+  padding: 8px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s ease;
 }
 
-.close-icon {
-  width: 20px;  
-  height: 20px;
-  opacity: 0.7; 
-  transition: opacity 0.2s ease;
+.user-name {
+  flex-grow: 1;
+  font-weight: 500;
+  color: #333;
+  font-family: 'SnowUI', system-ui, sans-serif;
+  font-size: 53px;
 }
 
-.close-icon:hover {
-  opacity: 1;
-}
 </style>
