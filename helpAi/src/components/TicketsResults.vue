@@ -8,7 +8,7 @@
     <div class="tickets-grid">
       <TicketCard
         v-for="ticket in tickets"
-        :key="ticket.id"
+        :key="ticket.ticketid"
         :ticket="ticket"
         @click="$emit('visualizar-ticket', ticket)"
       />

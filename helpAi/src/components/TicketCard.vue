@@ -3,12 +3,12 @@
     <template #content>
       <div class="ticket-header">
         <Tag :value="ticket.status" :severity="getStatusSeverity(ticket.status)" />
-        <span class="ticket-id">#{{ ticket.id }}</span>
+        <span class="ticket-id">#{{ ticket.ticketid }}</span>
       </div>
       <h4>{{ ticket.titulo }}</h4>
       <p>{{ ticket.descricao }}</p>
       <div class="ticket-meta">
-        <span><i class="pi pi-calendar"></i> {{ formatarData(ticket.data) }}</span>
+        <!-- <span><i class="pi pi-calendar"></i> {{ formatarData(ticket.data) }}</span> -->
         <span class="priority" :class="ticket.prioridade.toLowerCase()">
           {{ ticket.prioridade }}
         </span>
