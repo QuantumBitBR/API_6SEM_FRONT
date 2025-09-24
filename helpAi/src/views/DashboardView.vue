@@ -1,6 +1,7 @@
 <template>
   <div>
     <div>
+      <TicketsByStatus/>
       <TicketsPerCompany/>
       <TicketsPerProduct/>
       <TicketsPerCategory/>
@@ -9,22 +10,22 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+
+import TicketsByStatus from '@/components/TicketsByStatus.vue';
 import TicketsPerProduct from '@/components/TicketsPerProduct.vue';
 import TicketsPerCompany from '../components/TicketsPerCompany.vue';
 import TicketsPerCategory from '@/components/TicketsPerCategory.vue';
-
-
-export default defineComponent({
-  name: 'DashboardView',
-  components: {
-    TicketsPerProduct,
-    TicketsPerCompany,
-    TicketsPerCategory
+  export default {
+    components:{
+      TicketsByStatus,
+      TicketsPerCompany,
+      TicketsPerCategory,
+      TicketsPerProduct
+    }
   }
-});
 </script>
 
 <style lang="css">
 
 </style>
+
