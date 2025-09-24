@@ -65,13 +65,13 @@ export default {
 .company-header h3 {
   margin: 0;
   font-family: 'SnowUI', system-ui, sans-serif;
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 600;
   color: #333;
 }
 
 .user-count {
-  font-size: 11px;
+  font-size: 17px;
   color: #666;
   background: #e9ecef;
   padding: 2px 6px;
@@ -108,7 +108,7 @@ export default {
   font-weight: 500;
   color: #333;
   font-family: 'SnowUI', system-ui, sans-serif;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .delete-btn {
