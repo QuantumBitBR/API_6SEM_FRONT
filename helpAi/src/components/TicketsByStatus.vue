@@ -6,7 +6,6 @@
     <Card class="custom-card">
       <template #title>
         <div class="flex align-items-center">
-          <i class="pi pi-chart-pie mr-2" style="font-size: 1.25rem"></i>
           <span class="text-xl font-semibold">Percentual de Tickets por Status</span>
         </div>
       </template>
