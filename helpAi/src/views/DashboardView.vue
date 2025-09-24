@@ -9,6 +9,7 @@
     </div>
   </div>
 </template>
+
 <script lang="ts">
 
 import TicketsByStatus from '@/components/TicketsByStatus.vue';
@@ -24,9 +25,9 @@ import PrivacyPolicy from '@/components/PrivacyPolicy.vue';
       TicketsPerProduct,
       PrivacyPolicy
     }
-
   }
 </script>
+
 <style lang="css">
 
 </style>
