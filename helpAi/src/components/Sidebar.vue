@@ -5,7 +5,7 @@
     </div>
     <ul class="sidebar-links">
       <li v-for="link in links" :key="link.text">
-        <a :href="link.href">{{ link.text }}</a>
+        <router-link :to="link.href">{{ link.text }}</router-link>
       </li>
     </ul>
   </aside>
@@ -20,7 +20,7 @@ export default {
         { text: "Dashboard", href: "/dashboard" },
         { text: "Empresas", href: "/companies" },
         { text: "Chat", href: "/chat" },
-        // { text: "IA", href: "#relatorios" }
+        // { text: "IA", href: "/relatorios" }
       ]
     };
   }
@@ -57,8 +57,13 @@ export default {
   color: white;
   text-decoration: none;
   font-size: large;
-  font-weight: 00;
+  font-weight: 500;
   transition: color 0.2s;
+}
+
+.sidebar-links a.router-link-active {
+  color: #1abc9c; /* ativa quando está na rota atual */
+  font-weight: bold;
 }
 
 .sidebar-links a:hover {
