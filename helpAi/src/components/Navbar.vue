@@ -3,8 +3,14 @@
     <!-- Breadcrumb -->
     <div class="breadcrumb">
       <span v-for="(item, index) in breadcrumbs" :key="index">
-        <a v-if="index !== breadcrumbs.length - 1" href="/">{{ item }}</a>
-        <span v-else>{{ item }}</span>
+        <router-link
+          v-if="index !== breadcrumbs.length - 1"
+          :to="item.to"
+          class="crumb-link"
+        >
+          {{ capitalize(item.label) }}
+        </router-link>
+        <span v-else>{{ capitalize(item.label) }}</span>
         <span v-if="index !== breadcrumbs.length - 1"> &gt; </span>
       </span>
     </div>
@@ -20,9 +26,29 @@ export default {
   name: "Navbar",
   data() {
     return {
-      breadcrumbs: ["Home", "Dashboard"],
-      userAvatar: "https://cdn-icons-png.flaticon.com/512/847/847969.png"
+      userAvatar: "https://cdn-icons-png.flaticon.com/512/847/847969.png",
+      breadcrumbs: []
     };
+  },
+  watch: {
+    $route: {
+      immediate: true,
+      handler(to) {
+        this.updateBreadcrumbs(to);
+      }
+    }
+  },
+  methods: {
+    updateBreadcrumbs(route) {
+      this.breadcrumbs = route.matched.map(r => ({
+        label: r.meta?.breadcrumb || r.name,
+        to: r.path
+      }));
+    },
+    capitalize(str) {
+      if (!str) return "";
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
   }
 };
 </script>
@@ -38,14 +64,17 @@ export default {
   height: 60px;
 }
 
-.breadcrumb a {
-  color: #ecf0f1;
-  text-decoration: none;
+.breadcrumb {
   font-weight: 500;
 }
 
-.breadcrumb span {
-  font-weight: 500;
+.crumb-link {
+  color: #ecf0f1;
+  text-decoration: none;
+}
+
+.crumb-link:hover {
+  text-decoration: underline;
 }
 
 .user-avatar img {

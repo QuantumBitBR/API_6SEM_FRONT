@@ -62,7 +62,7 @@ export default {
 }
 
 .sidebar-links a.router-link-active {
-  color: #1abc9c; /* ativa quando está na rota atual */
+  color: #1abc9c;
   font-weight: bold;
 }
 
