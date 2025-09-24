@@ -1,7 +1,7 @@
 <template>
   <aside class="sidebar">
     <div class="sidebar-brand">
-      MeuSite
+      <img src="/HelpAI - Agente.svg" alt="Bot Avatar" class="chat-bot"/>
     </div>
     <ul class="sidebar-links">
       <li v-for="link in links" :key="link.text">
@@ -17,10 +17,10 @@ export default {
   data() {
     return {
       links: [
-        { text: "Dashboard", href: "#dashboard" },
-        { text: "Usuários", href: "#usuarios" },
-        { text: "Configurações", href: "#configuracoes" },
-        { text: "Relatórios", href: "#relatorios" }
+        { text: "Dashboard", href: "/dashboard" },
+        { text: "Empresas", href: "/companies" },
+        { text: "Chat", href: "/chat" },
+        // { text: "IA", href: "#relatorios" }
       ]
     };
   }
@@ -29,7 +29,7 @@ export default {
 
 <style scoped>
 .sidebar {
-  width: 220px;
+  width: 180px;
   height: 100vh;
   background-color: #34495e; /* cor diferente da navbar */
   color: white;
@@ -50,17 +50,24 @@ export default {
 }
 
 .sidebar-links li {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .sidebar-links a {
   color: white;
   text-decoration: none;
-  font-weight: 500;
+  font-size: large;
+  font-weight: 00;
   transition: color 0.2s;
 }
 
 .sidebar-links a:hover {
-  color: #1abc9c; /* hover com cor de destaque */
+  color: #1abc9c;
+}
+
+.chat-bot {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
 }
 </style>

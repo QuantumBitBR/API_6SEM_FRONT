@@ -3,13 +3,12 @@
     <!-- Breadcrumb -->
     <div class="breadcrumb">
       <span v-for="(item, index) in breadcrumbs" :key="index">
-        <a v-if="index !== breadcrumbs.length - 1" href="#">{{ item }}</a>
+        <a v-if="index !== breadcrumbs.length - 1" href="/">{{ item }}</a>
         <span v-else>{{ item }}</span>
         <span v-if="index !== breadcrumbs.length - 1"> &gt; </span>
       </span>
     </div>
 
-    <!-- Foto do usuário -->
     <div class="user-avatar">
       <img :src="userAvatar" alt="User Avatar" />
     </div>
@@ -21,8 +20,8 @@ export default {
   name: "Navbar",
   data() {
     return {
-      breadcrumbs: ["Home", "Dashboard", "Options"],
-      userAvatar: "https://i.pravatar.cc/40" // imagem de exemplo
+      breadcrumbs: ["Home", "Dashboard"],
+      userAvatar: "https://cdn-icons-png.flaticon.com/512/847/847969.png"
     };
   }
 };
