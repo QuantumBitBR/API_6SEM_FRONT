@@ -29,9 +29,9 @@ export default {
 
 <style scoped>
 .sidebar {
-  width: 180px;
+  width: 150px;
   height: 100vh;
-  background-color: #34495e; /* cor diferente da navbar */
+  background-color: #34495e;
   color: white;
   display: flex;
   flex-direction: column;
