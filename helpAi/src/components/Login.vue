@@ -1,0 +1,76 @@
+<template>
+  <div class="login-form">
+    <h2>Login please</h2>
+    <InputGroup class="inputs">
+        <InputGroupAddon>
+            <i class="pi pi-user"></i>
+        </InputGroupAddon>
+        <InputText v-model="text1" placeholder="Username" size="small"/>
+    </InputGroup>
+
+    <InputGroup class="inputs">
+        <InputGroupAddon>
+            <i class="pi pi-key"></i>
+        </InputGroupAddon>
+        <InputText v-model="text1" placeholder="Password" type="password" size="small"/>
+    </InputGroup>
+  <Button id="login-button" label="Sign in" raised  aria-label="undefined" icon="pi pi-sign-in"/>
+  </div>
+
+</template>
+
+<script lang="ts">
+import { defineComponent } from 'vue';
+import InputText from 'primevue/inputtext';
+import InputGroup from 'primevue/inputgroup';
+import InputGroupAddon from 'primevue/inputgroupaddon';
+import Button from 'primevue/button';
+import 'primeicons/primeicons.css';
+
+export default defineComponent({
+  name: 'MyForm',
+  components: {
+    Button,
+    InputText,
+    InputGroup,
+    InputGroupAddon
+  },
+  data() {
+    return {
+      value3: '',
+    };
+  },
+});
+</script>
+
+<style>
+.login-form{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 50vh;
+  width: 50vh;
+  border: 1px solid rgb(0, 0, 0);
+  border-radius: 10px;
+  padding: 10px 30px;
+  background-color: white;
+  margin-right: -50px;
+}
+.inputs{
+  margin: 5px 0px;
+  width: 100%;
+}
+
+#login-button{
+  margin-top: 10px;
+  width: 30%;
+  background-color: rgb(0, 26, 175);
+}
+
+#login-button:hover{
+  background-color: #0c0079;
+}
+
+
+</style>

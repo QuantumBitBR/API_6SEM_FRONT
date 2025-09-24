@@ -4,6 +4,10 @@
 
 <script setup lang="ts">
 import { RouterView } from 'vue-router';
+
+function setup() {
+  return {};
+}
 </script>
 
 
