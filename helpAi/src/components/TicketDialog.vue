@@ -2,26 +2,31 @@
   <Dialog 
     :visible="visible"
     @update:visible="$emit('update:visible', $event)"
-    :style="{width: '600px'}" 
+     :style="{ width: '600px', fontFamily: 'Inter, sans-serif' }"
     header="Detalhes do Ticket"
     modal
+  
   >
     <div v-if="ticket">
       <div class="ticket-detail-header">
-        <h2>#{{ ticket.id }}</h2>
+        <h2>#{{ ticket.ticketid }}</h2>
         <Tag :value="ticket.status" :severity="getStatusSeverity(ticket.status)" />
       </div>
       
       <Divider />
       
       <h3>{{ ticket.titulo }}</h3>
-      <p>{{ ticket.descricaoCompleta || ticket.descricao }}</p>
+      <p>{{ ticket.descricao }}</p>
       
       <div class="metadata">
-        <div><strong>Criado:</strong> {{ formatarDataCompleta(ticket.data) }}</div>
-        <div><strong>Categoria:</strong> {{ ticket.categoria }}</div>
-        <div><strong>Solicitante:</strong> {{ ticket.solicitante }}</div>
+        <div><strong>Produto:</strong> {{ ticket.produto }}</div>
+        <div><strong>Empresa:</strong> {{ ticket.solicitante }}</div>
         <div><strong>Prioridade:</strong> {{ ticket.prioridade }}</div>
+        <div><strong>Status:</strong> {{ ticket.status }}</div>
+        <div><strong>Categoria:</strong> {{ ticket.categoria }}</div>
+        <div><strong>Sub-categoria:</strong> {{ ticket.subcategoria }}</div>
+        <div><strong>Dispositivo:</strong> {{ ticket.dispositivo }}</div>
+        <div><strong>Canal:</strong> {{ ticket.canal }}</div>
       </div>
     </div>
   </Dialog>
@@ -52,8 +57,10 @@ export default {
     getStatusSeverity(status) {
       const map = {
         'Aberto': 'info',
-        'Em Andamento': 'warning', 
-        'Fechado': 'success'
+        'Em Atendimento': 'warning', 
+        'Aguardando Cliente': 'warning', 
+        'Fechado': 'success',
+        'Resolvido': 'success'
       }
       return map[status] || 'info'
     },
@@ -66,6 +73,9 @@ export default {
 </script>
 
 <style scoped>
+* {
+  font-family: 'Inter', sans-serif;
+}
 .ticket-detail-header {
   display: flex;
   justify-content: space-between;

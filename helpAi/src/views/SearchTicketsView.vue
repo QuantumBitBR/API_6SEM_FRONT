@@ -30,6 +30,7 @@ import ChatHeader from '@/components/ChatHeader.vue'
 import ChatMessages from '@/components/ChatMessages.vue'
 import ChatInput from '@/components/ChatInput.vue'
 import TicketDialog from '@/components/TicketDialog.vue'
+import { TicketSearchService } from '@/services/TicketSearchService'
 
 export default {
   name: 'TicketSearchChat',
@@ -47,58 +48,7 @@ export default {
       digitando: false,
       dialogTicketVisible: false,
       ticketSelecionado: null,
-      ticketsEncontrados: [],
-      
-      ticketsDatabase: [
-        {
-          id: 1234,
-          titulo: 'Erro de login no sistema',
-          descricao: 'Usuário não consegue fazer login na aplicação',
-          descricaoCompleta: 'O usuário relatou que ao tentar fazer login no sistema com suas credenciais válidas, recebe uma mensagem de erro "Credenciais inválidas". O problema começou hoje pela manhã.',
-          status: 'Aberto',
-          prioridade: 'Alta',
-          categoria: 'Acesso',
-          solicitante: 'João Silva',
-          data: new Date('2024-01-15'),
-          palavrasChave: ['login', 'erro', 'acesso', 'credenciais']
-        },
-        {
-          id: 5678,
-          titulo: 'Problema de conexão com banco de dados',
-          descricao: 'Aplicação apresenta lentidão e timeouts',
-          descricaoCompleta: 'A aplicação está apresentando lentidão significativa e timeouts frequentes ao tentar acessar o banco de dados.',
-          status: 'Em Andamento',
-          prioridade: 'Crítica',
-          categoria: 'Performance',
-          solicitante: 'Maria Santos',
-          data: new Date('2024-01-14'),
-          palavrasChave: ['conexão', 'banco', 'dados', 'lentidão', 'timeout']
-        },
-        {
-          id: 9101,
-          titulo: 'Falha no envio de emails',
-          descricao: 'Sistema não está enviando emails de notificação',
-          descricaoCompleta: 'O sistema parou de enviar emails de notificação para os usuários.',
-          status: 'Fechado',
-          prioridade: 'Média',
-          categoria: 'Integração',
-          solicitante: 'Carlos Oliveira',
-          data: new Date('2024-01-10'),
-          palavrasChave: ['email', 'notificação', 'envio']
-        },
-        {
-          id: 1122,
-          titulo: 'Erro 500 na página de relatórios',
-          descricao: 'Página de relatórios retorna erro interno do servidor',
-          descricaoCompleta: 'Ao tentar acessar a página de relatórios, os usuários recebem um erro 500.',
-          status: 'Aberto',
-          prioridade: 'Alta',
-          categoria: 'Bug',
-          solicitante: 'Ana Costa',
-          data: new Date('2024-01-16'),
-          palavrasChave: ['erro', '500', 'relatórios', 'servidor']
-        }
-      ]
+      ticketsEncontrados: []
     }
   },
   
@@ -117,10 +67,10 @@ export default {
       this.digitando = true
       
       await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      const ticketsEncontrados = this.buscarTickets(mensagem)
+  
+      const ticketsEncontrados = await this.buscarTickets(mensagem)
       this.ticketsEncontrados = ticketsEncontrados
-      
+
       this.mensagens.push({
         tipo: 'bot',
         tickets: ticketsEncontrados,
@@ -130,20 +80,36 @@ export default {
       this.digitando = false
     },
     
-    buscarTickets(busca) {
-      const termo = busca.toLowerCase()
-      
-      return this.ticketsDatabase.filter(ticket => {
-        if (termo.includes('#') || /^\d+$/.test(termo)) {
-          const numero = termo.replace('#', '')
-          return ticket.id.toString().includes(numero)
-        }
-        
-        return ticket.palavrasChave.some(palavra => palavra.includes(termo)) ||
-               ticket.titulo.toLowerCase().includes(termo) ||
-               ticket.descricao.toLowerCase().includes(termo)
-      })
-    },
+    async buscarTickets(busca) {
+    const service = new TicketSearchService()
+    
+    try {
+
+      const ticketsFromAPI = await service.searchTickets(busca)
+      console.log(ticketsFromAPI)
+      if (!ticketsFromAPI || ticketsFromAPI.length === 0) {
+        return []
+      }
+
+    return ticketsFromAPI.map(ticket => ({
+      ticketid: ticket.ticketid,
+      titulo: ticket.title || 'Título não informado',
+      descricao: ticket.description || 'Descrição não disponível',
+      status: ticket.status_name || 'Não informado',
+      prioridade: ticket.priority_name || 'Não informado',
+      categoria: ticket.category_name || 'Não informado',
+      subcategoria: ticket.subcategory_name || '',
+      solicitante: ticket.company_name || 'Não informado',
+      produto: ticket.product_name || 'Não informado',
+      canal: ticket.channel || 'Não informado',
+      dispositivo: ticket.device || 'Não informado'
+    }))
+    
+  } catch (error) {
+    console.error('Erro ao buscar tickets:', error)
+    return []
+  }
+},
     
     visualizarTicket(ticket) {
       this.ticketSelecionado = ticket
