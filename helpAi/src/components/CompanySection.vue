@@ -15,7 +15,7 @@
         :key="index" 
         class="user-item"
       >
-        <span class="user-name">{{ user }}</span>
+        <span class="user-name">{{user.fullname}}</span>
         <button 
           class="delete-btn" 
           @click="$emit('confirm-delete', user)" 
@@ -37,7 +37,7 @@ export default {
       required: true
     },
     deletingUser: {
-      type: String,
+      type: Number,
       default: null
     }
   },
