@@ -1,28 +1,46 @@
 <template>
   <div class="company-section">
-    <div class="company-header">
+    <div class="company-header" @click="toggleExpansion">
       <h3>{{ company.company_name }}</h3>
-      <span class="user-count">{{ company.users.length }} usuário(s)</span>
+      <div class="header-details">
+        <span class="user-count">{{ company.users.length }} usuário(s)</span>
+        <span 
+          class="toggle-icon" 
+          :class="{ 'rotated': isExpanded }"
+        >
+          &#9660; </span>
+      </div>
     </div>
 
-    <div v-if="company.users.length === 0" class="no-users">
-      <p>Nenhum usuário cadastrado</p>
-    </div>
+    <div v-show="isExpanded">
+      <div v-if="loading" class="loading-users">
+          <Skeleton height="30px" class="user-item-skeleton"></Skeleton>
+          <Skeleton height="30px" class="user-item-skeleton"></Skeleton>
+          <Skeleton height="30px" class="user-item-skeleton"></Skeleton>
+      </div>
 
-    <div v-else class="users-list">
-      <div 
-        v-for="(user, index) in company.users" 
-        :key="index" 
-        class="user-item"
-      >
-        <span class="user-name">{{user.fullname}}</span>
-        <button 
-          class="delete-btn" 
-          @click="$emit('confirm-delete', user)" 
-          :disabled="deletingUser === user"
+      <div v-else>
+        <div v-if="company.users.length === 0" class="no-users">
+          <p>Nenhum usuário cadastrado</p>
+        </div>
+
+        <div v-else class="users-list">
+          <div 
+            v-for="(user, index) in company.users" 
+            :key="index" 
+            class="user-item"
           >
-          <img src="../images/lixeira.png" alt="Excluir" class="trash-icon" />
-        </button>
+
+          <span class="user-name">{{user.fullname}}</span>
+            <button 
+              class="delete-btn" 
+              @click="$emit('confirm-delete', user)" 
+              :disabled="deletingUser === user"
+              >
+              <img src="../images/lixeira.png" alt="Excluir" class="trash-icon" />
+            </button>
+          </div>
+        </div>  
       </div>
     </div>
   </div>
@@ -41,6 +59,17 @@ export default {
       default: null
     }
   },
+  data() {
+    return {
+      isExpanded: false
+    };
+  },
+  methods: {
+    toggleExpansion() {
+      this.isExpanded = !this.isExpanded;
+    }
+  },
+
   emits: ['confirm-delete']
 }
 </script>
@@ -60,6 +89,25 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: none;
+}
+
+.header-details {
+  display: flex;
+  align-items: center;
+  gap: 10px; 
+}
+
+.toggle-icon {
+  transition: transform 0.3s ease-in-out;
+  font-size: 10px;
+  color: #666;
+  padding-left: 5px;
+  cursor: pointer;
+}
+
+.toggle-icon.rotated {
+  transform: rotate(180deg);
 }
 
 .company-header h3 {
