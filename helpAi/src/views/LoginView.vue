@@ -32,7 +32,7 @@ export default defineComponent({
   width: 100vw;
   display: flex;
   align-items: center;
-  background-image: url('/public/background1.svg');
+  background-image: url('/background1.svg');
   justify-content: center;
   background-size: cover;
   background-position: center;

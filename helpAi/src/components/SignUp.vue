@@ -27,7 +27,7 @@ export default defineComponent({
   width: 60vh;
   height: 60vh;
   padding: 0px 30px;
-  background-image: url('/public/background2.svg');
+  background-image: url('/background2.svg');
   border-radius: 10px;
 }
 .sign-up-text{
