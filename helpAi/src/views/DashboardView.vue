@@ -1,40 +1,32 @@
 <template>
-  <div class="app-container">
-    <Sidebar />
-
-    <div class="main-area">
-      <Navbar />
-      <div class="content">
-        <div class="grid-container1">
-          <TicketsByStatus />
-          <TicketsPerCompany />
-        </div>
-        <div class="grid-container2">
-          <TicketsPerProduct />
-          <TicketsPerCategory />
-        </div>
-      </div>
+  <DefaultLayout>
+    <div class="grid-container1">
+      <TicketsByStatus />
+      <TicketsPerCompany />
     </div>
-  </div>
+    <div class="grid-container2">
+      <TicketsPerProduct />
+      <TicketsPerCategory />
+    </div>
+  </DefaultLayout>
 </template>
 
-<script lang="ts">
+<script>
+import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import TicketsByStatus from '@/components/TicketsByStatus.vue'
 import TicketsPerProduct from '@/components/TicketsPerProduct.vue'
 import TicketsPerCompany from '@/components/TicketsPerCompany.vue'
 import TicketsPerCategory from '@/components/TicketsPerCategory.vue'
-import Navbar from '@/components/Navbar.vue'
-import Sidebar from '@/components/Sidebar.vue'
 
 export default {
+  name: 'Dashboard',
   components: {
+    DefaultLayout,
     TicketsByStatus,
-    TicketsPerCompany,
-    TicketsPerCategory,
     TicketsPerProduct,
-    Navbar,
-    Sidebar,
-  },
+    TicketsPerCompany,
+    TicketsPerCategory
+  }
 }
 </script>
 

@@ -1,28 +1,17 @@
 <template>
-  <div class="ticket-chat-container">
-    <ChatHeader 
-      :tickets-count="ticketsEncontrados.length"
-      title="Busca de Tickets"
-      subtitle="Digite palavras-chave para encontrar tickets"
-    />
+  <DefaultLayout>
+    <div class="ticket-chat-container">
+      <ChatHeader :tickets-count="ticketsEncontrados.length" title="Busca de Tickets"
+        subtitle="Digite palavras-chave para encontrar tickets" />
 
-    <ChatMessages 
-      :mensagens="mensagens"
-      :digitando="digitando"
-      @visualizar-ticket="visualizarTicket"
-    />
+      <ChatMessages :mensagens="mensagens" :digitando="digitando" @visualizar-ticket="visualizarTicket" />
 
-    <ChatInput 
-      v-model="mensagemInput"
-      :digitando="digitando"
-      @enviar="enviarMensagem"
-    />
+      <ChatInput v-model="mensagemInput" :digitando="digitando" @enviar="enviarMensagem" />
 
-    <TicketDialog 
-      v-model:visible="dialogTicketVisible"
-      :ticket="ticketSelecionado"
-    />
-  </div>
+      <TicketDialog v-model:visible="dialogTicketVisible" :ticket="ticketSelecionado" />
+    </div>
+  </DefaultLayout>
+
 </template>
 
 <script>
@@ -30,6 +19,7 @@ import ChatHeader from '@/components/ChatHeader.vue'
 import ChatMessages from '@/components/ChatMessages.vue'
 import ChatInput from '@/components/ChatInput.vue'
 import TicketDialog from '@/components/TicketDialog.vue'
+import DefaultLayout from '@/layouts/DefaultLayout.vue'
 
 export default {
   name: 'TicketSearchChat',
@@ -37,9 +27,10 @@ export default {
     ChatHeader,
     ChatMessages,
     ChatInput,
-    TicketDialog
+    TicketDialog,
+    DefaultLayout
   },
-  
+
   data() {
     return {
       mensagemInput: '',
@@ -48,7 +39,7 @@ export default {
       dialogTicketVisible: false,
       ticketSelecionado: null,
       ticketsEncontrados: [],
-      
+
       ticketsDatabase: [
         {
           id: 1234,
@@ -101,50 +92,50 @@ export default {
       ]
     }
   },
-  
+
   methods: {
     async enviarMensagem() {
       if (!this.mensagemInput.trim()) return
-      
+
       const mensagem = this.mensagemInput.trim()
-      
+
       this.mensagens.push({
         tipo: 'user',
         texto: mensagem
       })
-      
+
       this.mensagemInput = ''
       this.digitando = true
-      
+
       await new Promise(resolve => setTimeout(resolve, 1000))
-      
+
       const ticketsEncontrados = this.buscarTickets(mensagem)
       this.ticketsEncontrados = ticketsEncontrados
-      
+
       this.mensagens.push({
         tipo: 'bot',
         tickets: ticketsEncontrados,
         texto: ticketsEncontrados.length === 0 ? `Não encontrei tickets para "${mensagem}"` : null
       })
-      
+
       this.digitando = false
     },
-    
+
     buscarTickets(busca) {
       const termo = busca.toLowerCase()
-      
+
       return this.ticketsDatabase.filter(ticket => {
         if (termo.includes('#') || /^\d+$/.test(termo)) {
           const numero = termo.replace('#', '')
           return ticket.id.toString().includes(numero)
         }
-        
+
         return ticket.palavrasChave.some(palavra => palavra.includes(termo)) ||
-               ticket.titulo.toLowerCase().includes(termo) ||
-               ticket.descricao.toLowerCase().includes(termo)
+          ticket.titulo.toLowerCase().includes(termo) ||
+          ticket.descricao.toLowerCase().includes(termo)
       })
     },
-    
+
     visualizarTicket(ticket) {
       this.ticketSelecionado = ticket
       this.dialogTicketVisible = true
@@ -157,13 +148,13 @@ export default {
 .ticket-chat-container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 80vh;
   max-width: 1000px;
   margin: 0 auto;
   background: white;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 @media (max-width: 768px) {
