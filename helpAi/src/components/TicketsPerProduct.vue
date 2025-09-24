@@ -54,6 +54,12 @@ export default {
 </script>
 
 <style scoped>
+:deep(.p-datatable-thead > tr > th) {
+    font-size: 14px;
+    font-weight: 600;
+    color: black;
+}
+
 .tag_header {
   padding: 10px;
   color: black;
