@@ -19,7 +19,7 @@ export default defineComponent({
   },
 });
 </script>
-<style>
+<style scoped>
 .login{
   z-index: 1;
 }

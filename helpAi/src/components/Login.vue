@@ -5,16 +5,16 @@
         <InputGroupAddon>
             <i class="pi pi-user"></i>
         </InputGroupAddon>
-        <InputText v-model="text1" placeholder="Username" size="small"/>
+        <InputText v-model="username" placeholder="Username" size="small"/>
     </InputGroup>
 
     <InputGroup class="inputs">
         <InputGroupAddon>
             <i class="pi pi-key"></i>
         </InputGroupAddon>
-        <InputText v-model="text1" placeholder="Password" type="password" size="small"/>
+        <InputText v-model="password" placeholder="Password" type="password" size="small"/>
     </InputGroup>
-  <Button id="login-button" label="Sign in" raised  aria-label="undefined" icon="pi pi-sign-in"/>
+  <Button id="login-button" label="Sign in" raised  aria-label="undefined" icon="pi pi-sign-in" @click="login()"/>
   </div>
 
 </template>
@@ -28,7 +28,7 @@ import Button from 'primevue/button';
 import 'primeicons/primeicons.css';
 
 export default defineComponent({
-  name: 'MyForm',
+  name: 'LoginForm',
   components: {
     Button,
     InputText,
@@ -37,13 +37,19 @@ export default defineComponent({
   },
   data() {
     return {
-      value3: '',
+      username: '',
+      password: ''
     };
+  },
+  methods: {
+    async login() {
+      console.log('Login attempted with', this.username, this.password);
+    }
   },
 });
 </script>
 
-<style>
+<style scoped>
 .login-form{
   display: flex;
   flex-direction: column;
@@ -72,5 +78,8 @@ export default defineComponent({
   background-color: #0c0079;
 }
 
+#login-button:active{
+  background-color: #000000;
+}
 
 </style>

@@ -18,7 +18,7 @@ export default defineComponent({
   },
 });
 </script>
-<style>
+<style scoped>
 .signup{
   display: flex;
   flex-direction: column;
