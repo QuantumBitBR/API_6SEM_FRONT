@@ -27,6 +27,8 @@ import InputGroupAddon from 'primevue/inputgroupaddon';
 import Button from 'primevue/button';
 import 'primeicons/primeicons.css';
 import { LoginDataService } from '@/services/LoginDataService';
+import { useRouter } from 'vue-router';
+import router from '@/router';
 
 export default defineComponent({
   name: 'LoginForm',
@@ -39,7 +41,8 @@ export default defineComponent({
   data() {
     return {
       username: '',
-      password: ''
+      password: '',
+      router: useRouter()
     };
   },
   methods: {
@@ -54,8 +57,8 @@ export default defineComponent({
           localStorage.setItem('TextoTermoAtual', String(response.current_policy.text_policy));
           localStorage.setItem('DataVigenciaTermo', String(response.current_policy.policy_date));
 
-          console.log(response)
-
+          this.router.push('/dashboard');
+          console.log('Login successful:', response);
         }
         else {
           console.error('Login failed with status:');
