@@ -1,11 +1,6 @@
 <template>
-  <Dialog 
-    v-model:visible="isVisible" 
-    modal 
-    :closable="false"
-    :style="{ width: '50rem' }"
-    :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
-  >
+  <Dialog v-model:visible="isVisible" modal :closable="false" :style="{ width: '50rem' }"
+    :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" class="p-dialog-mask">
     <template #header>
       <div class="header-content">
         <h2>Termo de Privacidade</h2>
@@ -13,36 +8,28 @@
     </template>
 
     <div class="privacy-content">
-            
+
       <div v-html="privacyText"></div>
 
       <div v-if="effectiveDate" class="effective-date">
         <strong>Data de vigência:</strong> {{ formatDate(effectiveDate) }}
       </div>
-      
+      <div class="checkbox-container">
+        <Checkbox v-model="hasAccepted" :binary="true" input-id="accept-terms" />
+        <label for="accept-terms" class="checkbox-label">
+          Li e aceito os termos de privacidade
+        </label>
+      </div>
     </div>
 
     <template #footer>
       <div class="footer-content">
-        <div class="checkbox-container">
-          <Checkbox 
-            v-model="hasAccepted" 
-            :binary="true" 
-            input-id="accept-terms"
-          />
-          <label for="accept-terms" class="checkbox-label">
-            Li e aceito os termos de privacidade
-          </label>
-        </div>
-        
+
+
         <div class="footer-buttons">
-          
-          <Button 
-            label="Aceitar" 
-            icon="pi pi-check" 
-            :disabled="!hasAccepted"
-            @click="acceptTerms" 
-          />
+
+          <Button label="Aceitar" icon="pi pi-check" :disabled="!hasAccepted" @click="acceptTerms"
+            :loading="isloading" />
         </div>
       </div>
     </template>
@@ -54,6 +41,7 @@ import { defineComponent } from 'vue'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import Checkbox from 'primevue/checkbox'
+import { PrivacyPolicyService } from '@/services/PrivacyPolicyService'
 
 export default defineComponent({
   name: 'PrivacyModal',
@@ -62,27 +50,22 @@ export default defineComponent({
     Button,
     Checkbox
   },
+  data() {
+    return {
+      privacyText: localStorage.getItem('TextoTermoAtual'),
+      hasAccepted: false,
+      effectiveDate: localStorage.getItem('DataVigenciaTermo'),
+      privacyService: new PrivacyPolicyService(),
+      isloading: false
+    }
+  },
   props: {
     visible: {
       type: Boolean,
       default: false
-    },
-    privacyText: {
-      type: String,
-      required: true,
-      default: ''
-    },
-    effectiveDate: {
-      type: [String, Date],
-      default: null
     }
   },
   emits: ['update:visible', 'accept'],
-  data() {
-    return {
-      hasAccepted: false
-    }
-  },
   computed: {
     isVisible: {
       get(): boolean {
@@ -90,6 +73,7 @@ export default defineComponent({
       },
       set(value: boolean) {
         this.$emit('update:visible', value)
+        localStorage.setItem('termoExpirado', String(false));
         if (!value) {
           this.hasAccepted = false
         }
@@ -97,15 +81,26 @@ export default defineComponent({
     }
   },
   methods: {
-    acceptTerms(): void {
-      this.$emit('accept')
-      this.isVisible = false
+    async acceptTerms() {
+      this.isloading = true;
+      try {
+        await this.privacyService.acceptPolicy({
+          userid: Number(localStorage.getItem('userId')),
+          privacyid: Number(localStorage.getItem('idPolicy'))
+        })
+        this.$emit('accept')
+        this.isVisible = false;
+      }catch(error: any){
+        console.log('error - adicionar toast')
+      }
+      
+      this.isloading = false;
     },
     formatDate(date: string | Date): string {
       if (!date) return ''
-      
+
       const dateObj = typeof date === 'string' ? new Date(date) : date
-      
+
       return new Intl.DateTimeFormat('pt-BR', {
         day: '2-digit',
         month: '2-digit',
@@ -120,6 +115,7 @@ export default defineComponent({
 * {
   font-family: 'Inter', sans-serif;
 }
+
 .header-content h2 {
   margin: 0;
   color: #2c3e50;
@@ -197,4 +193,15 @@ export default defineComponent({
   border-color: #1976D2;
 }
 
+:global(.p-dialog-mask) {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background-color: rgba(0, 0, 0, 0.3) !important;
+}
+
+:global(.p-dialog) {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background-color: white !important;
+}
 </style>
