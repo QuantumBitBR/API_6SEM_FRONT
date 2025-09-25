@@ -24,7 +24,7 @@
   
   <ConfirmDialog
     v-if="showConfirmDialog"
-    :user-to-delete="userToDelete"
+    :user-to-delete="userToDelete.fullname"
     :deleting-user="deletingUser"
     @cancel="cancelDelete"
     @confirm="deleteUser"
@@ -33,6 +33,7 @@
 
 <script>
 import { CompaniesUsersDataService } from '@/services/CompaniesUsersDataService';
+import { DeleteUsersDataService } from '@/services/DeleteUserDataService';
 import { Skeleton } from 'primevue';
 import CompanySection from '@/components/CompanySection.vue'; 
 import ConfirmDialog from '@/components/ConfirmDialog.vue'; 
@@ -87,13 +88,12 @@ export default {
       this.deletingUser = this.userToDelete;
       
       try {
-        await new Promise(resolve => setTimeout(resolve, 1000));
         
-        this.companiesData = this.companiesData.map(company => ({
-          ...company,
-          users: company.users.filter(user => user !== this.userToDelete)
-        }));
+        const service = new DeleteUsersDataService()
+
+        await service.deleteUser(this.userToDelete.id)
         
+        this.loadData()
         console.log("Usuário deletado com sucesso:", this.userToDelete);
       } catch (error) {
         console.error("Erro ao deletar usuário:", error);
@@ -106,7 +106,9 @@ export default {
 </script>
 
 <style scoped>
-
+* {
+  font-family: 'Inter', sans-serif;
+}
 .loading-container {
   width: 100%;
   max-width: 900px;
