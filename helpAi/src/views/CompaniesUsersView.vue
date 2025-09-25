@@ -1,26 +1,28 @@
 <template>
-  <div v-if="loading" class="loading-full-screen">
-    <Skeleton class="full-card-skeleton"></Skeleton>
-  </div>
-  <div v-else class="card">
-    <div class="card-header">
-      <h2>Empresas e Usuários</h2>
+  <DefaultLayout>
+    <div v-if="loading" class="loading-full-screen">
+      <Skeleton class="full-card-skeleton"></Skeleton>
     </div>
-    <div class="card-body">
-      <div v-if="companiesData.length === 0" class="no-data">
-        <p>Nenhuma empresa encontrada</p>
+    <div v-else class="card">
+      <div class="card-header">
+        <h2>Empresas e Usuários</h2>
       </div>
-      <div v-else class="companies-container">
-        <CompanySection
-          v-for="company in companiesData"
-          :key="company.company_name"
-          :company="company"
-          :deletingUser="deletingUser"
-          @confirm-delete="confirmDeleteUser"
-        />
+      <div class="card-body">
+        <div v-if="companiesData.length === 0" class="no-data">
+          <p>Nenhuma empresa encontrada</p>
+        </div>
+        <div v-else class="companies-container">
+          <CompanySection
+            v-for="company in companiesData"
+            :key="company.company_name"
+            :company="company"
+            :deletingUser="deletingUser"
+            @confirm-delete="confirmDeleteUser"
+          />
+        </div>
       </div>
     </div>
-  </div>
+  </DefaultLayout>
   
   <ConfirmDialog
     v-if="showConfirmDialog"
@@ -37,13 +39,15 @@ import { DeleteUsersDataService } from '@/services/DeleteUserDataService';
 import { Skeleton } from 'primevue';
 import CompanySection from '@/components/CompanySection.vue'; 
 import ConfirmDialog from '@/components/ConfirmDialog.vue'; 
+import DefaultLayout from '@/layouts/DefaultLayout.vue';
 
 export default {
   name: 'CompaniesUsersView',
   components: {
     Skeleton,
     CompanySection,
-    ConfirmDialog
+    ConfirmDialog,
+    DefaultLayout
   },
   emits: ['close'],
   data() {
@@ -122,7 +126,7 @@ export default {
 
 .card {
   width: 100%;
-  height: 100%;
+  /* height: 100%; */
   border-radius: 0;
   background-color: #fff;
   box-shadow: none;
@@ -150,7 +154,7 @@ export default {
 }
 
 .companies-container {
-  max-height: 700px;
+  /* max-height: 700px; */
   padding: 8px;
 }
 
