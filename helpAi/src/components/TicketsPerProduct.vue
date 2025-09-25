@@ -6,7 +6,7 @@
     </div>
     <div v-else="" class="tabela-src">
       <template v-if="tags.length != 0">
-        <DataTable :value="tags" removableSort stripedRows scrollHeight="18rem">
+        <DataTable :value="tags" removableSort stripedRows scrollHeight="20rem">
           <Column field="product_name" sortable header="Produto" />
           <Column field="ticket_count" sortable header="Quantidade Tickets" />
         </DataTable>
@@ -54,6 +54,12 @@ export default {
 </script>
 
 <style scoped>
+:deep(.p-datatable-thead > tr > th) {
+    font-size: 14px;
+    font-weight: 600;
+    color: black;
+}
+
 .tag_header {
   padding: 10px;
   color: black;
@@ -69,7 +75,8 @@ export default {
   border-radius: 12px;
   padding: 5px;
   background-color: #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* sombra roxa suave */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  height: 336px;
 }
 
 ::v-deep(.p-datatable-table-container) {

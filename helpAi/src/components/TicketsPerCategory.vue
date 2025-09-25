@@ -152,8 +152,7 @@ export default {
 
 .card-header h2 {
     margin: 0;
-    font-family: 'SnowUI', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
 }
 
