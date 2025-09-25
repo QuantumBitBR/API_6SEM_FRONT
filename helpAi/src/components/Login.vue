@@ -26,6 +26,7 @@ import InputGroup from 'primevue/inputgroup';
 import InputGroupAddon from 'primevue/inputgroupaddon';
 import Button from 'primevue/button';
 import 'primeicons/primeicons.css';
+import { LoginDataService } from '@/services/LoginDataService';
 
 export default defineComponent({
   name: 'LoginForm',
@@ -43,9 +44,28 @@ export default defineComponent({
   },
   methods: {
     async login() {
-      console.log('Login attempted with', this.username, this.password);
+      const loginDataService = new LoginDataService();
+      try {
+        const response = await loginDataService.login(this.username, this.password)
+        if ( response ){
+          localStorage.setItem('token', response.token);
+          localStorage.setItem('userId', String(response.user_id));
+          localStorage.setItem('termoExpirado', String(response.policy_expired));
+          localStorage.setItem('TextoTermoAtual', String(response.current_policy.text_policy));
+          localStorage.setItem('DataVigenciaTermo', String(response.current_policy.policy_date));
+
+          console.log(response)
+
+        }
+        else {
+          console.error('Login failed with status:');
+        }
+    }
+    catch (error) {
+      console.error('Login failed:', error);
     }
   },
+  }
 });
 </script>
 
