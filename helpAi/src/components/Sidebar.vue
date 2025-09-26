@@ -5,7 +5,12 @@
     </div>
     <ul class="sidebar-links">
       <li v-for="link in links" :key="link.text">
-        <router-link :to="link.href">{{ link.text }}</router-link>
+        <!-- Se for logout, chama o método -->
+        <a v-if="link.text === 'Logout'" href="#" @click.prevent="logout">
+          {{ link.text }}
+        </a>
+        <!-- Se não for logout, usa router-link normalmente -->
+        <router-link v-else :to="link.href">{{ link.text }}</router-link>
       </li>
     </ul>
   </aside>
@@ -20,12 +25,19 @@ export default {
         { text: "Dashboard", href: "/dashboard" },
         { text: "Empresas", href: "/companies" },
         { text: "Chat", href: "/chat" },
-        // { text: "IA", href: "/relatorios" }
+        { text: "Logout", href: "/" }
       ]
     };
+  },
+  methods: {
+    logout() {
+      localStorage.clear();
+      this.$router.replace("/");
+    }
   }
 };
 </script>
+
 
 <style scoped>
 .sidebar {
