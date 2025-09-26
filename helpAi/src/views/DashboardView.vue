@@ -9,6 +9,7 @@
       <TicketsPerCategory />
     </div>
   </DefaultLayout>
+  <PrivacyPolicy :visible="showPolicy" @accept="hidePolicy()" />
 </template>
 
 <script>
@@ -17,15 +18,32 @@ import TicketsByStatus from '@/components/TicketsByStatus.vue'
 import TicketsPerProduct from '@/components/TicketsPerProduct.vue'
 import TicketsPerCompany from '@/components/TicketsPerCompany.vue'
 import TicketsPerCategory from '@/components/TicketsPerCategory.vue'
+import PrivacyPolicy from '@/components/PrivacyPolicy.vue'
 
 export default {
   name: 'Dashboard',
+  data() {
+    return {
+      showPolicy: false
+    }
+  },
   components: {
     DefaultLayout,
     TicketsByStatus,
     TicketsPerProduct,
     TicketsPerCompany,
-    TicketsPerCategory
+    TicketsPerCategory,
+    PrivacyPolicy
+  },
+  mounted() {
+    if(localStorage.getItem('termoExpirado') == 'true'){
+      this.showPolicy = true
+    }
+  },
+  methods: {
+    hidePolicy() {
+      this.showPolicy = false
+    }
   }
 }
 </script>

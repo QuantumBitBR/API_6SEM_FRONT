@@ -6,7 +6,8 @@ const router = createRouter({
     {
       path: '/dashboard',
       name: 'dashboard',
-      component: () => import('../views/DashboardView.vue')
+      component: () => import('../views/DashboardView.vue'),
+      meta: { requiresAuth: true }
     },
     {
       path: '/',
@@ -16,14 +17,27 @@ const router = createRouter({
     {
       path: '/companies',
       name: 'companies',
-      component: () => import('../views/CompaniesUsersView.vue')
+      component: () => import('../views/CompaniesUsersView.vue'),
+      meta: { requiresAuth: true }
     },
     {
       path: '/chat',
       name: 'chat',
-      component: () => import('../views/SearchTicketsView.vue')
+      component: () => import('../views/SearchTicketsView.vue'),
+      meta: { requiresAuth: true }
     },
   ],
 })
+
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem("token");
+
+  if (to.meta.requiresAuth && !token) {
+    next({ name: "login" });
+  } else {
+    next();
+  }
+});
+
 
 export default router
