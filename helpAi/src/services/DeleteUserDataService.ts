@@ -10,9 +10,9 @@ export class DeleteUsersDataService {
     try {
       const response: AxiosResponse<DeleteUserResponse> = await api.delete<DeleteUserResponse>(`user/delete?userid=${userId}`);
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error deleting user:", error);
-      return null;
+      throw new Error("Houve algum erro ao remover o usuário.");
     }
   }
 }
