@@ -5,16 +5,16 @@
         <InputGroupAddon>
             <i class="pi pi-user"></i>
         </InputGroupAddon>
-        <InputText v-model="username" placeholder="Username" size="small"/>
+        <InputText v-model="username" placeholder="Username" size="small"  @keyup.enter="login"/>
     </InputGroup>
 
     <InputGroup class="inputs">
         <InputGroupAddon>
             <i class="pi pi-key"></i>
         </InputGroupAddon>
-        <InputText v-model="password" placeholder="Password" type="password" size="small"/>
+        <InputText v-model="password" placeholder="Password" type="password" size="small"  @keyup.enter="login"/>
     </InputGroup>
-  <Button id="login-button" label="Sign in" raised  aria-label="undefined" icon="pi pi-sign-in" @click="login()"/>
+  <Button id="login-button" label="Sign in" raised  aria-label="undefined" icon="pi pi-sign-in" @click="login()" :loading="isloading"/>
   </div>
 
 </template>
@@ -42,11 +42,13 @@ export default defineComponent({
     return {
       username: '',
       password: '',
-      router: useRouter()
+      router: useRouter(),
+      isloading: false
     };
   },
   methods: {
     async login() {
+      this.isloading = true;
       const loginDataService = new LoginDataService();
       try {
         const response = await loginDataService.login(this.username, this.password)
@@ -56,9 +58,9 @@ export default defineComponent({
           localStorage.setItem('termoExpirado', String(response.policy_expired));
           localStorage.setItem('TextoTermoAtual', String(response.current_policy.text_policy));
           localStorage.setItem('DataVigenciaTermo', String(response.current_policy.policy_date));
+          localStorage.setItem('idPolicy', String(response.current_policy.id_policy));
 
           this.router.push('/dashboard');
-          console.log('Login successful:', response);
         }
         else {
           console.error('Login failed with status:');
@@ -67,6 +69,7 @@ export default defineComponent({
     catch (error) {
       console.error('Login failed:', error);
     }
+    this.isloading = false;
   },
   }
 });
@@ -80,7 +83,8 @@ export default defineComponent({
   justify-content: center;
   height: 50vh;
   width: 50vh;
-  border: 1px solid rgb(0, 0, 0);
+  /* border: 1px solid rgb(0, 0, 0); */
+   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   padding: 10px 30px;
   background-color: white;
@@ -93,8 +97,9 @@ export default defineComponent({
 
 #login-button{
   margin-top: 10px;
-  width: 30%;
+  /* width: 30%; */
   background-color: rgb(0, 26, 175);
+  border: none
 }
 
 #login-button:hover{
