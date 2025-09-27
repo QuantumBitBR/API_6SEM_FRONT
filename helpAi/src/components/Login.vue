@@ -1,6 +1,6 @@
 <template>
   <div class="login-form">
-    <h2>Login please</h2>
+    <h2>Login</h2>
     <InputGroup class="inputs">
         <InputGroupAddon>
             <i class="pi pi-user"></i>
@@ -14,7 +14,7 @@
         </InputGroupAddon>
         <InputText v-model="password" placeholder="Password" type="password" size="small"  @keyup.enter="login"/>
     </InputGroup>
-  <Button id="login-button" label="Sign in" raised  aria-label="undefined" icon="pi pi-sign-in" @click="login()" :loading="isloading"/>
+  <Button id="login-button" label="Entrar" raised  aria-label="undefined" icon="pi pi-sign-in" @click="login()" :loading="isloading"/>
   </div>
 
 </template>

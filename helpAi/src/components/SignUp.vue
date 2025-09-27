@@ -1,7 +1,7 @@
 <template>
   <div class="signup">
-    <h2 class="sign-up-text-title">Welcome!</h2>
-    <h3 class="sign-up-text">Enter your details and start jorney with us</h3>
+    <h2 class="sign-up-text-title">Bem vindo!</h2>
+    <h3 class="sign-up-text">Entre com suas credenciais para iniciar sua jornada conosco!</h3>
   </div>
 
 </template>
