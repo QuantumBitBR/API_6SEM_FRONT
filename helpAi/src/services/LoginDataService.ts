@@ -25,9 +25,13 @@ export class LoginDataService {
         }
       );
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao fazer login:", error);
-      return null;
+      if (error.response && error.response.status === 401) {
+        throw new Error("Credenciais inválidas");
+      } else {
+        throw new Error("Erro no sistema, tente novamente mais tarde.");
+      }
     }
   }
 }

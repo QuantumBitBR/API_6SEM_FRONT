@@ -12,7 +12,6 @@ export class PrivacyPolicyService {
       }
     } catch (error) {
       throw new Error("Houve algum erro ao aceitar o termo.")
-      
     }
   }
 }

@@ -70,7 +70,7 @@ export default {
 .confirm-actions {
   display: flex;
   gap: 12px;
-  justify-content: flex-end;
+  justify-content: center;
 }
 
 .btn-cancel, .btn-confirm {

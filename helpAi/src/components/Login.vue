@@ -29,6 +29,7 @@ import 'primeicons/primeicons.css';
 import { LoginDataService } from '@/services/LoginDataService';
 import { useRouter } from 'vue-router';
 import router from '@/router';
+import { showToast } from '@/eventBus';
 
 export default defineComponent({
   name: 'LoginForm',
@@ -66,8 +67,14 @@ export default defineComponent({
           console.error('Login failed with status:');
         }
     }
-    catch (error) {
-      console.error('Login failed:', error);
+    catch (error: any) {
+      console.log(error.message)
+      showToast({
+        severity: 'error',
+        summary: 'Erro ao fazer login',
+        detail: error.message,
+        life: 3000
+      });
     }
     this.isloading = false;
   },

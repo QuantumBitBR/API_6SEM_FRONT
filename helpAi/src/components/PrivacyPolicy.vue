@@ -42,6 +42,7 @@ import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import Checkbox from 'primevue/checkbox'
 import { PrivacyPolicyService } from '@/services/PrivacyPolicyService'
+import { showToast } from '@/eventBus'
 
 export default defineComponent({
   name: 'PrivacyModal',
@@ -90,8 +91,19 @@ export default defineComponent({
         })
         this.$emit('accept')
         this.isVisible = false;
+        showToast({
+          severity: 'success',
+          summary: 'Termo de privacidade',
+          detail:  "Termo aceito com sucesso!",
+          life: 3000
+        });
       }catch(error: any){
-        console.log('error - adicionar toast')
+        showToast({
+          severity: 'error',
+          summary: 'Erro ao aceitar o termo de privacidade',
+          detail: error.message,
+          life: 3000
+        });
       }
       
       this.isloading = false;

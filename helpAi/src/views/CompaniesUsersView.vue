@@ -40,6 +40,7 @@ import { Skeleton } from 'primevue';
 import CompanySection from '@/components/CompanySection.vue'; 
 import ConfirmDialog from '@/components/ConfirmDialog.vue'; 
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
+import { showToast } from '@/eventBus';
 
 export default {
   name: 'CompaniesUsersView',
@@ -99,8 +100,20 @@ export default {
         
         this.loadData()
         console.log("Usuário deletado com sucesso:", this.userToDelete);
+        showToast({
+          severity: 'success',
+          summary: 'Remoção de usuário',
+          detail: "Usuário removido com sucesso!",
+          life: 5000
+        })
       } catch (error) {
         console.error("Erro ao deletar usuário:", error);
+        showToast({
+          severity: 'error',
+          summary: 'Remoção de usuário',
+          detail: "Erro ao remover usuário do sistema.",
+          life: 3000
+        })
       } finally {
         this.cancelDelete();
       }

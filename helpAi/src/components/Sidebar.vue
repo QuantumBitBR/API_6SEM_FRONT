@@ -24,8 +24,8 @@ export default {
       links: [
         { text: "Dashboard", href: "/dashboard" },
         { text: "Empresas", href: "/companies" },
-        { text: "Chat", href: "/chat" },
-        { text: "Logout", href: "/" }
+        { text: "Pesquisar", href: "/chat" },
+        { text: "Sair", href: "/" }
       ]
     };
   },
