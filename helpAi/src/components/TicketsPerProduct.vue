@@ -32,6 +32,7 @@ export default {
     return {
       loading: true,
       tags: [],
+      products: [],
     };
   },
   methods:{
@@ -45,10 +46,21 @@ export default {
       }catch(err){
         console.error("Error to get data:", err);
       }
+    },
+    async allProducts(){
+      try{
+        const service = new ProductDataService();
+        const products = await service.getAllProducts();
+
+        this.products = products;
+      }catch(err){
+        console.error("Error to get data:", err);
+      }
     }
   },
-  mounted() {
-    this.loadData();
+  async mounted() {
+    await this.loadData();
+    await this.allProducts();
   },
 };
 </script>
