@@ -1,6 +1,6 @@
 <template>
   <DefaultLayout>
-    <!-- Calendar na parte superior -->
+
     <div class="calendar-container">
       <Calendar
         @filtro-aplicado="onFiltroAplicado"
@@ -9,7 +9,6 @@
       />
     </div>
 
-    <!-- Gráficos abaixo do calendário -->
     <div class="grid-container1">
       <TicketsByStatus />
       <TicketsPerCompany />
@@ -71,7 +70,7 @@ export default {
       console.log('Período alterado:', periodo)
     },
     atualizarDadosDashboard() {
-      // Atualizar os componentes do dashboard com base no filtro
+
       this.$emit('atualizar-dashboard', this.filtroAtual)
     }
   }
@@ -115,10 +114,15 @@ export default {
 
 .calendar-container {
   margin-bottom: 20px;
-  padding: 20px;
+  padding: 15px; 
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 25%;
+  min-width: 200px;
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: 0;
 }
 
 .grid-container1 {
@@ -133,5 +137,13 @@ export default {
   grid-template-columns: 1fr 1.2fr;
   gap: 10px;
   margin-bottom: 20px;
+}
+
+
+@media (max-width: 768px) {
+  .calendar-container {
+    width: 100%;
+    max-width: 100%;
+  }
 }
 </style>

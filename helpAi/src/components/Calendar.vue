@@ -1,88 +1,54 @@
 <template>
-  <div class="calendar-filtro">
-    <div class="filtro-header">
-      <h3>Filtrar por Período</h3>
-      <div class="periodo-atual" v-if="periodoSelecionado">
-        <i class="pi pi-calendar"></i>
-        <span>{{ periodoSelecionado }}</span>
-      </div>
-    </div>
+  <div class="calendar-filter-compact">
+    <div class="filter-field">
+      <label for="calendar-input" class="filter-label">Período</label>
+      <Calendar
+        id="calendar-input"
+        v-model="datasSelecionadas"
+        selectionMode="range"
+        :manualInput="false"
+        :showIcon="true"
+        dateFormat="dd/mm/yy"
+        placeholder="Selecione"
+        :minDate="dataMinima"
+        :maxDate="dataMaxima"
+        :locale="configLocalidade"
+        :class="{ 'calendar-error': temErro }"
+        @date-select="onSelecaoData"
+        @clear-click="limparFiltro"
+      />
 
-    <div class="filtro-body">
-      <div class="calendario-container">
-        <label for="calendario-range">Selecione o período</label>
-        <Calendar
-          id="calendario-range"
-          v-model="datasSelecionadas"
-          selectionMode="range"
-          :manualInput="false"
-          :showIcon="true"
-          :showButtonBar="true"
-          dateFormat="dd/mm/yy"
-          placeholder="Selecione o período"
-          :minDate="dataMinima"
-          :maxDate="dataMaxima"
-          :locale="configLocalidade"
-          :class="{ 'calendario-erro': temErro }"
-          @date-select="onSelecaoData"
-          @clear-click="limparFiltro"
-        />
-      </div>
-
-      <div v-if="temErro" class="mensagem-erro">
+      <div v-if="temErro" class="error-message">
         <i class="pi pi-exclamation-triangle"></i>
         {{ mensagemErro }}
       </div>
-
-      <!-- Exibição das datas selecionadas -->
-      <div v-if="datasSelecionadas && datasSelecionadas.length === 2" class="datas-selecionadas">
-        <div class="data-item">
-          <strong>Data Inicial:</strong>
-          <span>{{ formatarDataDisplay(datasSelecionadas[0]) }}</span>
-        </div>
-        <div class="data-item">
-          <strong>Data Final:</strong>
-          <span>{{ formatarDataDisplay(datasSelecionadas[1]) }}</span>
-        </div>
-      </div>
     </div>
 
-    <div class="filtro-actions">
+    <!-- Display compacto do período selecionado -->
+    <div v-if="periodoSelecionado" class="selected-period">
+      <span class="period-text">{{ periodoSelecionado }}</span>
       <Button
-        label="Aplicar Filtro"
-        icon="pi pi-check"
-        class="p-button-primary azul-primario"
-        @click="aplicarFiltro"
-        :disabled="!periodoValido"
-      />
-      <Button
-        label="Limpar"
         icon="pi pi-times"
-        class="p-button-secondary azul-secundario"
+        class="p-button-text p-button-sm clear-btn"
         @click="limparFiltro"
-      />
-      <Button
-        label="Últimos 60 dias"
-        icon="pi pi-calendar"
-        class="p-button-outline azul-outline"
-        @click="selecionarPeriodoPredefinido(60)"
-      />
-      <Button
-        label="Próximos 60 dias"
-        icon="pi pi-calendar"
-        class="p-button-outline azul-outline"
-        @click="selecionarPeriodoFuturo(60)"
       />
     </div>
   </div>
 </template>
 
 <script>
+import Calendar from 'primevue/calendar'
+import Button from 'primevue/button'
+
 export default {
-  name: 'CalendarFiltro',
+  name: 'CalendarFilterCompact',
+
+  components: {
+    Calendar,
+    Button
+  },
 
   props: {
-    // Data mínima permitida para seleção (60 dias atrás)
     dataMinima: {
       type: Date,
       default: function() {
@@ -91,7 +57,6 @@ export default {
         return data
       }
     },
-    // Data máxima permitida (60 dias à frente)
     dataMaxima: {
       type: Date,
       default: function() {
@@ -100,7 +65,6 @@ export default {
         return data
       }
     },
-    // Filtro inicial
     filtroInicial: {
       type: Object,
       default: function() {
@@ -144,7 +108,7 @@ export default {
 
     periodoSelecionado: function() {
       if (!this.periodoValido) return null
-      return this.formatarPeriodoDisplay(this.datasSelecionadas[0], this.datasSelecionadas[1])
+      return this.formatarPeriodoCompacto(this.datasSelecionadas[0], this.datasSelecionadas[1])
     },
 
     filtroFormatado: function() {
@@ -171,6 +135,21 @@ export default {
         }
       },
       immediate: true
+    },
+
+    datasSelecionadas: {
+      handler: function(novasDatas) {
+        if (this.periodoValido) {
+          this.temErro = false
+          this.mensagemErro = ''
+          this.$emit('filtro-aplicado', this.filtroFormatado)
+          this.$emit('periodo-alterado', this.filtroFormatado)
+        } else if (novasDatas && novasDatas.length === 2) {
+          // Se há seleção mas é inválida
+          this.validarPeriodo()
+        }
+      },
+      deep: true
     }
   },
 
@@ -186,34 +165,6 @@ export default {
       const dataInicio = new Date()
       dataInicio.setDate(dataInicio.getDate() - 30)
       this.datasSelecionadas = [dataInicio, dataFim]
-    },
-
-    selecionarPeriodoPredefinido: function(dias) {
-      const dataFim = new Date()
-      const dataInicio = new Date()
-      dataInicio.setDate(dataInicio.getDate() - dias)
-      this.datasSelecionadas = [dataInicio, dataFim]
-      this.aplicarFiltro()
-    },
-
-    selecionarPeriodoFuturo: function(dias) {
-      const dataInicio = new Date()
-      const dataFim = new Date()
-      dataFim.setDate(dataFim.getDate() + dias)
-      this.datasSelecionadas = [dataInicio, dataFim]
-      this.aplicarFiltro()
-    },
-
-    aplicarFiltro: function() {
-      if (!this.validarPeriodo()) {
-        return
-      }
-
-      this.temErro = false
-      this.mensagemErro = ''
-
-      this.$emit('filtro-aplicado', this.filtroFormatado)
-      this.$emit('periodo-alterado', this.filtroFormatado)
     },
 
     limparFiltro: function() {
@@ -249,27 +200,24 @@ export default {
       const dataMinima = this.dataMinima
       if (inicio < dataMinima) {
         this.temErro = true
-        this.mensagemErro = 'A data inicial não pode ser anterior a ' + this.formatarDataDisplay(dataMinima)
+        this.mensagemErro = 'Data inicial muito antiga'
         return false
       }
 
       const dataMaxima = this.dataMaxima
       if (fim > dataMaxima) {
         this.temErro = true
-        this.mensagemErro = 'A data final não pode ser posterior a ' + this.formatarDataDisplay(dataMaxima)
+        this.mensagemErro = 'Data final muito futura'
         return false
       }
 
       return true
     },
 
-    formatarDataDisplay: function(data) {
-      if (!data) return ''
-      return data.toLocaleDateString('pt-BR')
-    },
-
-    formatarPeriodoDisplay: function(dataInicio, dataFim) {
-      return this.formatarDataDisplay(dataInicio) + ' - ' + this.formatarDataDisplay(dataFim)
+    formatarPeriodoCompacto: function(dataInicio, dataFim) {
+      const inicio = dataInicio.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
+      const fim = dataFim.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
+      return `${inicio} - ${fim}`
     },
 
     formatarDataAPI: function(data) {
@@ -285,173 +233,138 @@ export default {
 </script>
 
 <style scoped>
-.calendar-filtro {
-  background: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.filtro-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.filtro-header h3 {
-  margin: 0;
-  color: #333;
-  font-size: 1.1rem;
-}
-
-.periodo-atual {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
-  background-color: #e3f2fd;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  color: #1976d2;
-}
-
-.periodo-atual i {
-  font-size: 0.8rem;
-}
-
-.filtro-body {
-  margin-bottom: 16px;
-}
-
-.calendario-container {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
-.calendario-container label {
-  font-weight: 500;
-  color: #333;
-  font-size: 0.9rem;
-}
-
-.calendario-erro {
-  border: 1px solid #f44336 !important;
-}
-
-.mensagem-erro {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 8px;
-  padding: 8px 12px;
-  background-color: #ffebee;
-  border: 1px solid #f44336;
-  border-radius: 4px;
-  color: #c62828;
-  font-size: 0.8rem;
-}
-
-.mensagem-erro i {
-  font-size: 0.8rem;
-}
-
-.datas-selecionadas {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-top: 16px;
-  padding: 12px;
-  background-color: #f8f9fa;
-  border-radius: 6px;
-  border: 1px solid #e9ecef;
-}
-
-.data-item {
+.calendar-filter-compact {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  width: 25%;
+  min-width: 120px;
+  max-width: 150px;
 }
 
-.data-item strong {
-  font-size: 0.8rem;
-  color: #6c757d;
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.data-item span {
-  font-size: 0.9rem;
-  color: #495057;
+.filter-label {
+  font-weight: 500;
+  color: #333;
+  font-size: 1rem;
+  margin-bottom: 1px;
+}
+
+.calendar-error {
+  border: 1px solid #f44336 !important;
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.65rem;
+  color: #d32f2f;
+  margin-top: 2px;
+}
+
+.error-message i {
+  font-size: 0.6rem;
+}
+
+.selected-period {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 6px;
+  background-color: #e3f2fd;
+  border-radius: 3px;
+  border: 1px solid #bbdefb;
+  font-size: 0.7rem;
+}
+
+.period-text {
+  font-size: 0.7rem;
+  color: #1976d2;
   font-weight: 500;
 }
 
-.filtro-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+.clear-btn {
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  min-height: 16px;
 }
 
-/* Estilos personalizados para botões em tons de azul */
-:deep(.azul-primario) {
-  background: #1976d2 !important;
-  border-color: #1976d2 !important;
+.clear-btn :deep(.p-button-icon) {
+  font-size: 0.5rem;
 }
 
-:deep(.azul-primario:hover) {
-  background: #1565c0 !important;
-  border-color: #1565c0 !important;
-}
-
-:deep(.azul-secundario) {
-  background: #42a5f5 !important;
-  border-color: #42a5f5 !important;
-  color: white !important;
-}
-
-:deep(.azul-secundario:hover) {
-  background: #1e88e5 !important;
-  border-color: #1e88e5 !important;
-}
-
-:deep(.azul-outline) {
-  background: transparent !important;
-  color: #1976d2 !important;
-  border-color: #1976d2 !important;
-}
-
-:deep(.azul-outline:hover) {
-  background: #e3f2fd !important;
-  color: #1565c0 !important;
-  border-color: #1565c0 !important;
-}
-
-/* Ajustes para os botões do PrimeVue */
-:deep(.p-button) {
-  font-size: 0.8rem;
-  padding: 6px 12px;
-}
 
 :deep(.p-calendar) {
   width: 100%;
 }
 
-:deep(.p-datepicker) {
+:deep(.p-inputtext) {
   width: 100%;
+  font-size: 0.75rem;
+  padding: 0.3rem 0.4rem;
 }
 
-/* Responsividade */
+:deep(.p-calendar .p-datepicker) {
+  min-width: 220px;
+  transform: scale(0.8);
+  transform-origin: top left;
+}
+
+:deep(.p-datepicker table) {
+  font-size: 0.75rem;
+}
+
+:deep(.p-datepicker .p-datepicker-header) {
+  padding: 0.3rem;
+}
+
+:deep(.p-datepicker .p-datepicker-calendar th),
+:deep(.p-datepicker .p-datepicker-calendar td) {
+  padding: 0.15rem;
+}
+
+:deep(.p-datepicker .p-datepicker-calendar td > span) {
+  width: 1.6rem;
+  height: 1.6rem;
+  line-height: 1.6rem;
+}
+
+:deep(.p-calendar .p-button) {
+  width: 1.8rem;
+  height: 1.8rem;
+}
+
+:deep(.p-calendar .p-button .p-button-icon) {
+  font-size: 0.7rem;
+}
+
+
 @media (max-width: 768px) {
-  .datas-selecionadas {
-    grid-template-columns: 1fr;
+  .calendar-filter-compact {
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
   }
 
-  .filtro-actions {
-    flex-direction: column;
+  :deep(.p-calendar .p-datepicker) {
+    min-width: 250px;
+    transform: scale(0.85);
+    transform-origin: top center;
+  }
+}
+
+@media (max-width: 480px) {
+  :deep(.p-calendar .p-datepicker) {
+    min-width: 230px;
+    transform: scale(0.75);
+    transform-origin: top center;
   }
 }
 </style>
