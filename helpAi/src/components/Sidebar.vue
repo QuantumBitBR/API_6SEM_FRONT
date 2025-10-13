@@ -13,12 +13,12 @@
         <!-- Se for logout, chama o método -->
         <a v-if="link.text === 'Sair'" href="#" @click.prevent="logout" class="a_element">
           <component :is="link.icon" class="icon" />
-          <span v-show="showText">{{link.text}}</span>
+          <span class="link-text">{{link.text}}</span>
         </a>
         <!-- Se não for logout, usa router-link normalmente -->
         <router-link v-else :to="link.href" class="a_element">
           <component :is="link.icon" class="icon" />
-          <span v-show="showText">{{link.text}}</span>
+          <span class="link-text">{{link.text}}</span>
         </router-link>
       </li>
     </ul>
@@ -49,8 +49,7 @@ export default {
         { text: "Pesquisar", href: "/chat", icon:"MagnifyingGlassIcon"},
         { text: "Sair", href: "/", icon: "ArrowRightOnRectangleIcon"}
       ],
-      isSideBarActive: false,
-      showText: false
+      isSideBarActive: false
     };
   },
   methods: {
@@ -60,19 +59,13 @@ export default {
     },
     handleMouseEnter(){
       this.isSideBarActive = true;
-
-      setTimeout(()=>{
-        this.showText = true;
-      }, 450)
     },
     handleMouseLeave(){
       this.isSideBarActive = false;
-      this.showText = false;
     }
   }
 };
 </script>
-
 
 <style scoped>
 .sidebar {
@@ -83,25 +76,31 @@ export default {
   display: flex;
   flex-direction: column;
   padding: 0.5rem 1rem;
-  /* overflow: hidden; */
-  transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
-  will-change: width, box-shadow;
+  transition: width 0.35s ease-out;
+  position: relative;
+  will-change: width;
 }
 
-
-.sidebar:hover {
-  width: 200px; /* expandida */
+.sidebar.active {
+  width: 200px;
 }
 
 .sidebar-brand {
   font-size: 1.5rem;
   font-weight: bold;
   margin-bottom: 2rem;
+  display: flex;
+  min-height: 50px;
+}
+
+.sidebar.active .sidebar-brand {
+  justify-content: flex-start;
 }
 
 .sidebar-links {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 .sidebar-links li {
@@ -111,9 +110,12 @@ export default {
 .sidebar-links a {
   color: white;
   text-decoration: none;
-  /* font-size: large; */
   font-weight: 500;
-  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
 }
 
 .sidebar-links a.router-link-active {
@@ -123,6 +125,7 @@ export default {
 
 .sidebar-links a:hover {
   color: #1abc9c;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .chat-bot {
@@ -134,10 +137,31 @@ export default {
 .icon {
   width: 20px;
   height: 20px;
-  margin: 5px;
+  flex-shrink: 0;
+  transition: margin 0.2s ease;
 }
 
-.a_element{
+.sidebar.active .icon {
+  margin-right: 12px;
+  transition-delay: 0.1s;
+}
+
+.link-text {
+  opacity: 0;
+  white-space: nowrap;
+  transform: translateX(-10px);
+  transition: 
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+
+.sidebar.active .link-text {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: 0.15s;
+}
+
+.a_element {
   display: flex;
   align-items: center;
 }
