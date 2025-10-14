@@ -25,6 +25,7 @@ export default {
         { text: "Dashboard", href: "/dashboard" },
         { text: "Empresas", href: "/companies" },
         { text: "Pesquisar", href: "/chat" },
+        { text: "Inteligência Artificial", href: "/ai" },
         { text: "Sair", href: "/" }
       ]
     };

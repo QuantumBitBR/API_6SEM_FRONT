@@ -26,6 +26,12 @@ const router = createRouter({
       component: () => import('../views/SearchTicketsView.vue'),
       meta: { requiresAuth: true }
     },
+    {
+      path: '/ai',
+      name: 'Inteligência Artificial',
+      component: () => import('../views/AIDashboardView.vue'),
+      meta: { requiresAuth: true }
+    },
   ],
 })
 
