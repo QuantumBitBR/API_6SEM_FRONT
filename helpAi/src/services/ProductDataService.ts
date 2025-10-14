@@ -39,4 +39,14 @@ export class ProductDataService {
       return [];
     }
   }
+
+  async getAllProductsAI(): Promise<ProductInfo[]> {
+    try {
+      const response: AxiosResponse<ProductsInfoResponse> = await api.get<ProductsInfoResponse>("/products/all-products-ai");
+      return response.data.data;
+    } catch (error) {
+      console.error("Error fetching all products data:", error);
+      return [];
+    }
+  }
 }
