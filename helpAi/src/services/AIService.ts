@@ -13,9 +13,9 @@ interface DataPredict {
 }
 
 class AIService{
-    async getPredict(period: number | null, freq: string | null, start_date: string | null): Promise<DataPredict[]> {
+    async getPredict(period: number | null, freq: string | null, start_date: string | null, product_id: number | null): Promise<DataPredict[]> {
         try {
-            const response: AxiosResponse<DataPredictResponse> = await api.get<DataPredictResponse>(`/ia/tendencia?period=${period}&freq=${freq}&start_date=${start_date}`)
+            const response: AxiosResponse<DataPredictResponse> = await api.get<DataPredictResponse>(`/ia/tendencia?period=${period}&freq=${freq}&start_date=${start_date}&product_id=${product_id}`)
             
             return response.data.data;
         } catch (error) {
