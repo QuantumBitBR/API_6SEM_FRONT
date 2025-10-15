@@ -1,5 +1,6 @@
 <template>
     <DefaultLayout>
+        <ChartAITrend />
         
     </DefaultLayout>
 
@@ -7,11 +8,13 @@
 
 <script lang="ts">
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
+import ChartAITrend from '@/components/ChartAITrend.vue';
 
 export default {
     name: 'AIDashboardView',
     components: {
-        DefaultLayout
+        DefaultLayout,
+        ChartAITrend
     }
 
 }
