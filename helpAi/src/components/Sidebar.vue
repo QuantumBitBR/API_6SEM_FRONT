@@ -49,7 +49,7 @@ export default {
         { text: "Dashboard", href: "/dashboard", icon: "ChartBarIcon" },
         { text: "Empresas", href: "/companies", icon: "BuildingOfficeIcon"},
         { text: "Pesquisar", href: "/chat", icon:"MagnifyingGlassIcon"},
-        { text: "Inteligência Artificial", href: "/ai", icon: "CpuChipIcon "},
+        { text: "Inteligência Artificial", href: "/ai", icon: "CpuChipIcon"},
         { text: "Sair", href: "/", icon: "ArrowRightOnRectangleIcon"}
       ],
       isSideBarActive: false
@@ -85,7 +85,7 @@ export default {
 }
 
 .sidebar.active {
-  width: 200px;
+  width: 230px;
 }
 
 .sidebar-brand {
