@@ -30,6 +30,7 @@ import {
   ChartBarIcon,
   BuildingOfficeIcon,
   MagnifyingGlassIcon,
+  CpuChipIcon,
   ArrowRightOnRectangleIcon
 } from "@heroicons/vue/24/outline";
 
@@ -39,6 +40,7 @@ export default {
     ChartBarIcon,
     BuildingOfficeIcon,
     MagnifyingGlassIcon,
+    CpuChipIcon,
     ArrowRightOnRectangleIcon
   },
   data() {
@@ -47,6 +49,7 @@ export default {
         { text: "Dashboard", href: "/dashboard", icon: "ChartBarIcon" },
         { text: "Empresas", href: "/companies", icon: "BuildingOfficeIcon"},
         { text: "Pesquisar", href: "/chat", icon:"MagnifyingGlassIcon"},
+        { text: "Inteligência Artificial", href: "/ai", icon: "CpuChipIcon "},
         { text: "Sair", href: "/", icon: "ArrowRightOnRectangleIcon"}
       ],
       isSideBarActive: false
