@@ -32,11 +32,4 @@ export default {
   flex-direction: column;
   flex: 1;
 }
-
-.content {
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto;
-  background: #ecf0f1;
-}
 </style>
