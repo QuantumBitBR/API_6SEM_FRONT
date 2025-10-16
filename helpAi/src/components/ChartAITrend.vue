@@ -7,7 +7,7 @@
         <Card class="custom-card">
             <template #title>
                 <span class="status_title">Filtros</span>
-                <button @click="">filtrar</button>
+                <button @click="getPredicts()">filtrar</button>
             </template>
             <template #content>
                 <div class="chart-container">
@@ -19,7 +19,7 @@
                     <div>
                         <label for="">Frequência</label>
                         <Select v-model="frequencia" :options="list_frequencia" optionLabel="value"
-                            placeholder="Selecione a frequência" class="w-full md:w-56" />
+                            placeholder="Selecione a frequência" class="w-full md:w-56" option-value="name" />
                     </div>
                     <div>
 
@@ -31,7 +31,7 @@
 
                         <label for="">Produto</label>
                         <Select v-model="product_id" :options="products" optionLabel="ProductName"
-                            placeholder="Selecione o produto" class="w-full md:w-56" />
+                            placeholder="Selecione o produto" class="w-full md:w-56" option-value="ProductID"/>
                     </div>
                 </div>
             </template>
@@ -46,10 +46,17 @@ import Card from 'primevue/card';
 import InputNumber from 'primevue/inputnumber';
 import DatePicker from 'primevue/datepicker';
 import { ProductDataService } from '@/services/ProductDataService';
+import AIService from '@/services/AIService';
 
 interface ProductInfo {
     ProductID: number,
     ProductName: string,
+}
+interface DataPredict {
+    ds: string,
+    year: number,
+    yhat: number, 
+    is_future: boolean
 }
 
 export default {
@@ -68,7 +75,8 @@ export default {
                 { "name": 'ME', "value": 'Mês' },
                 { "name": 'D', "value": 'Dia' },
             ],
-            products: [] as ProductInfo[]
+            products: [] as ProductInfo[],
+            predict_data: [] as DataPredict[]
         }
     },
     methods: {
@@ -79,6 +87,26 @@ export default {
             } catch (error) {
                 console.log("ERROR")
             }
+        },
+        async getPredicts(){
+            try{
+                const service = new AIService();
+                let date = null
+                if(this.start_date != null){
+                     date = this.formatData(String(this.start_date));
+                }
+                console.log(this.product_id)
+                this.predict_data = await service.getPredict(this.quantPrev, this.frequencia, date, this.product_id);
+            }catch(error){
+                console.log("ERROR")
+            }
+        },
+        formatData(dateStr: string) {
+            const d = new Date(dateStr)
+            const ano = d.getFullYear()
+            const mes = String(d.getMonth() + 1).padStart(2, '0')
+            const dia = String(d.getDate()).padStart(2, '0')
+            return `${ano}-${mes}-${dia}`
         }
     },
     mounted() {
