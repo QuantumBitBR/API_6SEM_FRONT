@@ -1,13 +1,17 @@
 <template>
-    <!-- <div class="loading">
-        <Skeleton width="100%" height="320px" />
-    </div> -->
-
     <div class="full-card">
         <Card class="custom-card">
             <template #title>
-                <span class="status_title">Filtros</span>
-                <button @click="getPredicts()">filtrar</button>
+                <div class="title-div">
+                    <span class="status_title">Filtros</span>
+                    <Button class="button-filter" @click="getPredicts()">
+                        <template #icon>
+                            <FunnelIcon class="w-4 h-4 filter" />
+                            Filtrar
+                        </template>
+                    </Button>
+                </div>
+
             </template>
             <template #content>
                 <div class="chart-container">
@@ -31,7 +35,7 @@
 
                         <label for="">Produto</label>
                         <Select v-model="product_id" :options="products" optionLabel="ProductName"
-                            placeholder="Selecione o produto" class="w-full md:w-56" option-value="ProductID"/>
+                            placeholder="Selecione o produto" class="w-full md:w-56" option-value="ProductID" />
                     </div>
                 </div>
             </template>
@@ -47,6 +51,9 @@ import InputNumber from 'primevue/inputnumber';
 import DatePicker from 'primevue/datepicker';
 import { ProductDataService } from '@/services/ProductDataService';
 import AIService from '@/services/AIService';
+import { FunnelIcon } from '@heroicons/vue/24/outline';
+import Button from 'primevue/button';
+import { showToast } from '@/eventBus';
 
 interface ProductInfo {
     ProductID: number,
@@ -55,14 +62,14 @@ interface ProductInfo {
 interface DataPredict {
     ds: string,
     year: number,
-    yhat: number, 
+    yhat: number,
     is_future: boolean
 }
 
 export default {
     name: 'ChartAITrend',
     components: {
-        Card, Skeleton, InputNumber, Select, DatePicker
+        Card, Skeleton, InputNumber, Select, DatePicker, FunnelIcon, Button
     },
     data() {
         return {
@@ -76,7 +83,8 @@ export default {
                 { "name": 'D', "value": 'Dia' },
             ],
             products: [] as ProductInfo[],
-            predict_data: [] as DataPredict[]
+            predict_data: [] as DataPredict[],
+            isLoading: false
         }
     },
     methods: {
@@ -84,21 +92,31 @@ export default {
             try {
                 const service = new ProductDataService();
                 this.products = await service.getAllProductsAI()
-            } catch (error) {
-                console.log("ERROR")
+            } catch (error: any) {
+                showToast({
+                    severity: 'error',
+                    summary: 'Atenção',
+                    detail: 'Erro ao buscar os dados. Entre em contato com seu administrador.',
+                    life: 3000
+                });
             }
         },
-        async getPredicts(){
-            try{
+        async getPredicts() {
+            try {
                 const service = new AIService();
                 let date = null
-                if(this.start_date != null){
-                     date = this.formatData(String(this.start_date));
+                if (this.start_date != null) {
+                    date = this.formatData(String(this.start_date));
                 }
                 console.log(this.product_id)
                 this.predict_data = await service.getPredict(this.quantPrev, this.frequencia, date, this.product_id);
-            }catch(error){
-                console.log("ERROR")
+            } catch (error: any) {
+                showToast({
+                    severity: 'error',
+                    summary: 'Atenção',
+                    detail: 'Erro ao buscar os dados. Entre em contato com seu administrador.',
+                    life: 3000
+                });
             }
         },
         formatData(dateStr: string) {
@@ -152,5 +170,33 @@ export default {
     .chart-container {
         grid-template-columns: 1fr;
     }
+}
+
+.button-filter {
+    width: 120px;
+    height: 40px;
+    background-color: #34495e;
+    border: none
+}
+
+.filter {
+    width: 30px;
+    height: 30px;
+    margin-right: 8px;
+}
+
+.status_title {
+    margin-right: 20px
+}
+
+.title-div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.button-filter:hover {
+    background-color: #0c0079;
+    border: none
 }
 </style>

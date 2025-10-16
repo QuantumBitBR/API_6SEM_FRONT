@@ -34,9 +34,8 @@ export class ProductDataService {
     try {
       const response: AxiosResponse<ProductsInfoResponse> = await api.get<ProductsInfoResponse>("/products/all-products");
       return response.data.data;
-    } catch (error) {
-      console.error("Error fetching all products data:", error);
-      return [];
+    } catch (error : any) {
+      throw new Error(String(error.message));
     }
   }
 
@@ -44,9 +43,8 @@ export class ProductDataService {
     try {
       const response: AxiosResponse<ProductsInfoResponse> = await api.get<ProductsInfoResponse>("/products/all-products-ai");
       return response.data.data;
-    } catch (error) {
-      console.error("Error fetching all products data:", error);
-      return [];
+    } catch (error : any) {
+      throw new Error(String(error.message));
     }
   }
 }

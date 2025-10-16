@@ -1,6 +1,6 @@
 <template>
     <DefaultLayout>
-        <ChartAITrend />
+        <FilterAI />
         
     </DefaultLayout>
 
@@ -8,13 +8,13 @@
 
 <script lang="ts">
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
-import ChartAITrend from '@/components/ChartAITrend.vue';
+import FilterAI from '@/components/FilterAI.vue';
 
 export default {
     name: 'AIDashboardView',
     components: {
         DefaultLayout,
-        ChartAITrend
+        FilterAI
     }
 
 }

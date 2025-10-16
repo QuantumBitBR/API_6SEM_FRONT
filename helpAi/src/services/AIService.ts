@@ -20,7 +20,7 @@ class AIService{
             if (period !== null) params.period = period.toString();
             if (freq !== null) params.freq = freq;
             if (start_date !== null) params.start_date = start_date;
-            if (product_id !== null) params.id_model = product_id.toString();
+            if (product_id !== null) params.product_id = product_id.toString();
 
             const queryString = new URLSearchParams(params).toString();
 
