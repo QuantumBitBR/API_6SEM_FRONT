@@ -1,11 +1,26 @@
 <template>
-    <div class="card">
-        <Chart type="line" :data="chartData" :options="chartOptions" class="chart-line" />
-    </div>
+
+    <Card class="custom-card">
+        <template #title>
+            <div class="title-div">
+                <span class="status_title">Análise de Tendência por Produto</span>
+            </div>
+
+        </template>
+        <template #content>
+            <div class="chart-container">
+
+                <div class="card">
+                    <Chart type="line" :data="chartData" :options="chartOptions" class="chart-line" />
+                </div>
+            </div>
+        </template>
+    </Card>
 </template>
 
 <script>
 import Chart from 'primevue/chart';
+import { Card } from 'primevue';
 
 export default {
     name: 'ChartAILine',
@@ -16,7 +31,7 @@ export default {
         };
     },
     components: {
-        Chart
+        Chart, Card
     },
     mounted() {
         this.chartData = this.setChartData();
@@ -71,7 +86,7 @@ export default {
                         label: 'Histórico',
                         data: pastData,
                         fill: false,
-                        borderColor: '#5A6ACF',
+                        borderColor: '#2c3e50',
                         tension: 0.4,
                         spanGaps: true
                     },
@@ -79,7 +94,7 @@ export default {
                         label: 'Previsão',
                         data: futureData,
                         fill: false,
-                        borderColor: '#39BFA7',
+                        borderColor: '#26A69A',
                         borderDash: [6, 6],
                         tension: 0.4,
                         spanGaps: true
@@ -110,7 +125,16 @@ export default {
                         },
                         grid: {
                             color: surfaceBorder
-                        }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Período',
+                            color: textColor,
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
                     },
                     y: {
                         ticks: {
@@ -118,7 +142,16 @@ export default {
                         },
                         grid: {
                             color: surfaceBorder
-                        }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Quantidade de Tickets',
+                            color: textColor,
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
                     }
                 }
             };
@@ -130,5 +163,16 @@ export default {
 <style scoped>
 .chart-line {
     height: 30rem;
+}
+
+.custom-card {
+    margin-top: 2rem;
+}
+.p-card-content{
+    display: flex;
+    justify-content: center;
+}
+.chart-container{
+    width: 98%;
 }
 </style>

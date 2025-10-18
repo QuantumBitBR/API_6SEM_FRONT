@@ -41,6 +41,7 @@
             </template>
         </Card>
     </div>
+    
 <ChartAILine  :data="predict_data.map(item => item.yhat)" 
   :labels="predict_data.map(item => item.ds)"
   :isFuture="predict_data.map(item => item.is_future)"/>
