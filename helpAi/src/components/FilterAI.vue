@@ -40,8 +40,11 @@
                 </div>
             </template>
         </Card>
-
     </div>
+<ChartAILine  :data="predict_data.map(item => item.yhat)" 
+  :labels="predict_data.map(item => item.ds)"
+  :isFuture="predict_data.map(item => item.is_future)"/>
+
 </template>
 
 <script lang="ts">
@@ -54,7 +57,7 @@ import AIService from '@/services/AIService';
 import { FunnelIcon } from '@heroicons/vue/24/outline';
 import Button from 'primevue/button';
 import { showToast } from '@/eventBus';
-
+import ChartAILine from './ChartAILine.vue';
 interface ProductInfo {
     ProductID: number,
     ProductName: string,
@@ -69,7 +72,7 @@ interface DataPredict {
 export default {
     name: 'ChartAITrend',
     components: {
-        Card, Skeleton, InputNumber, Select, DatePicker, FunnelIcon, Button
+        Card, Skeleton, InputNumber, Select, DatePicker, FunnelIcon, Button, ChartAILine
     },
     data() {
         return {
@@ -108,8 +111,8 @@ export default {
                 if (this.start_date != null) {
                     date = this.formatData(String(this.start_date));
                 }
-                console.log(this.product_id)
                 this.predict_data = await service.getPredict(this.quantPrev, this.frequencia, date, this.product_id);
+                console.log(this.predict_data)
             } catch (error: any) {
                 showToast({
                     severity: 'error',
@@ -127,8 +130,9 @@ export default {
             return `${ano}-${mes}-${dia}`
         }
     },
-    mounted() {
-        this.getProducts()
+    async mounted() {
+        await this.getProducts()
+        await this.getPredicts()
     }
 
 }

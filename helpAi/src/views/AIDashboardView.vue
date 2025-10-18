@@ -9,12 +9,13 @@
 <script lang="ts">
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
 import FilterAI from '@/components/FilterAI.vue';
-
+import ChartAILine from '@/components/ChartAILine.vue';
 export default {
     name: 'AIDashboardView',
     components: {
         DefaultLayout,
-        FilterAI
+        FilterAI,
+        ChartAILine
     }
 
 }
