@@ -1,5 +1,6 @@
 import { api } from "./apiConfig";
 import type { AxiosResponse } from "axios";
+import type { TicketFilters } from "./FiltersDataService";
 
 interface Status {
   status_name: string;
@@ -8,7 +9,7 @@ interface Status {
 
 interface ApiStatus {
   status_name: string;
-  percentage: number;
+  percentage: number; 
 }
 
 interface StatusesResponse {
@@ -16,9 +17,11 @@ interface StatusesResponse {
 }
 
 export class StatusDataService {
-  async getStatusData(): Promise<Status[]> {
+  async getStatusData(filters?: TicketFilters): Promise<Status[]> {
     try {
-      const response: AxiosResponse<StatusesResponse> = await api.get<StatusesResponse>("/tickets/tickets-by-status");
+      const response: AxiosResponse<StatusesResponse> = await api.get<StatusesResponse>("/tickets/tickets-by-status", {
+        params: filters
+      });
 
 
       return response.data.data.map(item => ({
