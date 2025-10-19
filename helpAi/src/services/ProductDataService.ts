@@ -6,9 +6,17 @@ interface Product {
   ticket_count: number;
 }
 
+interface ProductInfo{
+  ProductID: number,
+  ProductName: string,
+}
+
 
 interface ProductsResponse {
   data: Product[];
+}
+interface ProductsInfoResponse {
+  data: ProductInfo[];
 }
 
 export class ProductDataService {
@@ -18,6 +26,26 @@ export class ProductDataService {
       return response.data.data;
     } catch (error) {
       console.error("Error fetching product data:", error);
+      return [];
+    }
+  }
+
+  async getAllProducts(): Promise<ProductInfo[]> {
+    try {
+      const response: AxiosResponse<ProductsInfoResponse> = await api.get<ProductsInfoResponse>("/products/all-products");
+      return response.data.data;
+    } catch (error) {
+      console.error("Error fetching all products data:", error);
+      return [];
+    }
+  }
+
+  async getAllProductsAI(): Promise<ProductInfo[]> {
+    try {
+      const response: AxiosResponse<ProductsInfoResponse> = await api.get<ProductsInfoResponse>("/products/all-products-ai");
+      return response.data.data;
+    } catch (error) {
+      console.error("Error fetching all products data:", error);
       return [];
     }
   }

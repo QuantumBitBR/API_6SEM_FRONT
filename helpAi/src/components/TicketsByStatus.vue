@@ -139,7 +139,7 @@ export default defineComponent({
 .chart-container {
   position: relative;
   height: 280px;
-  width: 100%;
+  width: 80%;
   padding: 1rem;
 }
 .loading {
