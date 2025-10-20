@@ -237,9 +237,8 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  width: 25%;
-  min-width: 120px;
-  max-width: 150px;
+  width: 80%;
+
 }
 
 .filter-field {
