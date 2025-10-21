@@ -4,7 +4,7 @@
             <template #title>
                 <div class="title-div">
                     <span class="status_title">Filtros</span>
-                    <Button class="button-filter" @click="console.log('a')">
+                    <Button class="button-filter" @click="modelFilters()">
                         <template #icon>
                             <FunnelIcon class="w-4 h-4 filter" />
                             Filtrar
@@ -32,7 +32,8 @@
                     </div>
                     <div>
                         <label for="">Período</label>
-                        <DatePicker v-model="start_date" showIcon fluid :showOnFocus="false" />
+                        <DatePicker v-model="dateRange" selectionMode="range" showIcon fluid :showOnFocus="false"
+                            dateFormat="dd/mm/yy" placeholder="Selecione o período" />
                     </div>
                 </div>
             </template>
@@ -60,7 +61,7 @@ export default {
     },
     data() {
         return {
-            start_date: null,
+            dateRange: null,
             product_id: null,
             company_list: null,
             company: null,
@@ -103,12 +104,12 @@ export default {
             }
         },
         async getAllProducts() {
-            try{
+            try {
                 const service = new ProductDataService();
                 const data = await service.getAllProducts();
                 console.log(data);
                 this.product_list = data;
-            }catch(error){
+            } catch (error) {
                 console.error("An error occurred to get products:", error);
                 showToast({
                     severity: 'error',
@@ -118,12 +119,14 @@ export default {
                 });
             }
         },
-        formatData(dateStr) {
-            const d = new Date(dateStr)
-            const ano = d.getFullYear()
-            const mes = String(d.getMonth() + 1).padStart(2, '0')
-            const dia = String(d.getDate()).padStart(2, '0')
-            return `${ano}-${mes}-${dia}`
+        modelFilters(){
+            const selected_filters = {
+                company: this.company,
+                category: this.category,
+                product: this.product,
+                dateRange: this.dateRange
+            };
+            console.log("Filtros selecionados:", selected_filters);
         }
     },
     async mounted() {
