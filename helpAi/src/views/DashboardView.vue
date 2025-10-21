@@ -1,6 +1,6 @@
 <template>
   <DefaultLayout>
-
+    <Filter/>
     <div class="calendar-container">
       <Calendar
         @filtro-aplicado="onFiltroAplicado"
@@ -33,6 +33,7 @@ import TicketsPerCompany from '@/components/TicketsPerCompany.vue'
 import TicketsPerCategory from '@/components/TicketsPerCategory.vue'
 import PrivacyPolicy from '@/components/PrivacyPolicy.vue'
 import TicketsPerDepartment from '@/components/TicketsPerDepartment.vue'
+import Filter from '@/components/Filter.vue'
 
 export default {
   name: 'Dashboard',
@@ -44,6 +45,7 @@ export default {
   },
   components: {
     DefaultLayout,
+    Filter,
     Calendar,
     TicketsByStatus,
     TicketsPerProduct,
