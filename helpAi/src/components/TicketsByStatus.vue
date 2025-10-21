@@ -51,7 +51,7 @@ export default defineComponent({
           labels: data.map(s => s.status_name),
           datasets: [
             {
-              data: data.map(s => s.ticket_count),
+              data: data.map(s => s.percentage),
               backgroundColor: ['#3498db', '#2980b9', '#74b9ff', '#2c3e50', '#5dade2'],
               borderWidth: 0,
               hoverOffset: 12
@@ -77,9 +77,8 @@ export default defineComponent({
                 generateLabels: (chart: any) => {
                   return chart.data.labels.map((label: string, i: number) => {
                     const value = chart.data.datasets[0].data[i] as number;
-                    const percentage = total === 0 ? 0 : Math.round((value / total) * 100);
                     return {
-                      text: `${label} (${percentage}%)`,
+                      text: `${label} (${value}%)`,
                       fillStyle: chart.data.datasets[0].backgroundColor[i],
                       hidden: !chart.getDataVisibility(i),
                       index: i
