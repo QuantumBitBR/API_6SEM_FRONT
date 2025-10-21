@@ -17,17 +17,17 @@
                 <div class="chart-container">
                     <div>
                         <label for="">Empresa</label>
-                        <Select v-model="frequencia" :options="list_frequencia" optionLabel="value"
-                            placeholder="Selecione a empresa" class="w-full md:w-56" option-value="name" />
+                        <Select v-model="company" :options="company_list" optionLabel="company_name"
+                            placeholder="Selecione a empresa" class="w-full md:w-56" option-value="company_name" />
                     </div>
                     <div>
                         <label for="">Categoria</label>
-                        <Select v-model="frequencia" :options="list_frequencia" optionLabel="value"
-                            placeholder="Selecione a categoria" class="w-full md:w-56" option-value="name" />
+                        <Select v-model="category" :options="category_list" optionLabel="category_name"
+                            placeholder="Selecione a categoria" class="w-full md:w-56" option-value="category_id" />
                     </div>
                     <div>
                         <label for="">Produto</label>
-                        <Select v-model="product_id" :options="products" optionLabel="ProductName"
+                        <Select v-model="product" :options="product_list" optionLabel="ProductName"
                             placeholder="Selecione o produto" class="w-full md:w-56" option-value="ProductID" />
                     </div>
                     <div>
@@ -41,7 +41,7 @@
 
 </template>
 
-<script lang="ts">
+<script>
 import { Select, Skeleton } from 'primevue';
 import Card from 'primevue/card';
 import InputNumber from 'primevue/inputnumber';
@@ -50,16 +50,8 @@ import { ProductDataService } from '@/services/ProductDataService';
 import { FunnelIcon } from '@heroicons/vue/24/outline';
 import Button from 'primevue/button';
 import { showToast } from '@/eventBus';
-interface ProductInfo {
-    ProductID: number,
-    ProductName: string,
-}
-interface DataPredict {
-    ds: string,
-    year: number,
-    yhat: number,
-    is_future: boolean
-}
+import { CompaniesUsersDataService } from '@/services/CompaniesUsersDataService';
+import { CategoryDataService } from '@/services/CategoryDataService';
 
 export default {
     name: 'Filter',
@@ -68,22 +60,65 @@ export default {
     },
     data() {
         return {
-            quantPrev: null,
-            frequencia: '',
             start_date: null,
             product_id: null,
-            list_frequencia: [
-                { "name": 'YE', "value": 'Ano' },
-                { "name": 'ME', "value": 'Mês' },
-                { "name": 'D', "value": 'Dia' },
-            ],
-            products: [] as ProductInfo[],
-            predict_data: [] as DataPredict[],
+            company_list: null,
+            company: null,
+            category_list: null,
+            category: null,
+            product_list: null,
+            product: null,
             isLoading: false
         }
     },
     methods: {
-        formatData(dateStr: string) {
+        async getAllCompanies() {
+            try {
+                const service = new CompaniesUsersDataService();
+                const data = await service.getCompaniesUsers();
+                this.company_list = data;
+            } catch (error) {
+                console.error("An error occurred to get companies:", error);
+                showToast({
+                    severity: 'error',
+                    summary: 'Erro ao buscar dados do filtro',
+                    detail: error.message,
+                    life: 3000
+                });
+            }
+        },
+        async getAllCategories() {
+            try {
+                const service = new CategoryDataService();
+                const data = await service.getAllCategories();
+                this.category_list = data;
+            } catch (error) {
+                console.error("An error occurred to get categories:", error);
+                showToast({
+                    severity: 'error',
+                    summary: 'Erro ao buscar dados do filtro',
+                    detail: error.message,
+                    life: 3000
+                });
+            }
+        },
+        async getAllProducts() {
+            try{
+                const service = new ProductDataService();
+                const data = await service.getAllProducts();
+                console.log(data);
+                this.product_list = data;
+            }catch(error){
+                console.error("An error occurred to get products:", error);
+                showToast({
+                    severity: 'error',
+                    summary: 'Erro ao buscar dados do filtro',
+                    detail: error.message,
+                    life: 3000
+                });
+            }
+        },
+        formatData(dateStr) {
             const d = new Date(dateStr)
             const ano = d.getFullYear()
             const mes = String(d.getMonth() + 1).padStart(2, '0')
@@ -92,6 +127,9 @@ export default {
         }
     },
     async mounted() {
+        await this.getAllCompanies();
+        await this.getAllCategories();
+        await this.getAllProducts();
     }
 
 }

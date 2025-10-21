@@ -65,16 +65,13 @@ export default {
     },
     onFiltroAplicado(filtro) {
       this.filtroAtual = filtro
-      console.log('Filtro aplicado:', filtro)
       this.atualizarDadosDashboard()
     },
     onFiltroLimpo() {
       this.filtroAtual = null
-      console.log('Filtro limpo')
       this.atualizarDadosDashboard()
     },
     onPeriodoAlterado(periodo) {
-      console.log('Período alterado:', periodo)
     },
     atualizarDadosDashboard() {
 
