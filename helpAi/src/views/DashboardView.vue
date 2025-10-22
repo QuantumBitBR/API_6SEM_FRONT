@@ -1,6 +1,11 @@
 <template>
   <DefaultLayout>
-
+    <div class ="priority-cards-container">
+      <PriorityCard title="Crítico" :quantity="criticalTotal" :priority="'Critical'"/>
+      <PriorityCard title="Alta prioridade" :quantity="highTotal" priority="High"/>
+      <PriorityCard title="Média prioridade" :quantity="mediumTotal" priority="Moderate"/>
+      <PriorityCard title="Baixa prioridade" :quantity="lowTotal" priority="Low"/>
+    </div>
     <div class="calendar-container">
       <Calendar
         @filtro-aplicado="onFiltroAplicado"
@@ -33,11 +38,17 @@ import TicketsPerCompany from '@/components/TicketsPerCompany.vue'
 import TicketsPerCategory from '@/components/TicketsPerCategory.vue'
 import PrivacyPolicy from '@/components/PrivacyPolicy.vue'
 import TicketsPerDepartment from '@/components/TicketsPerDepartment.vue'
+import PriorityCard from '@/components/PriorityCard.vue'
+import { PriorityDataService } from '@/services/PriorityDataService'
 
 export default {
   name: 'Dashboard',
   data() {
     return {
+      criticalTotal: 0,
+      highTotal: 0,
+      mediumTotal: 0,
+      lowTotal: 0,
       showPolicy: false,
       filtroAtual: null
     }
@@ -50,12 +61,15 @@ export default {
     TicketsPerCompany,
     TicketsPerCategory,
     PrivacyPolicy,
-    TicketsPerDepartment
+    TicketsPerDepartment,
+    PriorityCard
+
   },
-  mounted() {
+  async mounted() {
     if(localStorage.getItem('termoExpirado') == 'true'){
       this.showPolicy = true
     }
+    await this.getTicketCount()
   },
   methods: {
     hidePolicy() {
@@ -77,6 +91,14 @@ export default {
     atualizarDadosDashboard() {
 
       this.$emit('atualizar-dashboard', this.filtroAtual)
+    },
+    async getTicketCount() {
+      const priorityService = new PriorityDataService()
+      const data = await priorityService.getPriorityData()
+      this.criticalTotal = data[2].ticket_count || 0
+      this.highTotal = data[0].ticket_count || 0
+      this.mediumTotal = data[3].ticket_count || 0
+      this.lowTotal = data[1].ticket_count || 0
     }
   }
 }
@@ -119,7 +141,7 @@ export default {
 
 .calendar-container {
   margin-bottom: 20px;
-  padding: 15px; 
+  padding: 15px;
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -150,5 +172,10 @@ export default {
     width: 100%;
     max-width: 100%;
   }
+}
+.priority-cards-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
 }
 </style>
