@@ -5,7 +5,7 @@
   <div v-else class="full-card">
     <Card class="custom-card">
       <template #title>
-        <span class="status_title">Percentual de Tickets por Status</span>
+        <span class="status_title">Percentual de Tickets por SLAPlan</span>
       </template>
       <template #content>
         <div class="chart-container">
@@ -17,17 +17,18 @@
 </template> 
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent } from 'vue';
 import { Skeleton } from 'primevue';
 import Card from 'primevue/card';
 import { Doughnut } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement, ChartData, ChartOptions } from 'chart.js';
-import { StatusDataService } from '@/services/StatusDataService';
+import { SLAPlanDataService } from '@/services/SLAPlanDataService';
+import type { SLAPlan } from '@/services/SLAPlanDataService'; 
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement);
 
 export default defineComponent({
-  name: 'StatusChart',
+  name: 'SLAPlanChart',
   components: { Skeleton, Card, Doughnut },
   data() {
     return {
@@ -39,28 +40,26 @@ export default defineComponent({
   methods: {
     async fetchData() {
       this.loading = true;
-      const statusService = new StatusDataService();
+      const slaplanService = new SLAPlanDataService();
       try {
-        const data = await statusService.getStatusData();
+        const data: SLAPlan[] = await slaplanService.getSLAPlanData(); 
+        
         if (!data.length) {
           this.chartData = null;
           return;
         }
 
         this.chartData = {
-          labels: data.map(s => s.status_name),
+          labels: data.map(s => s.slaplan_name), 
           datasets: [
             {
-              data: data.map(s => s.percentage),
-              backgroundColor: ['#3498db', '#2980b9', '#74b9ff', '#2c3e50', '#5dade2'],
+              data: data.map(s => s.percentage), 
+              backgroundColor: ['#3498db', '#2980b9', '#74b9ff', '#2c3e50', '#5dade2', '#aed6f1'], 
               borderWidth: 0,
               hoverOffset: 12
             }
           ]
         };
-
-        const dataset = this.chartData.datasets[0];
-        const total = (dataset.data as number[]).reduce((a, b) => a + b, 0);
 
         this.chartOptions = {
           responsive: true,
@@ -77,8 +76,9 @@ export default defineComponent({
                 generateLabels: (chart: any) => {
                   return chart.data.labels.map((label: string, i: number) => {
                     const value = chart.data.datasets[0].data[i] as number;
+                    const formattedValue = value.toFixed(1); 
                     return {
-                      text: `${label} (${value}%)`,
+                      text: `${label} (${formattedValue}%)`,
                       fillStyle: chart.data.datasets[0].backgroundColor[i],
                       hidden: !chart.getDataVisibility(i),
                       index: i
@@ -89,13 +89,13 @@ export default defineComponent({
             },
             tooltip: {
               callbacks: {
-                label: (context: any) => `${context.label}: ${context.raw}`
+                label: (context: any) => `${context.label}: ${context.raw.toFixed(1)}%` 
               }
             }
           }
         };
       } catch (err) {
-        console.error(err);
+        console.error("Erro ao buscar dados de SLAPlan:", err);
         this.chartData = null;
       } finally {
         this.loading = false;
