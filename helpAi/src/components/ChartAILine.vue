@@ -4,6 +4,19 @@
         <template #title>
             <div class="title-div">
                 <span class="status_title">Análise de Tendência por Produto</span>
+                <Button class="button-info" @click="resetZoom()"
+                    v-tooltip="'Para visualizar os dados mais de perto, basta selecionar a área do gráfico.'">
+                    <template #icon>
+                        <InformationCircleIcon class="w-4 h-4 info" id="icon" />
+
+                    </template>
+                </Button>
+                
+                <Button class="button-reset" @click="resetZoom()" v-tooltip="'Resetar Zoom'">
+                    <template #icon>
+                        <ArrowPathIcon class="w-4 h-4 refresh" id="icon" />
+                    </template>
+                </Button>
             </div>
 
         </template>
@@ -11,7 +24,7 @@
             <div class="chart-container">
 
                 <div class="card">
-                    <Chart type="line" :data="chartData" :options="chartOptions" class="chart-line" />
+                    <Chart ref="chartRef" type="line" :data="chartData" :options="chartOptions" class="chart-line" />
                 </div>
             </div>
         </template>
@@ -21,6 +34,16 @@
 <script>
 import Chart from 'primevue/chart';
 import { Card } from 'primevue';
+import zoomPlugin from 'chartjs-plugin-zoom'
+import { Chart as ChartJS } from 'chart.js'
+import Button from 'primevue/button';
+import { InformationCircleIcon } from '@heroicons/vue/24/outline';
+import { ArrowPathIcon } from '@heroicons/vue/24/outline';
+import Tooltip from 'primevue/tooltip';
+
+if (!ChartJS.registry.plugins.get('zoom')) {
+    ChartJS.register(zoomPlugin)
+}
 
 export default {
     name: 'ChartAILine',
@@ -30,8 +53,11 @@ export default {
             chartOptions: null
         };
     },
+    directives: {
+        tooltip: Tooltip
+    },
     components: {
-        Chart, Card
+        Chart, Card, Button, ArrowPathIcon, InformationCircleIcon
     },
     mounted() {
         this.chartData = this.setChartData();
@@ -72,6 +98,10 @@ export default {
         }
     },
     methods: {
+        resetZoom() {
+            const chart = this.$refs.chartRef?.chart;
+            if (chart) chart.resetZoom();
+        },
 
         setChartData() {
             const documentStyle = getComputedStyle(document.documentElement);
@@ -116,7 +146,51 @@ export default {
                         labels: {
                             color: textColor
                         }
-                    }
+                    },
+                    zoom: {
+                        pan: {
+                            enabled: true,
+                            mode: 'xy',
+                            onPan: ({ chart, deltaX, deltaY }) => {
+                                const xScale = chart.scales.x;
+                                const yScale = chart.scales.y;
+
+                                const xRange = xScale.max - xScale.min;
+                                const yRange = yScale.max - yScale.min;
+
+                                const xDelta = (deltaX / chart.width) * xRange;
+                                const yDelta = (deltaY / chart.height) * yRange;
+
+                                xScale.options.min = xScale.min + xDelta;
+                                xScale.options.max = xScale.max + xDelta;
+
+                                yScale.options.min = yScale.min - yDelta;
+                                yScale.options.max = yScale.max - yDelta;
+
+                                chart.update('none');
+                            },
+                        },
+                        zoom: {
+                            drag: {
+                                enabled: true,
+                                backgroundColor: 'rgba(54,162,235,0.3)',
+                                borderColor: 'rgba(54,162,235,0.8)',
+                                borderWidth: 1,
+                            },
+                            mode: 'xy',
+                            wheel: {
+                                enabled: true,
+                                speed: 0.05
+                            },
+                            pinch: {
+                                enabled: false
+                            },
+                            limits: {
+                                x: { minRange: 1 },
+                                y: { minRange: 1 }
+                            }
+                        }
+                    },
                 },
                 scales: {
                     x: {
@@ -168,11 +242,44 @@ export default {
 .custom-card {
     margin-top: 2rem;
 }
-.p-card-content{
+
+.p-card-content {
     display: flex;
     justify-content: center;
 }
-.chart-container{
+
+.chart-container {
     width: 98%;
+}
+
+.button-reset {
+    width: 35px;
+    height: 35px;
+    background-color: #34495e;
+    border: none;
+    margin-left: 10px;
+}
+
+.refresh {
+    width: 25px;
+    height: 25px;
+}
+
+.info {
+    width: 25px;
+    height: 25px;
+}
+
+.button-info {
+    width: 35px;
+    height: 35px;
+    background-color: #34495e;
+    border: none;
+    margin-left: 10px;
+}
+
+.title-div {
+    display: flex;
+    align-items: center;
 }
 </style>
