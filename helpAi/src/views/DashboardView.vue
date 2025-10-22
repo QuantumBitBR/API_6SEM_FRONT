@@ -24,6 +24,7 @@
     </div>
     <div class="grid-container3">
       <TicketsPerDepartment />
+      <TicketsBySLAPlan />
     </div>
   </DefaultLayout>
   <PrivacyPolicy :visible="showPolicy" @accept="hidePolicy()" />
@@ -40,6 +41,7 @@ import PrivacyPolicy from '@/components/PrivacyPolicy.vue'
 import TicketsPerDepartment from '@/components/TicketsPerDepartment.vue'
 import PriorityCard from '@/components/PriorityCard.vue'
 import { PriorityDataService } from '@/services/PriorityDataService'
+import TicketsBySLAPlan from '@/components/TicketsBySLAPlan.vue'
 
 export default {
   name: 'Dashboard',
@@ -62,8 +64,8 @@ export default {
     TicketsPerCategory,
     PrivacyPolicy,
     TicketsPerDepartment,
-    PriorityCard
-
+    PriorityCard,
+    TicketsBySLAPlan
   },
   async mounted() {
     if(localStorage.getItem('termoExpirado') == 'true'){
