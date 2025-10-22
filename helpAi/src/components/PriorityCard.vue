@@ -1,19 +1,15 @@
 <template>
   <div class="priority-card">
     <div class="card-body">
-
       <h3 class="quantity">{{ quantity.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) }} Tickets</h3>
     </div>
-
     <div class="card-footer" :style="{ backgroundColor: footerColor }">
       <h3 class="title" style="color:black">{{ title }}</h3>
     </div>
   </div>
 </template>
-
 <script>
 import 'primeicons/primeicons.css';
-
 export default {
   name: "PriorityCard",
   props: {
