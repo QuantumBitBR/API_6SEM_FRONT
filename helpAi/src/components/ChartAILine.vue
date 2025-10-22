@@ -1,6 +1,9 @@
 <template>
+    <div v-if="loading" class="loading">
+        <Skeleton width="100%" height="500px"></Skeleton>
+    </div>
 
-    <Card class="custom-card">
+    <Card class="custom-card" v-else>
         <template #title>
             <div class="title-div">
                 <span class="status_title">Análise de Tendência por Produto</span>
@@ -11,7 +14,7 @@
 
                     </template>
                 </Button>
-                
+
                 <Button class="button-reset" @click="resetZoom()" v-tooltip="'Resetar Zoom'">
                     <template #icon>
                         <ArrowPathIcon class="w-4 h-4 refresh" id="icon" />
@@ -40,6 +43,7 @@ import Button from 'primevue/button';
 import { InformationCircleIcon } from '@heroicons/vue/24/outline';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 import Tooltip from 'primevue/tooltip';
+import {Skeleton} from 'primevue';
 
 if (!ChartJS.registry.plugins.get('zoom')) {
     ChartJS.register(zoomPlugin)
@@ -57,7 +61,7 @@ export default {
         tooltip: Tooltip
     },
     components: {
-        Chart, Card, Button, ArrowPathIcon, InformationCircleIcon
+        Chart, Card, Button, ArrowPathIcon, InformationCircleIcon, Skeleton
     },
     mounted() {
         this.chartData = this.setChartData();
@@ -74,6 +78,10 @@ export default {
         },
         isFuture: {
             type: Array,
+            required: true
+        },
+        loading: {
+            type: Boolean,
             required: true
         }
     },
@@ -281,5 +289,8 @@ export default {
 .title-div {
     display: flex;
     align-items: center;
+}
+.loading{
+    margin-top: 30px
 }
 </style>

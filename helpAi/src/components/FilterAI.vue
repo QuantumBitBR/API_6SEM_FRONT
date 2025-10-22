@@ -27,12 +27,6 @@
                     </div>
                     <div>
 
-
-                        <label for="">Ver dados a partir de</label>
-                        <DatePicker v-model="start_date" showIcon fluid :showOnFocus="false" />
-                    </div>
-                    <div>
-
                         <label for="">Produto</label>
                         <Select v-model="product_id" :options="products" optionLabel="ProductName"
                             placeholder="Selecione o produto" class="w-full md:w-56" option-value="ProductID" />
@@ -41,10 +35,9 @@
             </template>
         </Card>
     </div>
-    
-<ChartAILine  :data="predict_data.map(item => item.yhat)" 
-  :labels="predict_data.map(item => item.ds)"
-  :isFuture="predict_data.map(item => item.is_future)"/>
+
+    <ChartAILine :data="predict_data.map(item => item.yhat)" :labels="predict_data.map(item => item.ds)"
+        :isFuture="predict_data.map(item => item.is_future)" :loading="isLoading" />
 
 </template>
 
@@ -88,7 +81,7 @@ export default {
             ],
             products: [] as ProductInfo[],
             predict_data: [] as DataPredict[],
-            isLoading: false
+            isLoading: true
         }
     },
     methods: {
@@ -106,6 +99,7 @@ export default {
             }
         },
         async getPredicts() {
+            this.isLoading = true;
             try {
                 const service = new AIService();
                 let date = null
@@ -122,6 +116,7 @@ export default {
                     life: 3000
                 });
             }
+            this.isLoading = false;
         },
         formatData(dateStr: string) {
             const d = new Date(dateStr)
@@ -134,6 +129,7 @@ export default {
     async mounted() {
         await this.getProducts()
         await this.getPredicts()
+        this.isLoading = false;
     }
 
 }
