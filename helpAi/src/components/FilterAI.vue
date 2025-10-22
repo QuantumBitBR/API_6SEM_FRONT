@@ -17,19 +17,21 @@
                 <div class="chart-container">
                     <div>
                         <label for="">Quantidade de Previsões</label>
-                        <InputNumber v-model="quantPrev" :min="1" :placeholder="'Digite a quantidade de previsões'"  />
+                        <InputNumber v-model="quantPrev" :min="1" :placeholder="'Digite a quantidade de previsões'" />
 
                     </div>
                     <div>
                         <label for="">Frequência</label>
                         <Select v-model="frequencia" :options="list_frequencia" optionLabel="value"
-                            placeholder="Selecione a frequência" class="w-full md:w-56" option-value="name" :showClear="true" />
+                            placeholder="Selecione a frequência" class="w-full md:w-56" option-value="name"
+                            :showClear="true" />
                     </div>
                     <div>
 
                         <label for="">Produto</label>
                         <Select v-model="product_id" :options="products" optionLabel="ProductName"
-                            placeholder="Selecione o produto" class="w-full md:w-56" option-value="ProductID" :showClear="true" />
+                            placeholder="Selecione o produto" class="w-full md:w-56" option-value="ProductID"
+                            :showClear="true" />
                     </div>
                 </div>
             </template>
@@ -52,6 +54,7 @@ import { FunnelIcon } from '@heroicons/vue/24/outline';
 import Button from 'primevue/button';
 import { showToast } from '@/eventBus';
 import ChartAILine from './ChartAILine.vue';
+
 interface ProductInfo {
     ProductID: number,
     ProductName: string,

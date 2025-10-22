@@ -7,19 +7,15 @@
         <template #title>
             <div class="title-div">
                 <span class="status_title">Análise de Tendência por Produto</span>
-                <Button class="button-info" @click="resetZoom()"
-                    v-tooltip="'Para visualizar os dados mais de perto, basta selecionar a área do gráfico.'">
-                    <template #icon>
-                        <InformationCircleIcon class="w-4 h-4 info" id="icon" />
-
-                    </template>
-                </Button>
 
                 <Button class="button-reset" @click="resetZoom()" v-tooltip="'Resetar Zoom'">
                     <template #icon>
                         <ArrowPathIcon class="w-4 h-4 refresh" id="icon" />
                     </template>
                 </Button>
+            </div>
+            <div class="accordions">
+                <Accordion />
             </div>
 
         </template>
@@ -43,7 +39,8 @@ import Button from 'primevue/button';
 import { InformationCircleIcon } from '@heroicons/vue/24/outline';
 import { ArrowPathIcon } from '@heroicons/vue/24/outline';
 import Tooltip from 'primevue/tooltip';
-import {Skeleton} from 'primevue';
+import { Skeleton } from 'primevue';
+import Accordion from './Accordion.vue';
 
 if (!ChartJS.registry.plugins.get('zoom')) {
     ChartJS.register(zoomPlugin)
@@ -61,7 +58,7 @@ export default {
         tooltip: Tooltip
     },
     components: {
-        Chart, Card, Button, ArrowPathIcon, InformationCircleIcon, Skeleton
+        Chart, Card, Button, ArrowPathIcon, InformationCircleIcon, Skeleton, Accordion
     },
     mounted() {
         this.chartData = this.setChartData();
@@ -252,12 +249,17 @@ export default {
 }
 
 .p-card-content {
-    display: flex;
-    justify-content: center;
+    display: flex !important;
+    justify-content: center !important;
 }
 
 .chart-container {
     width: 98%;
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    margin: 0 auto;
+    padding: 1.5em;
 }
 
 .button-reset {
@@ -290,7 +292,14 @@ export default {
     display: flex;
     align-items: center;
 }
-.loading{
+
+.loading {
     margin-top: 30px
+}
+
+.accordions {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
 }
 </style>
