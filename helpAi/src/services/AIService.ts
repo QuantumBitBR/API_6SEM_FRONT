@@ -15,8 +15,18 @@ interface DataPredict {
 class AIService{
     async getPredict(period: number | null, freq: string | null, start_date: string | null, product_id: number | null): Promise<DataPredict[]> {
         try {
-            const response: AxiosResponse<DataPredictResponse> = await api.get<DataPredictResponse>(`/ia/tendencia?period=${period}&freq=${freq}&start_date=${start_date}&product_id=${product_id}`)
-            
+            const params: Record<string, string> = {};
+            if(freq == '') freq = null;
+            if (period !== null) params.period = period.toString();
+            if (freq !== null) params.freq = freq;
+            if (start_date !== null) params.start_date = start_date;
+            if (product_id !== null) params.product_id = product_id.toString();
+
+            const queryString = new URLSearchParams(params).toString();
+
+            const response: AxiosResponse<DataPredictResponse> = await api.get<DataPredictResponse>(
+                `/ia/tendencia?${queryString}`
+            );
             return response.data.data;
         } catch (error) {
             console.error("Error fetching predict data:", error);
@@ -25,4 +35,4 @@ class AIService{
     }
 }
 
-export default new AIService;
+export default AIService;
