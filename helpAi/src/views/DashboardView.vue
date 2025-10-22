@@ -19,6 +19,7 @@
     </div>
     <div class="grid-container3">
       <TicketsPerDepartment />
+      <TicketsBySLAPlan />
     </div>
   </DefaultLayout>
   <PrivacyPolicy :visible="showPolicy" @accept="hidePolicy()" />
@@ -33,6 +34,7 @@ import TicketsPerCompany from '@/components/TicketsPerCompany.vue'
 import TicketsPerCategory from '@/components/TicketsPerCategory.vue'
 import PrivacyPolicy from '@/components/PrivacyPolicy.vue'
 import TicketsPerDepartment from '@/components/TicketsPerDepartment.vue'
+import TicketsBySLAPlan from '@/components/TicketsBySLAPlan.vue'
 
 export default {
   name: 'Dashboard',
@@ -50,7 +52,8 @@ export default {
     TicketsPerCompany,
     TicketsPerCategory,
     PrivacyPolicy,
-    TicketsPerDepartment
+    TicketsPerDepartment,
+    TicketsBySLAPlan  
   },
   mounted() {
     if(localStorage.getItem('termoExpirado') == 'true'){
