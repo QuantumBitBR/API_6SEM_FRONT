@@ -77,7 +77,6 @@ export default {
       try {
 
         const ticketsFromAPI = await service.searchTickets(busca)
-        console.log(ticketsFromAPI)
         if (!ticketsFromAPI || ticketsFromAPI.length === 0) {
           return []
         }

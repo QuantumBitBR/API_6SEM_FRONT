@@ -107,7 +107,6 @@ export default {
             try {
                 const service = new ProductDataService();
                 const data = await service.getAllProducts();
-                console.log(data);
                 this.product_list = data;
             } catch (error) {
                 console.error("An error occurred to get products:", error);
@@ -126,7 +125,7 @@ export default {
                 product: this.product,
                 dateRange: this.dateRange
             };
-            console.log("Filtros selecionados:", selected_filters);
+            this.$emit('filter',selected_filters);
         }
     },
     async mounted() {

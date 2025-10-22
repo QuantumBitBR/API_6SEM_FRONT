@@ -1,6 +1,6 @@
 <template>
   <DefaultLayout>
-    <Filter/>
+    <Filter @filter="getFilter"/>
     <div class="calendar-container">
       <Calendar
         @filtro-aplicado="onFiltroAplicado"
@@ -10,15 +10,15 @@
     </div>
 
     <div class="grid-container1">
-      <TicketsByStatus />
-      <TicketsPerCompany />
+      <TicketsByStatus :filter="filtroAtual"/>
+      <TicketsPerCompany :filter="filtroAtual"/>
     </div>
     <div class="grid-container2">
-      <TicketsPerProduct />
-      <TicketsPerCategory />
+      <TicketsPerProduct :filter="filtroAtual"/>
+      <TicketsPerCategory :filter="filtroAtual"/>
     </div>
     <div class="grid-container3">
-      <TicketsPerDepartment />
+      <TicketsPerDepartment :filter="filtroAtual"/>
     </div>
   </DefaultLayout>
   <PrivacyPolicy :visible="showPolicy" @accept="hidePolicy()" />
@@ -63,19 +63,8 @@ export default {
     hidePolicy() {
       this.showPolicy = false
     },
-    onFiltroAplicado(filtro) {
+    getFilter(filtro){
       this.filtroAtual = filtro
-      this.atualizarDadosDashboard()
-    },
-    onFiltroLimpo() {
-      this.filtroAtual = null
-      this.atualizarDadosDashboard()
-    },
-    onPeriodoAlterado(periodo) {
-    },
-    atualizarDadosDashboard() {
-
-      this.$emit('atualizar-dashboard', this.filtroAtual)
     }
   }
 }
