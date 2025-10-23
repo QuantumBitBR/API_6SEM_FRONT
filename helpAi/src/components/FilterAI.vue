@@ -110,7 +110,6 @@ export default {
                     date = this.formatData(String(this.start_date));
                 }
                 this.predict_data = await service.getPredict(this.quantPrev, this.frequencia, date, this.product_id);
-                console.log(this.predict_data)
             } catch (error: any) {
                 showToast({
                     severity: 'error',

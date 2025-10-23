@@ -99,7 +99,6 @@ export default {
         await service.deleteUser(this.userToDelete.id)
         
         this.loadData()
-        console.log("Usuário deletado com sucesso:", this.userToDelete);
         showToast({
           severity: 'success',
           summary: 'Remoção de usuário',

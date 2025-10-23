@@ -54,7 +54,6 @@ export default {
         },
         setChartData() {
             const departments = this.departmentData.map(item => item.department_name);
-            console.log(departments);
             const tickets = this.departmentData.map(item => item.ticket_count);
             return {
                 labels: departments,
