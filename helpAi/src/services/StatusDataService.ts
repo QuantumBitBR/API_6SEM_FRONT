@@ -11,8 +11,10 @@ interface StatusesResponse {
 }
 
 export class StatusDataService {
-  async getStatusData(): Promise<Status[]> {
+  async getStatusData(filter: String): Promise<Status[]> {
     try {
+      //continue daqui :)
+      console.log("Filtros", filter)
       const response: AxiosResponse<StatusesResponse> = await api.get<StatusesResponse>("/tickets/tickets-by-status");
       return response.data.data;
     } catch (error) {

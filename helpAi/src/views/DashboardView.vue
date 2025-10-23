@@ -1,14 +1,6 @@
 <template>
   <DefaultLayout>
     <Filter @filter="getFilter"/>
-    <div class="calendar-container">
-      <Calendar
-        @filtro-aplicado="onFiltroAplicado"
-        @filtro-limpo="onFiltroLimpo"
-        @periodo-alterado="onPeriodoAlterado"
-      />
-    </div>
-
     <div class="grid-container1">
       <TicketsByStatus :filter="filtroAtual"/>
       <TicketsPerCompany :filter="filtroAtual"/>

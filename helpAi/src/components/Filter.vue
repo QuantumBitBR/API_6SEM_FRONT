@@ -17,8 +17,8 @@
                 <div class="chart-container">
                     <div>
                         <label for="">Empresa</label>
-                        <Select v-model="company" :options="company_list" optionLabel="company_name"
-                            placeholder="Selecione a empresa" class="w-full md:w-56" option-value="company_name" />
+                        <Select v-model="company" :options="company_list" optionLabel="CompanyName"
+                            placeholder="Selecione a empresa" class="w-full md:w-56" option-value="CompanyID" />
                     </div>
                     <div>
                         <label for="">Categoria</label>
@@ -51,8 +51,8 @@ import { ProductDataService } from '@/services/ProductDataService';
 import { FunnelIcon } from '@heroicons/vue/24/outline';
 import Button from 'primevue/button';
 import { showToast } from '@/eventBus';
-import { CompaniesUsersDataService } from '@/services/CompaniesUsersDataService';
 import { CategoryDataService } from '@/services/CategoryDataService';
+import { CompanyDataService } from '@/services/CompanyDataService';
 
 export default {
     name: 'Filter',
@@ -75,8 +75,8 @@ export default {
     methods: {
         async getAllCompanies() {
             try {
-                const service = new CompaniesUsersDataService();
-                const data = await service.getCompaniesUsers();
+                const service = new CompanyDataService();
+                const data = await service.getAllCompanies();
                 this.company_list = data;
             } catch (error) {
                 console.error("An error occurred to get companies:", error);
@@ -118,15 +118,34 @@ export default {
                 });
             }
         },
-        modelFilters(){
+        modelFilters() {
+            const formatDate = (date) => {
+                if (!date) return null;
+                const d = new Date(date);
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
+
+            let formattedRange = null;
+            if (this.dateRange && this.dateRange.length === 2) {
+                formattedRange = [
+                    formatDate(this.dateRange[0]),
+                    formatDate(this.dateRange[1])
+                ];
+            }
+
             const selected_filters = {
                 company: this.company,
                 category: this.category,
                 product: this.product,
-                dateRange: this.dateRange
+                dateRange: formattedRange
             };
-            this.$emit('filter',selected_filters);
+
+            this.$emit('filter', selected_filters);
         }
+
     },
     async mounted() {
         await this.getAllCompanies();
@@ -138,6 +157,10 @@ export default {
 </script>
 
 <style scoped>
+.full-card {
+    margin-bottom: 20px;
+}
+
 .chart-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
