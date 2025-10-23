@@ -75,7 +75,6 @@ export default {
     },
     getFilter(filtro){
       this.filtroAtual = filtro
-      console.log('Filtro aplicado:', filtro)
     },
     async getTicketCount() {
       const priorityService = new PriorityDataService()

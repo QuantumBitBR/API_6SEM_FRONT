@@ -68,7 +68,7 @@ export default defineComponent({
         }
     }
     catch (error: any) {
-      console.log(error.message)
+      console.error(error.message)
       showToast({
         severity: 'error',
         summary: 'Erro ao fazer login',
