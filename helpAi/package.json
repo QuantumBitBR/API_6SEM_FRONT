@@ -20,6 +20,7 @@
     "@primeuix/themes": "^1.2.3",
     "axios": "^1.11.0",
     "chart.js": "^4.5.0",
+    "chartjs-plugin-zoom": "^2.2.0",
     "mitt": "^3.0.1",
     "pinia": "^3.0.3",
     "primeicons": "^7.0.0",
