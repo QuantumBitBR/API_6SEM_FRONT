@@ -1,7 +1,7 @@
 <template>
     <div class="card">
         <Accordion>
-            <AccordionPanel>
+            <AccordionPanel value="0">
                 <AccordionHeader>
                     <div class="header-content">
                         <i class="pi pi-info-circle"></i>
