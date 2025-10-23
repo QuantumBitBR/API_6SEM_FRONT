@@ -36,12 +36,19 @@ export default defineComponent({
       loading: true
     };
   },
+  props:{
+    filter: {
+      type: String,
+      required: false,
+      default: null
+    }
+  },
   methods: {
     async fetchData() {
       this.loading = true;
       const statusService = new StatusDataService();
       try {
-        const data = await statusService.getStatusData();
+        const data = await statusService.getStatusData(this.filter);
         if (!data.length) {
           this.chartData = null;
           return;
@@ -104,6 +111,13 @@ export default defineComponent({
   },
   mounted() {
     this.fetchData();
+  },
+  watch: {
+    filter(newVal, oldVal) {
+      if(newVal !== oldVal){
+        this.fetchData();
+      }
+    }
   }
 });
 </script>

@@ -9,7 +9,7 @@ interface Status {
 
 interface ApiStatus {
   status_name: string;
-  percentage: number; 
+  percentage: number;
 }
 
 interface StatusesResponse {

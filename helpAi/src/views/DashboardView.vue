@@ -1,30 +1,24 @@
 <template>
   <DefaultLayout>
+    <Filter @filter="getFilter"/>
     <div class ="priority-cards-container">
-      <PriorityCard title="Crítico" :quantity="criticalTotal" :priority="'Critical'"/>
-      <PriorityCard title="Alta prioridade" :quantity="highTotal" priority="High"/>
-      <PriorityCard title="Média prioridade" :quantity="mediumTotal" priority="Moderate"/>
-      <PriorityCard title="Baixa prioridade" :quantity="lowTotal" priority="Low"/>
-    </div>
-    <div class="calendar-container">
-      <Calendar
-        @filtro-aplicado="onFiltroAplicado"
-        @filtro-limpo="onFiltroLimpo"
-        @periodo-alterado="onPeriodoAlterado"
-      />
+      <PriorityCard title="Crítico" :filter="filtroAtual" :quantity="criticalTotal" :priority="'Critical'"/>
+      <PriorityCard title="Alta prioridade" :filter="filtroAtual" :quantity="highTotal" priority="High"/>
+      <PriorityCard title="Média prioridade" :filter="filtroAtual" :quantity="mediumTotal" priority="Moderate"/>
+      <PriorityCard title="Baixa prioridade" :filter="filtroAtual" :quantity="lowTotal" priority="Low"/>
     </div>
 
     <div class="grid-container1">
-      <TicketsByStatus />
-      <TicketsPerCompany />
+      <TicketsByStatus :filter="filtroAtual"/>
+      <TicketsPerCompany :filter="filtroAtual"/>
     </div>
     <div class="grid-container2">
-      <TicketsPerProduct />
-      <TicketsPerCategory />
+      <TicketsPerProduct :filter="filtroAtual"/>
+      <TicketsPerCategory :filter="filtroAtual"/>
     </div>
     <div class="grid-container3">
-      <TicketsPerDepartment />
-      <TicketsBySLAPlan />
+      <TicketsPerDepartment :filter="filtroAtual"/>
+      <TicketsBySLAPlan :filter="filtroAtual"/>
     </div>
   </DefaultLayout>
   <PrivacyPolicy :visible="showPolicy" @accept="hidePolicy()" />
@@ -39,6 +33,7 @@ import TicketsPerCompany from '@/components/TicketsPerCompany.vue'
 import TicketsPerCategory from '@/components/TicketsPerCategory.vue'
 import PrivacyPolicy from '@/components/PrivacyPolicy.vue'
 import TicketsPerDepartment from '@/components/TicketsPerDepartment.vue'
+import Filter from '@/components/Filter.vue'
 import PriorityCard from '@/components/PriorityCard.vue'
 import { PriorityDataService } from '@/services/PriorityDataService'
 import TicketsBySLAPlan from '@/components/TicketsBySLAPlan.vue'
@@ -57,6 +52,7 @@ export default {
   },
   components: {
     DefaultLayout,
+    Filter,
     Calendar,
     TicketsByStatus,
     TicketsPerProduct,
@@ -77,22 +73,8 @@ export default {
     hidePolicy() {
       this.showPolicy = false
     },
-    onFiltroAplicado(filtro) {
+    getFilter(filtro){
       this.filtroAtual = filtro
-      console.log('Filtro aplicado:', filtro)
-      this.atualizarDadosDashboard()
-    },
-    onFiltroLimpo() {
-      this.filtroAtual = null
-      console.log('Filtro limpo')
-      this.atualizarDadosDashboard()
-    },
-    onPeriodoAlterado(periodo) {
-      console.log('Período alterado:', periodo)
-    },
-    atualizarDadosDashboard() {
-
-      this.$emit('atualizar-dashboard', this.filtroAtual)
     },
     async getTicketCount() {
       const priorityService = new PriorityDataService()
