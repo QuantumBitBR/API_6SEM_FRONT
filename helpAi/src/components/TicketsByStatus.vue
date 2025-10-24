@@ -9,56 +9,66 @@
       </template>
       <template #content>
         <div class="chart-container">
-          <Doughnut v-if="chartData" :data="chartData" :options="chartOptions" />
+          <Doughnut
+            v-if="chartData"
+            :data="chartData"
+            :options="chartOptions"
+            :key="chartKey"
+          />
+          <div v-else class="no-data">Nenhum dado disponível</div>
         </div>
       </template>
     </Card>
   </div>
-</template> 
+</template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted, PropType, watch } from 'vue';
 import { Skeleton } from 'primevue';
 import Card from 'primevue/card';
 import { Doughnut } from 'vue-chartjs';
-import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement, ChartData, ChartOptions } from 'chart.js';
+import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement } from 'chart.js';
+import type { ChartData, ChartOptions } from 'chart.js';
 import { StatusDataService } from '@/services/StatusDataService';
+import type { TicketFilters } from '@/services/FiltersDataService';
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement);
 
 export default defineComponent({
   name: 'StatusChart',
   components: { Skeleton, Card, Doughnut },
-  data() {
-    return {
-      chartData: null as ChartData<'doughnut'> | null,
-      chartOptions: {} as ChartOptions<'doughnut'>,
-      loading: true
-    };
-  },
-  props:{
+  props: {
     filter: {
-      type: String,
+      type: Object as PropType<TicketFilters>,
       required: false,
       default: null
     }
   },
-  methods: {
-    async fetchData() {
-      this.loading = true;
+  setup(props) {
+    const chartData = ref<ChartData<'doughnut'> | null>(null);
+    const chartOptions = ref<ChartOptions<'doughnut'>>({});
+    const loading = ref(true);
+    const chartKey = ref(0);
+
+    const fetchData = async () => {
+      loading.value = true;
       const statusService = new StatusDataService();
+
       try {
-        const data = await statusService.getStatusData(this.filter);
+        console.log('🔍 [StatusChart] Buscando dados com filtro:', props.filter);
+        const data = await statusService.getStatusData(props.filter);
+        console.log('📊 [StatusChart] Dados recebidos:', data);
+
         if (!data.length) {
-          this.chartData = null;
+          chartData.value = null;
           return;
         }
 
-        this.chartData = {
+        chartData.value = {
           labels: data.map(s => s.status_name),
           datasets: [
             {
-              data: data.map(s => s.percentage),
+              data: data.map(s => s.ticket_count),
               backgroundColor: ['#3498db', '#2980b9', '#74b9ff', '#2c3e50', '#5dade2'],
               borderWidth: 0,
               hoverOffset: 12
@@ -66,10 +76,7 @@ export default defineComponent({
           ]
         };
 
-        const dataset = this.chartData.datasets[0];
-        const total = (dataset.data as number[]).reduce((a, b) => a + b, 0);
-
-        this.chartOptions = {
+        chartOptions.value = {
           responsive: true,
           maintainAspectRatio: false,
           cutout: '60%',
@@ -81,43 +88,60 @@ export default defineComponent({
                 color: '#495057',
                 usePointStyle: true,
                 padding: 20,
-                generateLabels: (chart: any) => {
-                  return chart.data.labels.map((label: string, i: number) => {
-                    const value = chart.data.datasets[0].data[i] as number;
+                generateLabels: (chart) => {
+                  const data = chart.data;
+                  return data.labels?.map((label, i) => {
+                    const value = data.datasets[0].data[i] as number;
                     return {
                       text: `${label} (${value}%)`,
-                      fillStyle: chart.data.datasets[0].backgroundColor[i],
+                      fillStyle: data.datasets[0].backgroundColor[i],
                       hidden: !chart.getDataVisibility(i),
                       index: i
                     };
-                  });
+                  }) || [];
                 }
               }
             },
             tooltip: {
               callbacks: {
-                label: (context: any) => `${context.label}: ${context.raw}`
+                label: (context) => {
+                  const label = context.label || '';
+                  const value = context.raw || 0;
+                  return `${label}: ${value}%`;
+                }
               }
             }
           }
         };
+
+        chartKey.value += 1;
       } catch (err) {
-        console.error(err);
-        this.chartData = null;
+        console.error('❌ [StatusChart] Erro:', err);
+        chartData.value = null;
       } finally {
-        this.loading = false;
+        loading.value = false;
       }
-    }
-  },
-  mounted() {
-    this.fetchData();
-  },
-  watch: {
-    filter(newVal, oldVal) {
-      if(newVal !== oldVal){
-        this.fetchData();
-      }
-    }
+    };
+
+    onMounted(fetchData);
+
+    watch(
+      () => props.filter,
+      (newVal, oldVal) => {
+        if (JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
+          console.log('🔄 [StatusChart] Filtro mudou, atualizando...');
+          fetchData();
+        }
+      },
+      { deep: true }
+    );
+
+    return {
+      chartData,
+      chartOptions,
+      loading,
+      chartKey
+    };
   }
 });
 </script>
@@ -164,5 +188,10 @@ export default defineComponent({
 .full-card {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   border-radius: 12px;
+}
+.no-data {
+  text-align: center;
+  color: #666;
+  font-style: italic;
 }
 </style>

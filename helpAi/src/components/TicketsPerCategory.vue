@@ -2,14 +2,19 @@
     <div v-if="loading" class="loading">
         <Skeleton width="100%" height="320px"></Skeleton>
     </div>
-    <div v-else="" class="full-card">
+    <div v-else class="full-card">
         <div class="card">
             <div class="card-header">
                 <h2>Tickets por Categoria</h2>
             </div>
             <div class="card-body">
                 <div class="chart-wrapper">
-                    <Chart type="bar" :data="chartData" :options="chartOptions" />
+                    <Chart
+                        type="bar"
+                        :data="chartData"
+                        :options="chartOptions"
+                        :key="chartKey"
+                    />
                 </div>
             </div>
         </div>
@@ -20,10 +25,19 @@
 import { CategoryDataService } from '@/services/CategoryDataService';
 import { Skeleton } from 'primevue';
 import Chart from 'primevue/chart';
+
 export default {
+    name: 'TicketsPerCategory',
     components: {
         Chart,
         Skeleton
+    },
+    props: {
+        filter: {
+            type: Object,
+            required: false,
+            default: null
+        }
     },
     data() {
         return {
@@ -31,25 +45,39 @@ export default {
             chartData: null,
             chartOptions: null,
             loading: true,
+            chartKey: 0
         }
     },
     async mounted() {
-        await this.getChartData();
-        if(this.categoryData){
-            this.chartData = this.setChartData();
-            this.chartOptions = this.setChartOptions();
-        }
-        this.loading = false;
+        await this.fetchData();
     },
     methods: {
-        async getChartData() {
+        async fetchData() {
+            this.loading = true;
             try {
+                console.log('🔍 [TicketsPerCategory] Filtros:', this.filter);
+
                 const service = new CategoryDataService();
-                const data = await service.getCategoryData();
+                const data = await service.getCategoryData(this.filter);
+
+                console.log('📊 [TicketsPerCategory] Dados recebidos:', data);
 
                 this.categoryData = data;
+
+                if(this.categoryData && this.categoryData.length) {
+                    this.chartData = this.setChartData();
+                    this.chartOptions = this.setChartOptions();
+                    this.chartKey += 1;
+                    console.log('✅ [TicketsPerCategory] Gráfico atualizado com sucesso');
+                } else {
+                    this.chartData = null;
+                    console.log('⚠️ [TicketsPerCategory] Nenhum dado retornado');
+                }
             } catch (err) {
-                console.error("An error occurred to get data:", err);
+                console.error("❌ [TicketsPerCategory] Erro:", err);
+                this.chartData = null;
+            } finally {
+                this.loading = false;
             }
         },
         setChartData() {
@@ -59,8 +87,12 @@ export default {
                 labels: categories,
                 datasets: [
                     {
+                        label: 'Tickets',
                         data: tickets,
                         backgroundColor: "#3498db",
+                        borderColor: "#2980b9",
+                        borderWidth: 1,
+                        borderRadius: 4,
                     }
                 ]
             }
@@ -73,6 +105,13 @@ export default {
                     legend: {
                         display: false,
                     },
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => {
+                                return `Tickets: ${context.parsed.y}`;
+                            }
+                        }
+                    }
                 },
                 scales: {
                     x: {
@@ -107,8 +146,15 @@ export default {
                 },
             };
         },
-
     },
+    watch: {
+        filter(newVal, oldVal) {
+            if(newVal !== oldVal){
+                console.log('🔄 [TicketsPerCategory] Filtro mudou, atualizando...');
+                this.fetchData();
+            }
+        }
+    }
 }
 </script>
 

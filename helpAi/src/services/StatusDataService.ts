@@ -4,12 +4,12 @@ import type { TicketFilters } from "./FiltersDataService";
 
 interface Status {
   status_name: string;
-  ticket_count: number;
+  percentage: number;
 }
 
 interface ApiStatus {
   status_name: string;
-  percentage: number;
+  ticket_count: number;
 }
 
 interface StatusesResponse {
@@ -19,17 +19,23 @@ interface StatusesResponse {
 export class StatusDataService {
   async getStatusData(filters?: TicketFilters): Promise<Status[]> {
     try {
+      console.log('🎯 [StatusDataService] Filtros:', filters);
+
       const response: AxiosResponse<StatusesResponse> = await api.get<StatusesResponse>("/tickets/tickets-by-status", {
-        params: filters
+        params: filters,
+        paramsSerializer: {
+          indexes: null
+        }
       });
 
+      console.log('📡 [StatusDataService] Resposta:', response.data);
 
       return response.data.data.map(item => ({
         status_name: item.status_name,
-        ticket_count: item.percentage
+        percentage: item.ticket_count
       }));
     } catch (error) {
-      console.error("Error fetching status data:", error);
+      console.error("❌ [StatusDataService] Erro:", error);
       return [];
     }
   }
