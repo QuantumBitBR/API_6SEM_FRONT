@@ -14,8 +14,6 @@ interface DepartmentsResponse {
 export class DepartmentDataService {
   async getDepartmentData(filters?: TicketFilters): Promise<Department[]> {
     try {
-      console.log('🎯 [DepartmentDataService] Filtros:', filters);
-
       const response: AxiosResponse<DepartmentsResponse> = await api.get<DepartmentsResponse>("/tickets/tickets-by-department", {
         params: filters,
         paramsSerializer: {
@@ -23,10 +21,9 @@ export class DepartmentDataService {
         }
       });
 
-      console.log('📡 [DepartmentDataService] Resposta:', response.data);
       return response.data.data;
     } catch (error) {
-      console.error("❌ [DepartmentDataService] Erro:", error);
+      console.error(error);
       return [];
     }
   }

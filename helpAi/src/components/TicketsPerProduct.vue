@@ -1,11 +1,10 @@
-<!-- components/TagTable.vue -->
 <template>
   <div>
     <div v-if="loading" class="loading">
       <Skeleton width="100%" height="288px"></Skeleton>
     </div>
-    <div v-else="" class="tabela-src">
-      <template v-if="tags.length != 0">
+    <div v-else class="tabela-src">
+      <template v-if="tags.length > 0">
         <DataTable :value="tags" removableSort stripedRows scrollHeight="20rem">
           <Column field="product_name" sortable header="Produto" />
           <Column field="ticket_count" sortable header="Quantidade Tickets" />
@@ -23,11 +22,18 @@
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import { ProductDataService } from '@/services/ProductDataService';
-import { Skeleton } from 'primevue';
+import Skeleton from 'primevue/skeleton';
 
 export default {
   name: 'TagTable',
   components: { DataTable, Column, Skeleton },
+  props: {
+    filter: {
+      type: Object,
+      required: false,
+      default: null
+    }
+  },
   data() {
     return {
       loading: true,
@@ -35,26 +41,26 @@ export default {
       products: [],
     };
   },
-  methods:{
-    async loadData(){
-      try{
+  methods: {
+    async loadData() {
+      try {
+        this.loading = true;
         const service = new ProductDataService();
-        const products = await service.getProductData();
-
+        const products = await service.getProductData(this.filter);
         this.tags = products;
+      } catch (err) {
+        this.tags = [];
+      } finally {
         this.loading = false;
-      }catch(err){
-        console.error("Error to get data:", err);
       }
     },
-    async allProducts(){
-      try{
+    async allProducts() {
+      try {
         const service = new ProductDataService();
         const products = await service.getAllProducts();
-
         this.products = products;
-      }catch(err){
-        console.error("Error to get data:", err);
+      } catch (err) {
+        // Silencioso
       }
     }
   },
@@ -62,6 +68,14 @@ export default {
     await this.loadData();
     await this.allProducts();
   },
+  watch: {
+    filter: {
+      handler(newVal) {
+        this.loadData();
+      },
+      deep: true
+    }
+  }
 };
 </script>
 
@@ -115,6 +129,14 @@ export default {
   color: #666;
   font-style: italic;
   text-align: center;
+  padding: 20px;
+}
+
+.loading {
+  margin: auto;
+  color: #666;
+  text-align: center;
+  padding: 16px 0;
 }
 
 @media (max-width: 768px) {

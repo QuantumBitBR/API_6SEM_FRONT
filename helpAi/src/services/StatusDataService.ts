@@ -4,23 +4,16 @@ import type { TicketFilters } from "./FiltersDataService";
 
 interface Status {
   status_name: string;
-  percentage: number;
-}
-
-interface ApiStatus {
-  status_name: string;
-  ticket_count: number;
+  percentage: number; // ← CORRETO: o backend retorna percentage
 }
 
 interface StatusesResponse {
-  data: ApiStatus[];
+  data: Status[];
 }
 
 export class StatusDataService {
   async getStatusData(filters?: TicketFilters): Promise<Status[]> {
     try {
-      console.log('🎯 [StatusDataService] Filtros:', filters);
-
       const response: AxiosResponse<StatusesResponse> = await api.get<StatusesResponse>("/tickets/tickets-by-status", {
         params: filters,
         paramsSerializer: {
@@ -28,14 +21,10 @@ export class StatusDataService {
         }
       });
 
-      console.log('📡 [StatusDataService] Resposta:', response.data);
-
-      return response.data.data.map(item => ({
-        status_name: item.status_name,
-        percentage: item.ticket_count
-      }));
+      // Retornar diretamente, sem mapear - o backend já retorna percentage
+      return response.data.data;
     } catch (error) {
-      console.error("❌ [StatusDataService] Erro:", error);
+      console.error(error);
       return [];
     }
   }

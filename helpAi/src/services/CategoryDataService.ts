@@ -23,8 +23,6 @@ interface CategoriesInfoResponse {
 export class CategoryDataService {
   async getCategoryData(filters?: TicketFilters): Promise<Category[]> {
     try {
-      console.log('🎯 [CategoryDataService] Filtros:', filters);
-
       const response: AxiosResponse<CategoriesResponse> = await api.get<CategoriesResponse>("/tickets/tickets-by-category", {
         params: filters,
         paramsSerializer: {
@@ -32,24 +30,19 @@ export class CategoryDataService {
         }
       });
 
-      console.log('📡 [CategoryDataService] Resposta:', response.data);
       return response.data.data;
     } catch (error) {
-      console.error("❌ [CategoryDataService] Erro:", error);
+      console.error(error);
       return [];
     }
   }
 
   async getAllCategories(): Promise<CategoryInfo[]> {
     try {
-      console.log('🎯 [CategoryDataService] Buscando todas categorias');
-
       const response: AxiosResponse<CategoriesInfoResponse> = await api.get<CategoriesInfoResponse>("/tickets/categories");
-
-      console.log('📡 [CategoryDataService] Todas categorias:', response.data);
       return response.data.data;
     } catch (error) {
-      console.error("❌ [CategoryDataService] Erro ao buscar categorias:", error);
+      console.error(error);
       return [];
     }
   }
