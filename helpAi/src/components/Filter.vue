@@ -73,9 +73,9 @@ export default {
             dateRange: null,
             product_id: null,
             company_list: null,
-            company_id: null,
+            company: null,
             category_list: null,
-            category_id: null,
+            category: null,
             product_list: null,
             product: null,
             isLoading: false
@@ -155,11 +155,10 @@ export default {
 
             this.$emit('filter', selected_filters);
         },
-
         cleanFilters() {
-            this.company_id = null;
-            this.category_id = null;
-            this.product_id = null;
+            this.company = null;
+            this.category = null;
+            this.product = null;
             this.dateRange = null;
 
             const cleaned_filters = {
@@ -172,7 +171,6 @@ export default {
 
             this.$emit('filter', cleaned_filters);
         }
-
 
     },
     async mounted() {
