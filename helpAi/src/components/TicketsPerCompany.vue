@@ -6,9 +6,9 @@
         <div class="card">
             <div class="card-header">
                 <h2>Tickets por Companhia</h2>
-                <div v-if="companyData" class="debug-info">
+                <!-- <div v-if="companyData" class="debug-info">
                     Total de empresas: {{ companyData.length }}
-                </div>
+                </div> -->
             </div>
             <div class="card-body">
                 <div class="chart-wrapper">
@@ -183,9 +183,14 @@ export default {
 }
 
 .chart-wrapper {
+    position: relative;
     width: 100%;
     height: 100%;
+    min-height: 280px;
+    padding: 1rem;
     display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .p-chart {
@@ -217,9 +222,14 @@ export default {
 }
 
 .card-body {
-    padding: 8px;
-    flex: 1 1 auto;
-    min-height: 0;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 280px;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .loading {

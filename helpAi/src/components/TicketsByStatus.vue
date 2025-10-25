@@ -17,7 +17,7 @@
             class="chart-canvas"
           />
           <div v-else class="no-data">
-            Nenhum dado disponível
+              Nenhum dado disponível para os filtros aplicados
           </div>
         </div>
       </template>

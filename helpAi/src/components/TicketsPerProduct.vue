@@ -4,19 +4,25 @@
       <Skeleton width="100%" height="288px"></Skeleton>
     </div>
     <div v-else class="tabela-src">
-      <template v-if="tags.length > 0">
-        <DataTable :value="tags" removableSort stripedRows scrollHeight="20rem">
-          <Column field="product_name" sortable header="Produto" />
-          <Column field="ticket_count" sortable header="Quantidade Tickets" />
-        </DataTable>
-      </template>
+      <DataTable 
+        :value="tags" 
+        removableSort 
+        stripedRows 
+        scrollHeight="20rem"
+      >
+        <Column field="product_name" sortable header="Produto" />
+        <Column field="ticket_count" sortable header="Quantidade Tickets" />
 
-      <template v-else>
-        <h4 id="no-text">Nenhum card encontrado para os filtros selecionados</h4>
-      </template>
+        <template #empty>
+          <div class="no-data">
+            Nenhum dado disponível para os filtros aplicados
+          </div>
+        </template>
+      </DataTable>
     </div>
   </div>
 </template>
+
 
 <script>
 import DataTable from 'primevue/datatable';
@@ -120,16 +126,16 @@ export default {
   border-radius: 12px;
 }
 
-#no-text {
-  display: flex;
-  justify-content: center;
-  height: 70%;
-  align-content: center;
-  align-items: center;
-  color: #666;
-  font-style: italic;
-  text-align: center;
-  padding: 20px;
+.no-data {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #666;
+    font-style: italic;
+    text-align: center;
+    width: 100%;
+    padding: 20px;
 }
 
 .loading {

@@ -10,14 +10,15 @@
             <div class="chart-body">
                 <div class="chart-container">
                     <Chart
+                        v-if="chartData"
                         type="bar"
                         :data="chartData"
                         :options="chartOptions"
                         :key="componentKey"
                         :style="{ width: '100%', height: '100%' }"
                     />
-                    <div v-if="!chartData || !chartData.labels || chartData.labels.length === 0" class="no-data">
-                        Nenhum dado disponível para os filtros selecionados
+                    <div v-else class="no-data">
+                        Nenhum dado disponível para os filtros aplicados
                     </div>
                 </div>
             </div>
@@ -46,7 +47,7 @@ export default {
     data() {
         return {
             departmentData: [],
-            chartData: this.getEmptyChartData(),
+            chartData: null,
             chartOptions: this.getDefaultOptions(),
             loading: true,
             componentKey: 0
@@ -65,10 +66,10 @@ export default {
                 if(data && data.length > 0) {
                     this.updateChartData(data);
                 } else {
-                    this.chartData = this.getEmptyChartData();
+                    this.chartData = null;
                 }
             } catch (err) {
-                this.chartData = this.getEmptyChartData();
+                this.chartData = null;
             } finally {
                 this.loading = false;
             }
@@ -99,22 +100,6 @@ export default {
             };
 
             this.componentKey += 1;
-        },
-
-        getEmptyChartData() {
-            return {
-                labels: [],
-                datasets: [
-                    {
-                        label: 'Quantidade de Tickets',
-                        data: [],
-                        backgroundColor: "#3498db",
-                        borderColor: "#2980b9",
-                        borderWidth: 1,
-                        borderRadius: 6
-                    }
-                ]
-            };
         },
 
         getDefaultOptions() {
@@ -205,7 +190,7 @@ export default {
 
 .card {
     width: 100%;
-    height: 320px;
+    height: 100%;
     background: #fff;
     border-radius: 8px;
     box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
