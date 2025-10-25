@@ -73,9 +73,9 @@ export default {
             dateRange: null,
             product_id: null,
             company_list: null,
-            company: null,
+            company_id: null,
             category_list: null,
-            category: null,
+            category_id: null,
             product_list: null,
             product: null,
             isLoading: false
@@ -137,38 +137,42 @@ export default {
                 return `${year}-${month}-${day}`;
             };
 
-            let formattedRange = null;
+            let createdat = null;
+            let end_date = null;
+
             if (this.dateRange && this.dateRange.length === 2) {
-                formattedRange = [
-                    formatDate(this.dateRange[0]),
-                    formatDate(this.dateRange[1])
-                ];
+                createdat = formatDate(this.dateRange[0]);
+                end_date = formatDate(this.dateRange[1]);
             }
 
             const selected_filters = {
-                company: this.company,
-                category: this.category,
-                product: this.product,
-                dateRange: formattedRange
+                company_id: this.company,
+                category_id: this.category,
+                product_id: this.product,
+                createdat,
+                end_date
             };
 
             this.$emit('filter', selected_filters);
         },
+
         cleanFilters() {
-            this.company = null;
-            this.category = null;
-            this.product = null;
+            this.company_id = null;
+            this.category_id = null;
+            this.product_id = null;
             this.dateRange = null;
 
             const cleaned_filters = {
-                company: null,
-                category: null,
-                product: null,
-                dateRange: null
+                company_id: null,
+                category_id: null,
+                product_id: null,
+                createdat: null,
+                end_date: null
             };
 
             this.$emit('filter', cleaned_filters);
         }
+
 
     },
     async mounted() {

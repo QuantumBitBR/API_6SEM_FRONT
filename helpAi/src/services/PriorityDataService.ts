@@ -22,8 +22,6 @@ export class PriorityDataService {
           indexes: null
         }
       });
-
-      console.log('📡 [PriorityDataService] Resposta:', response.data);
       return response.data.data;
     } catch (error) {
       console.error("❌ [PriorityDataService] Erro:", error);

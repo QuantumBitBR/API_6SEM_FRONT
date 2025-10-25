@@ -62,12 +62,8 @@ export default {
         async fetchData() {
             this.loading = true;
             try {
-                console.log('🔍 Filtros no componente CompanyChart:', this.filter);
-
                 const service = new CompanyDataService();
                 const data = await service.getCompanyData(this.filter);
-
-                console.log('📊 Dados recebidos de company:', data);
 
                 this.companyData = data;
 
@@ -75,10 +71,8 @@ export default {
                     this.chartData = this.setChartData();
                     this.chartOptions = this.setChartOptions();
                     this.chartKey += 1;
-                    console.log('✅ Gráfico atualizado com sucesso');
                 } else {
                     this.chartData = null;
-                    console.log('⚠️  Nenhum dado retornado para os filtros');
                 }
             } catch (err) {
                 console.error("❌ Erro ao buscar dados:", err);
@@ -158,7 +152,6 @@ export default {
         filter: {
             handler(newVal, oldVal) {
                 if(newVal !== oldVal){
-                    console.log('🔄 Filtros mudaram, buscando novos dados...');
                     this.fetchData();
                 }
             },

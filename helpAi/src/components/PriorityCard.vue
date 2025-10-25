@@ -24,11 +24,6 @@ export default {
       type: String,
       required: true
     },
-     filter: {
-            type: Object,
-            required: false,
-            default: null
-        }
   },
   computed: {
     iconStyle() {
@@ -53,15 +48,6 @@ export default {
       return colors[this.priority] || "#bdc3c7"; // cinza claro padrão
     }
   },
-  watch: {
-        filter: {
-            handler(newVal, oldVal) {
-                if(newVal !== oldVal  )
-                this.fetchData();
-            },
-            deep: true
-        }
-    }
 };
 </script>
 
