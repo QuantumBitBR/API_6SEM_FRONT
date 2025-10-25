@@ -1,0 +1,31 @@
+import { api } from "./apiConfig";
+import type { AxiosResponse } from "axios";
+import type { TicketFilters } from "./FiltersDataService";
+
+interface Priority {
+  priority_name: string;
+  ticket_count: number;
+}
+
+interface PrioritiesResponse {
+  data: Priority[];
+}
+
+export class PriorityDataService {
+  async getPriorityData(filters?: TicketFilters): Promise<Priority[]> {
+    try {
+      console.log("FILTROS FILTROS!!!!!!!!!!!!!!!!!!!:", filters)
+
+      const response: AxiosResponse<PrioritiesResponse> = await api.get<PrioritiesResponse>("/tickets/tickets-by-priority", {
+        params: filters,
+        paramsSerializer: {
+          indexes: null
+        }
+      });
+      return response.data.data;
+    } catch (error) {
+      console.error("❌ [PriorityDataService] Erro:", error);
+      return [];
+    }
+  }
+}

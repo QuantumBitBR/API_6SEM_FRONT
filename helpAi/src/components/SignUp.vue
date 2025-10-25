@@ -1,5 +1,6 @@
 <template>
   <div class="signup">
+    <img src="/Logo_Letra.svg" alt="Bot Avatar" class="chat-bot"/>
     <h2 class="sign-up-text-title">Bem vindo!</h2>
     <h3 class="sign-up-text">Entre com suas credenciais para iniciar sua jornada conosco!</h3>
   </div>
@@ -35,12 +36,16 @@ export default defineComponent({
   color: white;
   font-weight: normal;
   font-size: 1em;
+  margin-bottom: 100px;
 }
 .sign-up-text-title{
   color: white;
   font-weight: bold;
   font-size: 2em;
   margin: 0
+}
+.chat-bot{
+  width: 150px;
 }
 </style>
 

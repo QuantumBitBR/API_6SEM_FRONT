@@ -1,55 +1,87 @@
-<!-- components/TagTable.vue -->
 <template>
   <div>
     <div v-if="loading" class="loading">
       <Skeleton width="100%" height="288px"></Skeleton>
     </div>
-    <div v-else="" class="tabela-src">
-      <template v-if="tags.length != 0">
-        <DataTable :value="tags" removableSort stripedRows scrollHeight="20rem">
-          <Column field="product_name" sortable header="Produto" />
-          <Column field="ticket_count" sortable header="Quantidade Tickets" />
-        </DataTable>
-      </template>
+    <div v-else class="tabela-src">
+      <DataTable 
+        :value="tags" 
+        removableSort 
+        stripedRows 
+        scrollHeight="20rem"
+      >
+        <Column field="product_name" sortable header="Produto" />
+        <Column field="ticket_count" sortable header="Quantidade Tickets" />
 
-      <template v-else>
-        <h4 id="no-text">Nenhum card encontrado para os filtros selecionados</h4>
-      </template>
+        <template #empty>
+          <div class="no-data">
+            Nenhum dado disponível para os filtros aplicados
+          </div>
+        </template>
+      </DataTable>
     </div>
   </div>
 </template>
+
 
 <script>
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import { ProductDataService } from '@/services/ProductDataService';
-import { Skeleton } from 'primevue';
+import Skeleton from 'primevue/skeleton';
 
 export default {
   name: 'TagTable',
   components: { DataTable, Column, Skeleton },
+  props: {
+    filter: {
+      type: Object,
+      required: false,
+      default: null
+    }
+  },
   data() {
     return {
       loading: true,
       tags: [],
+      products: [],
     };
   },
-  methods:{
-    async loadData(){
-      try{
+  methods: {
+    async loadData() {
+      try {
+        this.loading = true;
         const service = new ProductDataService();
-        const products = await service.getProductData();
-
+        const products = await service.getProductData(this.filter);
         this.tags = products;
+      } catch (err) {
+        this.tags = [];
+      } finally {
         this.loading = false;
-      }catch(err){
-        console.error("Error to get data:", err);
+      }
+    },
+    async allProducts() {
+      try {
+        const service = new ProductDataService();
+        const products = await service.getAllProducts();
+        this.products = products;
+      } catch (err) {
+        // Silencioso
       }
     }
   },
-  mounted() {
-    this.loadData();
+  async mounted() {
+    await this.loadData();
+    await this.allProducts();
   },
+  watch: {
+    filter: {
+      handler(newVal) {
+        this.loadData();
+      },
+      deep: true
+    }
+  }
 };
 </script>
 
@@ -94,15 +126,23 @@ export default {
   border-radius: 12px;
 }
 
-#no-text {
-  display: flex;
-  justify-content: center;
-  height: 70%;
-  align-content: center;
-  align-items: center;
+.no-data {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #666;
+    font-style: italic;
+    text-align: center;
+    width: 100%;
+    padding: 20px;
+}
+
+.loading {
+  margin: auto;
   color: #666;
-  font-style: italic;
   text-align: center;
+  padding: 16px 0;
 }
 
 @media (max-width: 768px) {
