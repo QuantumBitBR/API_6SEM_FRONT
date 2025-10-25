@@ -11,6 +11,7 @@
                         </template>
                     </Button>
                 </div>
+
             </template>
             <template #content>
                 <div class="chart-container">
@@ -38,11 +39,13 @@
             </template>
         </Card>
     </div>
+
 </template>
 
 <script>
-import { Select } from 'primevue';
+import { Select, Skeleton } from 'primevue';
 import Card from 'primevue/card';
+import InputNumber from 'primevue/inputnumber';
 import DatePicker from 'primevue/datepicker';
 import { ProductDataService } from '@/services/ProductDataService';
 import { FunnelIcon } from '@heroicons/vue/24/outline';
@@ -54,17 +57,19 @@ import { CompanyDataService } from '@/services/CompanyDataService';
 export default {
     name: 'Filter',
     components: {
-        Card, Select, DatePicker, FunnelIcon, Button
+        Card, Skeleton, InputNumber, Select, DatePicker, FunnelIcon, Button
     },
     data() {
         return {
             dateRange: null,
+            product_id: null,
             company_list: null,
             company: null,
             category_list: null,
             category: null,
             product_list: null,
-            product: null
+            product: null,
+            isLoading: false
         }
     },
     methods: {
@@ -74,10 +79,10 @@ export default {
                 const data = await service.getAllCompanies();
                 this.company_list = data;
             } catch (error) {
-                console.error("Erro ao buscar empresas:", error);
+                console.error("An error occurred to get companies:", error);
                 showToast({
                     severity: 'error',
-                    summary: 'Erro ao buscar empresas',
+                    summary: 'Erro ao buscar dados do filtro',
                     detail: error.message,
                     life: 3000
                 });
@@ -89,10 +94,10 @@ export default {
                 const data = await service.getAllCategories();
                 this.category_list = data;
             } catch (error) {
-                console.error("Erro ao buscar categorias:", error);
+                console.error("An error occurred to get categories:", error);
                 showToast({
                     severity: 'error',
-                    summary: 'Erro ao buscar categorias',
+                    summary: 'Erro ao buscar dados do filtro',
                     detail: error.message,
                     life: 3000
                 });
@@ -104,10 +109,10 @@ export default {
                 const data = await service.getAllProducts();
                 this.product_list = data;
             } catch (error) {
-                console.error("Erro ao buscar produtos:", error);
+                console.error("An error occurred to get products:", error);
                 showToast({
                     severity: 'error',
-                    summary: 'Erro ao buscar produtos',
+                    summary: 'Erro ao buscar dados do filtro',
                     detail: error.message,
                     life: 3000
                 });
@@ -117,35 +122,37 @@ export default {
             const formatDate = (date) => {
                 if (!date) return null;
                 const d = new Date(date);
-                return d.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
             };
 
-            const filters = {};
-
-            // Formatar para o que o backend espera
-            if (this.company) {
-                filters.company_id = [this.company];
-            }
-            if (this.category) {
-                filters.category_id = [this.category];
-            }
-            if (this.product) {
-                filters.product_id = [this.product];
-            }
+            let formattedRange = null;
             if (this.dateRange && this.dateRange.length === 2) {
-                filters.createdat = formatDate(this.dateRange[0]);
-                filters.end_date = formatDate(this.dateRange[1]);
+                formattedRange = [
+                    formatDate(this.dateRange[0]),
+                    formatDate(this.dateRange[1])
+                ];
             }
 
-            console.log('🎯 [Filter] Emitindo filtros:', filters);
-            this.$emit('filter', filters);
+            const selected_filters = {
+                company: this.company,
+                category: this.category,
+                product: this.product,
+                dateRange: formattedRange
+            };
+
+            this.$emit('filter', selected_filters);
         }
+
     },
     async mounted() {
         await this.getAllCompanies();
         await this.getAllCategories();
         await this.getAllProducts();
     }
+
 }
 </script>
 
