@@ -10,6 +10,9 @@
       <template #content>
         <div class="chart-container">
           <Doughnut v-if="chartData" :data="chartData" :options="chartOptions" />
+          <div v-else class="no-data">
+            Nenhum dado disponível para os filtros aplicados
+          </div>
         </div>
       </template>
     </Card>

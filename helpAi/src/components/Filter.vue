@@ -4,12 +4,20 @@
             <template #title>
                 <div class="title-div">
                     <span class="status_title">Filtros</span>
-                    <Button class="button-filter" @click="modelFilters()">
-                        <template #icon>
-                            <FunnelIcon class="w-4 h-4 filter" />
-                            Filtrar
-                        </template>
-                    </Button>
+                    <div class="filter_buttons">
+                        <Button class="button-filter2" @click="cleanFilters()">
+                            <template #icon>
+                                <TrashIcon class="w-4 h-4 filter" />
+                                Limpar
+                            </template>
+                        </Button>
+                        <Button class="button-filter" @click="modelFilters()">
+                            <template #icon>
+                                <FunnelIcon class="w-4 h-4 filter" />
+                                Filtrar
+                            </template>
+                        </Button>
+                    </div>
                 </div>
 
             </template>
@@ -49,6 +57,7 @@ import InputNumber from 'primevue/inputnumber';
 import DatePicker from 'primevue/datepicker';
 import { ProductDataService } from '@/services/ProductDataService';
 import { FunnelIcon } from '@heroicons/vue/24/outline';
+import { TrashIcon } from '@heroicons/vue/24/outline';
 import Button from 'primevue/button';
 import { showToast } from '@/eventBus';
 import { CategoryDataService } from '@/services/CategoryDataService';
@@ -57,7 +66,7 @@ import { CompanyDataService } from '@/services/CompanyDataService';
 export default {
     name: 'Filter',
     components: {
-        Card, Skeleton, InputNumber, Select, DatePicker, FunnelIcon, Button
+        Card, Skeleton, InputNumber, Select, DatePicker, FunnelIcon, TrashIcon, Button
     },
     data() {
         return {
@@ -128,22 +137,39 @@ export default {
                 return `${year}-${month}-${day}`;
             };
 
-            let formattedRange = null;
+            let createdat = null;
+            let end_date = null;
+
             if (this.dateRange && this.dateRange.length === 2) {
-                formattedRange = [
-                    formatDate(this.dateRange[0]),
-                    formatDate(this.dateRange[1])
-                ];
+                createdat = formatDate(this.dateRange[0]);
+                end_date = formatDate(this.dateRange[1]);
             }
 
             const selected_filters = {
-                company: this.company,
-                category: this.category,
-                product: this.product,
-                dateRange: formattedRange
+                company_id: this.company,
+                category_id: this.category,
+                product_id: this.product,
+                createdat,
+                end_date
             };
 
             this.$emit('filter', selected_filters);
+        },
+        cleanFilters() {
+            this.company = null;
+            this.category = null;
+            this.product = null;
+            this.dateRange = null;
+
+            const cleaned_filters = {
+                company_id: null,
+                category_id: null,
+                product_id: null,
+                createdat: null,
+                end_date: null
+            };
+
+            this.$emit('filter', cleaned_filters);
         }
 
     },
@@ -203,6 +229,14 @@ export default {
     height: 40px;
     background-color: #34495e;
     border: none
+}
+
+.button-filter2 {
+    width: 120px;
+    height: 40px;
+    background-color: #34495e;
+    border: none;
+    margin-right: 10px;
 }
 
 .filter {

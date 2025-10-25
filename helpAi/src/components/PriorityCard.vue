@@ -23,7 +23,7 @@ export default {
     priority: {
       type: String,
       required: true
-    }
+    },
   },
   computed: {
     iconStyle() {
@@ -47,7 +47,7 @@ export default {
       };
       return colors[this.priority] || "#bdc3c7"; // cinza claro padrão
     }
-  }
+  },
 };
 </script>
 

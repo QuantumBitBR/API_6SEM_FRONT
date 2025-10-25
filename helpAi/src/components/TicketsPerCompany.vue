@@ -2,14 +2,26 @@
     <div v-if="loading" class="loading">
         <Skeleton width="100%" height="320px"></Skeleton>
     </div>
-    <div v-else="" class="full-card">
+    <div v-else class="full-card">
         <div class="card">
             <div class="card-header">
                 <h2>Tickets por Companhia</h2>
+                <!-- <div v-if="companyData" class="debug-info">
+                    Total de empresas: {{ companyData.length }}
+                </div> -->
             </div>
             <div class="card-body">
                 <div class="chart-wrapper">
-                    <Chart type="bar" :data="chartData" :options="chartOptions" />
+                    <Chart
+                        v-if="chartData"
+                        type="bar"
+                        :data="chartData"
+                        :options="chartOptions"
+                        :key="chartKey"
+                    />
+                    <div v-else class="no-data">
+                        Nenhum dado disponível para os filtros aplicados
+                    </div>
                 </div>
             </div>
         </div>
@@ -20,10 +32,19 @@
 import { CompanyDataService } from '@/services/CompanyDataService';
 import { Skeleton } from 'primevue';
 import Chart from 'primevue/chart';
+
 export default {
+    name: 'CompanyChart',
     components: {
         Chart,
         Skeleton
+    },
+    props: {
+        filter: {
+            type: Object,
+            required: false,
+            default: null
+        }
     },
     data() {
         return {
@@ -31,25 +52,33 @@ export default {
             chartData: null,
             chartOptions: null,
             loading: true,
+            chartKey: 0
         }
     },
     async mounted() {
-        await this.getChartData();
-        if(this.companyData){
-            this.chartData = this.setChartData();
-            this.chartOptions = this.setChartOptions();
-        }
-        this.loading = false;
+        await this.fetchData();
     },
     methods: {
-        async getChartData() {
+        async fetchData() {
+            this.loading = true;
             try {
                 const service = new CompanyDataService();
-                const data = await service.getCompanyData();
+                const data = await service.getCompanyData(this.filter);
 
                 this.companyData = data;
+
+                if(this.companyData && this.companyData.length) {
+                    this.chartData = this.setChartData();
+                    this.chartOptions = this.setChartOptions();
+                    this.chartKey += 1;
+                } else {
+                    this.chartData = null;
+                }
             } catch (err) {
-                console.error("An error occurred to get data:", err);
+                console.error("❌ Erro ao buscar dados:", err);
+                this.chartData = null;
+            } finally {
+                this.loading = false;
             }
         },
         setChartData() {
@@ -59,8 +88,12 @@ export default {
                 labels: companies,
                 datasets: [
                     {
+                        label: 'Tickets',
                         data: tickets,
                         backgroundColor: "#3498db",
+                        borderColor: "#2980b9",
+                        borderWidth: 1,
+                        borderRadius: 4,
                     }
                 ]
             }
@@ -73,6 +106,13 @@ export default {
                     legend: {
                         display: false,
                     },
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => {
+                                return `Tickets: ${context.parsed.y}`;
+                            }
+                        }
+                    }
                 },
                 scales: {
                     x: {
@@ -107,8 +147,17 @@ export default {
                 },
             };
         },
-
     },
+    watch: {
+        filter: {
+            handler(newVal, oldVal) {
+                if(newVal !== oldVal){
+                    this.fetchData();
+                }
+            },
+            deep: true
+        }
+    }
 }
 </script>
 
@@ -134,9 +183,14 @@ export default {
 }
 
 .chart-wrapper {
+    position: relative;
     width: 100%;
     height: 100%;
+    min-height: 280px;
+    padding: 1rem;
     display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .p-chart {
@@ -148,6 +202,9 @@ export default {
 .card-header {
     padding: 10px 12px;
     border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .card-header h2 {
@@ -156,10 +213,23 @@ export default {
     font-weight: 600;
 }
 
+.debug-info {
+    font-size: 11px;
+    color: #666;
+    background: #f5f5f5;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
 .card-body {
-    padding: 8px;
-    flex: 1 1 auto;
-    min-height: 0;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 280px;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .loading {
@@ -167,5 +237,14 @@ export default {
     color: #666;
     text-align: center;
     padding: 16px;
+}
+
+.no-data {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #666;
+    font-style: italic;
 }
 </style>
