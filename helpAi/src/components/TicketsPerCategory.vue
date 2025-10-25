@@ -184,7 +184,6 @@ export default {
         filter: {
             handler(newVal, oldVal) {
                 if(newVal !== oldVal  )
-                     console.log('🔄 Filtros mudaram, buscando novos dados...');
                 this.fetchData();
             },
             deep: true

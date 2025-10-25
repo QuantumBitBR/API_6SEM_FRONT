@@ -77,7 +77,7 @@ export default {
       this.filtroAtual = filtro
     },
     async getTicketCount() {
-      const priorityService = new PriorityDataService()
+      const priorityService = new PriorityDataService(filtroAtual)
       const data = await priorityService.getPriorityData()
       this.criticalTotal = data[2].ticket_count || 0
       this.highTotal = data[0].ticket_count || 0
