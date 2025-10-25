@@ -4,12 +4,20 @@
             <template #title>
                 <div class="title-div">
                     <span class="status_title">Filtros</span>
-                    <Button class="button-filter" @click="modelFilters()">
-                        <template #icon>
-                            <FunnelIcon class="w-4 h-4 filter" />
-                            Filtrar
-                        </template>
-                    </Button>
+                    <div class="filter_buttons">
+                        <Button class="button-filter2" @click="cleanFilters()">
+                            <template #icon>
+                                <TrashIcon class="w-4 h-4 filter" />
+                                Limpar
+                            </template>
+                        </Button>
+                        <Button class="button-filter" @click="modelFilters()">
+                            <template #icon>
+                                <FunnelIcon class="w-4 h-4 filter" />
+                                Filtrar
+                            </template>
+                        </Button>
+                    </div>
                 </div>
 
             </template>
@@ -49,6 +57,7 @@ import InputNumber from 'primevue/inputnumber';
 import DatePicker from 'primevue/datepicker';
 import { ProductDataService } from '@/services/ProductDataService';
 import { FunnelIcon } from '@heroicons/vue/24/outline';
+import { TrashIcon } from '@heroicons/vue/24/outline';
 import Button from 'primevue/button';
 import { showToast } from '@/eventBus';
 import { CategoryDataService } from '@/services/CategoryDataService';
@@ -57,7 +66,7 @@ import { CompanyDataService } from '@/services/CompanyDataService';
 export default {
     name: 'Filter',
     components: {
-        Card, Skeleton, InputNumber, Select, DatePicker, FunnelIcon, Button
+        Card, Skeleton, InputNumber, Select, DatePicker, FunnelIcon, TrashIcon, Button
     },
     data() {
         return {
@@ -144,6 +153,21 @@ export default {
             };
 
             this.$emit('filter', selected_filters);
+        },
+        cleanFilters() {
+            this.company = null;
+            this.category = null;
+            this.product = null;
+            this.dateRange = null;
+
+            const cleaned_filters = {
+                company: null,
+                category: null,
+                product: null,
+                dateRange: null
+            };
+
+            this.$emit('filter', cleaned_filters);
         }
 
     },
@@ -203,6 +227,14 @@ export default {
     height: 40px;
     background-color: #34495e;
     border: none
+}
+
+.button-filter2 {
+    width: 120px;
+    height: 40px;
+    background-color: #34495e;
+    border: none;
+    margin-right: 10px;
 }
 
 .filter {
