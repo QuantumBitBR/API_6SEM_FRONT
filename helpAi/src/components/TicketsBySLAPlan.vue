@@ -17,7 +17,7 @@
       </template>
     </Card>
   </div>
-</template> 
+</template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
@@ -26,13 +26,20 @@ import Card from 'primevue/card';
 import { Doughnut } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement, ChartData, ChartOptions } from 'chart.js';
 import { SLAPlanDataService } from '@/services/SLAPlanDataService';
-import type { SLAPlan } from '@/services/SLAPlanDataService'; 
+import type { SLAPlan } from '@/services/SLAPlanDataService';
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement);
 
 export default defineComponent({
   name: 'SLAPlanChart',
   components: { Skeleton, Card, Doughnut },
+  props: {
+    filter: {
+      type: Object,
+      required: false,
+      default: null
+    }
+  },
   data() {
     return {
       chartData: null as ChartData<'doughnut'> | null,
@@ -45,19 +52,19 @@ export default defineComponent({
       this.loading = true;
       const slaplanService = new SLAPlanDataService();
       try {
-        const data: SLAPlan[] = await slaplanService.getSLAPlanData(); 
-        
+        const data: SLAPlan[] = await slaplanService.getSLAPlanData(this.filter);
+
         if (!data.length) {
           this.chartData = null;
           return;
         }
 
         this.chartData = {
-          labels: data.map(s => s.slaplan_name), 
+          labels: data.map(s => s.slaplan_name),
           datasets: [
             {
-              data: data.map(s => s.percentage), 
-              backgroundColor: ['#3498db', '#2980b9', '#74b9ff', '#2c3e50', '#5dade2', '#aed6f1'], 
+              data: data.map(s => s.percentage),
+              backgroundColor: ['#3498db', '#2980b9', '#74b9ff', '#2c3e50', '#5dade2', '#aed6f1'],
               borderWidth: 0,
               hoverOffset: 12
             }
@@ -79,7 +86,7 @@ export default defineComponent({
                 generateLabels: (chart: any) => {
                   return chart.data.labels.map((label: string, i: number) => {
                     const value = chart.data.datasets[0].data[i] as number;
-                    const formattedValue = value.toFixed(1); 
+                    const formattedValue = value.toFixed(1);
                     return {
                       text: `${label} (${formattedValue}%)`,
                       fillStyle: chart.data.datasets[0].backgroundColor[i],
@@ -92,7 +99,7 @@ export default defineComponent({
             },
             tooltip: {
               callbacks: {
-                label: (context: any) => `${context.label}: ${context.raw.toFixed(1)}%` 
+                label: (context: any) => `${context.label}: ${context.raw.toFixed(1)}%`
               }
             }
           }
@@ -105,10 +112,17 @@ export default defineComponent({
       }
     }
   },
-  mounted() {
-    this.fetchData();
-  }
-});
+  watch: {
+        filter: {
+            handler(newVal, oldVal) {
+                if(newVal !== oldVal  )
+                this.fetchData();
+            },
+            deep: true
+        }
+    }
+}
+);
 </script>
 
 <style scoped>
