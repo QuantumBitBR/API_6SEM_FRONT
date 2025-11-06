@@ -1,17 +1,30 @@
 <template>
   <div class="priority-card">
-    <div class="card-body">
-      <h3 class="quantity">{{ quantity.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) }} Tickets</h3>
-    </div>
-    <div class="card-footer" :style="{ backgroundColor: footerColor }">
-      <h3 class="title" style="color:black">{{ title }}</h3>
-    </div>
+    <template v-if="quantity !== null && quantity !== undefined">
+      <div class="card-body">
+        <h3 class="quantity">
+          {{ quantity.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) }} Tickets
+        </h3>
+      </div>
+      <div class="card-footer" :style="{ backgroundColor: footerColor }">
+        <h3 class="title" style="color:black">{{ title }}</h3>
+      </div>
+    </template>
+
+    <!-- Skeleton no lugar do card inteiro -->
+    <template v-else>
+      <Skeleton width="100%" height="100%" borderRadius="8px" />
+    </template>
   </div>
 </template>
+
 <script>
 import 'primeicons/primeicons.css';
+import Skeleton from 'primevue/skeleton';
+
 export default {
   name: "PriorityCard",
+  components: { Skeleton },
   props: {
     title: {
       type: String,
@@ -45,7 +58,7 @@ export default {
         Moderate: "rgba(255, 255, 0, 0.6)",
         Low: "rgba(0, 255, 0, 0.6)",
       };
-      return colors[this.priority] || "#bdc3c7"; // cinza claro padrão
+      return colors[this.priority] || "#bdc3c7";
     }
   },
 };
@@ -65,18 +78,10 @@ export default {
   width: 33%;
 }
 
-.card-header {
-  display: flex;
-  justify-content: left;
-  align-items: center;
-  margin-bottom: 8px;
-  height: 25px;
-}
-
 .card-body {
   flex: 1;
   display: flex;
-  justify-content:space-evenly;
+  justify-content: space-evenly;
   align-items: center;
 }
 
