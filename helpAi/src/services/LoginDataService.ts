@@ -9,6 +9,7 @@ import type { AxiosResponse } from "axios";
     id_policy: number | null;
     text_policy: string | null;
     policy_date: string | null;
+    is_mandatory: boolean | null
   };
 }
 
