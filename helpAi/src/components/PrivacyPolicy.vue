@@ -3,8 +3,18 @@
     :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" class="p-dialog-mask">
     <template #header>
       <div class="header-content">
-        <h2>Termo de Privacidade</h2>
+        <div class="head">
+          <div class="title">
+            <h2>Termo de Privacidade</h2>
+          </div>
+          <Message severity="error" v-if="is_mandatory">*Obrigatório: Para continuar, é necessário aceitar o termo de privacidade. Caso não concorde, seu usuário será removido do sistema.</Message>
+          <Message severity="info" v-else >Opcional: Opcional: Você pode avançar sem aceitar o termo de privacidade, mas algumas funcionalidades podem ficar limitadas.</Message>
+          
+        </div>
+
+        <Avatar icon="pi pi-times" class="close-avatar" @click="closePopup" v-if="!is_mandatory" />
       </div>
+
     </template>
 
     <div class="privacy-content">
@@ -27,6 +37,8 @@
 
 
         <div class="footer-buttons">
+          <Button label="Negar" icon="pi pi-times" @click="askForDeliting"
+            :loading="isloading" class="button-negar" v-if="is_mandatory"/>
 
           <Button label="Aceitar" icon="pi pi-check" :disabled="!hasAccepted" @click="acceptTerms"
             :loading="isloading" />
@@ -34,6 +46,7 @@
       </div>
     </template>
   </Dialog>
+  <ConfirmDelete :text="message_delete" v-if="show_confirm_delete" @cancel="cancelDelete" @confirm=""/>
 </template>
 
 <script lang="ts">
@@ -43,13 +56,18 @@ import Button from 'primevue/button'
 import Checkbox from 'primevue/checkbox'
 import { PrivacyPolicyService } from '@/services/PrivacyPolicyService'
 import { showToast } from '@/eventBus'
-
+import { Avatar } from 'primevue'
+import {Message} from 'primevue'
+import ConfirmDelete from './ConfirmDelete.vue'
 export default defineComponent({
   name: 'PrivacyModal',
   components: {
     Dialog,
     Button,
-    Checkbox
+    Checkbox,
+    Avatar,
+    Message, 
+    ConfirmDelete
   },
   data() {
     return {
@@ -57,7 +75,10 @@ export default defineComponent({
       hasAccepted: false,
       effectiveDate: localStorage.getItem('DataVigenciaTermo'),
       privacyService: new PrivacyPolicyService(),
-      isloading: false
+      isloading: false,
+      is_mandatory: localStorage.getItem("is_mandatory"),
+      show_confirm_delete: false,
+      message_delete: 'Ao negar o termo de privacidade, seu acesso ao sistema será encerrado e seus dados de usuário serão removidos. Deseja realmente continuar?'
     }
   },
   props: {
@@ -94,10 +115,10 @@ export default defineComponent({
         showToast({
           severity: 'success',
           summary: 'Termo de privacidade',
-          detail:  "Termo aceito com sucesso!",
+          detail: "Termo aceito com sucesso!",
           life: 3000
         });
-      }catch(error: any){
+      } catch (error: any) {
         showToast({
           severity: 'error',
           summary: 'Erro ao aceitar o termo de privacidade',
@@ -105,7 +126,7 @@ export default defineComponent({
           life: 3000
         });
       }
-      
+
       this.isloading = false;
     },
     formatDate(date: string | Date): string {
@@ -118,6 +139,18 @@ export default defineComponent({
         month: '2-digit',
         year: 'numeric'
       }).format(dateObj)
+    },
+    closePopup() {
+      this.$emit('accept')
+      this.isVisible = false;
+    },
+    askForDeliting(){
+      this.$emit('accept')
+      this.show_confirm_delete = true
+    },
+    cancelDelete(){
+      this.show_confirm_delete = false
+      this.$emit('accept')
     }
   }
 })
@@ -127,11 +160,24 @@ export default defineComponent({
 * {
   font-family: 'Inter', sans-serif;
 }
+.button-negar{
+  background-color: red;
+}
+.title{
+  margin-bottom: 1em;
+}
 
 .header-content h2 {
   margin: 0;
   color: #2c3e50;
   font-weight: 600;
+
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .effective-date {
@@ -145,7 +191,7 @@ export default defineComponent({
 
 .privacy-content {
   line-height: 1.6;
-  max-height: 400px;
+  max-height: 600px;
   overflow-y: auto;
 }
 
@@ -195,25 +241,28 @@ export default defineComponent({
   justify-content: flex-end;
 }
 
-.footer-buttons :deep(.p-button:not(.p-button-secondary)) {
-  background: linear-gradient(135deg, #2196F3, #21CBF3);
-  border-color: #2196F3;
-}
 
-.footer-buttons :deep(.p-button:not(.p-button-secondary):hover:not(:disabled)) {
-  background: linear-gradient(135deg, #1976D2, #1BB5E0);
-  border-color: #1976D2;
+.footer-buttons > button{
+  border: none
 }
-
+.button-negar:hover {
+  background-color: #b02a37 !important;
+  border-color: #b02a37 !important;
+}
 :global(.p-dialog-mask) {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   background-color: rgba(0, 0, 0, 0.3) !important;
+    padding: 2em 1em;
 }
 
 :global(.p-dialog) {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   background-color: white !important;
+}
+
+.close-avatar {
+  cursor: pointer
 }
 </style>

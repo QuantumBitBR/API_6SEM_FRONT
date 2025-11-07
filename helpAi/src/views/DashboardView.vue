@@ -71,7 +71,7 @@ export default {
   },
   methods: {
     hidePolicy() {
-      this.showPolicy = false
+      this.showPolicy = !this.showPolicy
     },
     async getFilter(filtro){
       this.filtroAtual = filtro
