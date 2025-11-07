@@ -1,24 +1,24 @@
 <template>
   <DefaultLayout>
-    <Filter @filter="getFilter"/>
-    <div class ="priority-cards-container">
-      <PriorityCard title="Crítico" :filter="filtroAtual" :quantity="criticalTotal" :priority="'Critical'"/>
-      <PriorityCard title="Alta prioridade" :filter="filtroAtual" :quantity="highTotal" priority="High"/>
-      <PriorityCard title="Média prioridade" :filter="filtroAtual" :quantity="mediumTotal" priority="Moderate"/>
-      <PriorityCard title="Baixa prioridade" :filter="filtroAtual" :quantity="lowTotal" priority="Low"/>
+    <Filter @filter="getFilter" />
+    <div class="priority-cards-container">
+      <PriorityCard title="Crítico" :filter="filtroAtual" :quantity="criticalTotal" :priority="'Critical'" />
+      <PriorityCard title="Alta prioridade" :filter="filtroAtual" :quantity="highTotal" priority="High" />
+      <PriorityCard title="Média prioridade" :filter="filtroAtual" :quantity="mediumTotal" priority="Moderate" />
+      <PriorityCard title="Baixa prioridade" :filter="filtroAtual" :quantity="lowTotal" priority="Low" />
     </div>
 
     <div class="grid-container1">
-      <TicketsByStatus :filter="filtroAtual"/>
-      <TicketsPerCompany :filter="filtroAtual"/>
+      <TicketsByStatus :filter="filtroAtual" />
+      <TicketsPerCompany :filter="filtroAtual" />
     </div>
     <div class="grid-container2">
-      <TicketsPerProduct :filter="filtroAtual"/>
-      <TicketsPerCategory :filter="filtroAtual"/>
+      <TicketsPerProduct :filter="filtroAtual" />
+      <TicketsPerCategory :filter="filtroAtual" />
     </div>
     <div class="grid-container3">
-      <TicketsPerDepartment :filter="filtroAtual"/>
-      <TicketsBySLAPlan :filter="filtroAtual"/>
+      <TicketsPerDepartment :filter="filtroAtual" />
+      <TicketsBySLAPlan :filter="filtroAtual" />
     </div>
   </DefaultLayout>
   <PrivacyPolicy :visible="showPolicy" @accept="hidePolicy()" />
@@ -42,10 +42,10 @@ export default {
   name: 'Dashboard',
   data() {
     return {
-      criticalTotal: 0,
-      highTotal: 0,
-      mediumTotal: 0,
-      lowTotal: 0,
+      criticalTotal: null,
+      highTotal: null,
+      mediumTotal: null,
+      lowTotal: null,
       showPolicy: false,
       filtroAtual: null
     }
@@ -64,7 +64,7 @@ export default {
     TicketsBySLAPlan
   },
   async mounted() {
-    if(localStorage.getItem('termoExpirado') == 'true'){
+    if (localStorage.getItem('termoExpirado') == 'true') {
       this.showPolicy = true
     }
     await this.getTicketCount()
@@ -73,11 +73,15 @@ export default {
     hidePolicy() {
       this.showPolicy = !this.showPolicy
     },
-    async getFilter(filtro){
+    async getFilter(filtro) {
       this.filtroAtual = filtro
       await this.getTicketCount()
     },
     async getTicketCount() {
+      this.criticalTotal = null;
+      this.highTotal = null;
+      this.mediumTotal = null;
+      this.lowTotal = null;
       const priorityService = new PriorityDataService()
       const data = await priorityService.getPriorityData(this.filtroAtual)
       this.criticalTotal = data?.[2]?.ticket_count ?? 0
@@ -143,7 +147,8 @@ export default {
   margin-right: 0;
 }
 
-.grid-container1, .grid-container3 {
+.grid-container1,
+.grid-container3 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
@@ -164,6 +169,7 @@ export default {
     max-width: 100%;
   }
 }
+
 .priority-cards-container {
   display: flex;
   justify-content: space-between;
