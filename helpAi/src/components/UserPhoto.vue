@@ -30,12 +30,12 @@ export default {
   display: flex;
   align-items: center;
   gap: 40px;
-    margin-top: 30px;
+    /* margin-top: 30px; */
 }
 
 .user-avatar {
-  width: 200px;
-  height: 200px;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   overflow: hidden;
   border: 2px solid #000;

@@ -39,19 +39,19 @@ import { EnvelopeIcon, UserGroupIcon } from '@heroicons/vue/16/solid';
 
 <style scoped>
     .details-container {
-        width: 100%;
-        padding: 20px;
+        width: 80%;
         box-sizing: border-box;
         background-color: #fff;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         height: 400px;
-        margin-top: 100px;
-        border-radius: 50px;
-        padding-inline: 70px;
+        /* margin-top: 100px; */
+        border-radius: 30px;
+        padding: 10px 30px;
+        margin: 0 auto;
     }
 
     .box-title{
-        font-size: 24px;
+        font-size: larger;
     }
 
     .refresh {
@@ -84,7 +84,7 @@ import { EnvelopeIcon, UserGroupIcon } from '@heroicons/vue/16/solid';
         flex-direction: column;
     }
     h3{
-        font-size: 22px;
+        font-size: large;
     }
     h3, #email-text {
         margin: 2px;
@@ -104,7 +104,7 @@ import { EnvelopeIcon, UserGroupIcon } from '@heroicons/vue/16/solid';
         border: none;
         background-color: #34495e;
         color: white;
-        font-size: 18px;
+        font-size: large;
         cursor: pointer;
     }
 </style>

@@ -12,20 +12,25 @@ import UserDetails from '@/components/UserDetails.vue';
 import UserPhoto from '@/components/UserPhoto.vue';
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
 
-    export default {
-        name: 'ProfileView',
-        components: {
-            DefaultLayout,
-            UserPhoto,
-            UserDetails
-        }
+export default {
+    name: 'ProfileView',
+    components: {
+        DefaultLayout,
+        UserPhoto,
+        UserDetails
     }
+}
 </script>
 
 <style scoped>
-.profile_limit{
+.profile_limit {
     width: 90%;
-    height: 100%;
+    height: 85vh;
     margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    align-items: start;
+    justify-content: space-evenly;
 }
 </style>
