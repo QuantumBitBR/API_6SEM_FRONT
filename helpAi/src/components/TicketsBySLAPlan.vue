@@ -112,6 +112,10 @@ export default defineComponent({
       }
     }
   },
+mounted() {
+    this.fetchData();
+  },
+
   watch: {
         filter: {
             handler(newVal, oldVal) {
@@ -135,17 +139,15 @@ export default defineComponent({
   padding: 0;
 }
 :deep(.p-card-title) {
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid #eee;
-  margin-bottom: 0;
-  font-size: 1.15rem;
+padding: 10px 12px;
 }
 :deep(.p-card-content) {
-  padding: 0;
+  width: 100%;
   height: 300px;
+  padding: 8px;
   display: flex;
-  align-items: center;
   justify-content: center;
+
 }
 .status_title {
   font-size: 14px;
@@ -167,5 +169,15 @@ export default defineComponent({
 .full-card {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   border-radius: 12px;
+}
+.no-data {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #666;
+  font-style: italic;
+  text-align: center;
+  width: 100%;
 }
 </style>
