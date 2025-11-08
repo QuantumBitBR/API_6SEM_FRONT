@@ -4,8 +4,8 @@
       <h3>Confirmar Exclusão</h3>
       <p>{{ text }}</p>
       <div class="confirm-actions">
-        <Button class="btn-cancel" @click="$emit('cancel')">Cancelar</Button>
-        <Button class="btn-confirm" @click="$emit('confirm')">
+        <Button class="btn-cancel" @click="$emit('cancel')" :loading="this.is_loading">Cancelar</Button>
+        <Button class="btn-confirm" @click="$emit('confirm')" :loading="this.is_loading">
           Excluir
         </Button>
       </div>
@@ -24,6 +24,9 @@ export default {
     text: {
       type: String,
       required: true
+    },
+    is_loading: {
+      type: Boolean
     }
   },
   emits: ['cancel', 'confirm']
