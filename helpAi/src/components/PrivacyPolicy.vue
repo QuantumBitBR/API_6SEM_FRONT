@@ -46,7 +46,7 @@
       </div>
     </template>
   </Dialog>
-  <ConfirmDelete :text="message_delete" v-if="show_confirm_delete" @cancel="cancelDelete" @confirm=""/>
+  <ConfirmDelete :text="message_delete" v-if="show_confirm_delete" @cancel="cancelDelete" @confirm="confirmDelete" :is_loading="isloading" />
 </template>
 
 <script lang="ts">
@@ -59,6 +59,9 @@ import { showToast } from '@/eventBus'
 import { Avatar } from 'primevue'
 import {Message} from 'primevue'
 import ConfirmDelete from './ConfirmDelete.vue'
+import {UserService} from '@/services/UserService'
+import { useRouter } from 'vue-router';
+
 export default defineComponent({
   name: 'PrivacyModal',
   components: {
@@ -78,7 +81,9 @@ export default defineComponent({
       isloading: false,
       is_mandatory: localStorage.getItem("is_mandatory"),
       show_confirm_delete: false,
-      message_delete: 'Ao negar o termo de privacidade, seu acesso ao sistema será encerrado e seus dados de usuário serão removidos. Deseja realmente continuar?'
+      message_delete: 'Ao negar o termo de privacidade, seu acesso ao sistema será encerrado e seus dados de usuário serão removidos. Deseja realmente continuar?',
+      userService: new UserService(),
+      router: useRouter()
     }
   },
   props: {
@@ -151,6 +156,33 @@ export default defineComponent({
     cancelDelete(){
       this.show_confirm_delete = false
       this.$emit('accept')
+    },
+    async confirmDelete(){
+      this.isloading = true;
+      try{
+        const id_user = localStorage.getItem('userId')
+        await this.userService.deleteById(Number(id_user))
+        this.router.push('/');
+
+        this.isVisible = false;
+        this.show_confirm_delete = false;
+        showToast({
+          severity: 'warn',
+          summary: 'Alerta',
+          detail: "Usuário deletado",
+          life: 3000
+        });
+      }catch(error : any){
+        
+        showToast({
+          severity: 'error',
+          summary: 'Erro ao aceitar o termo de privacidade',
+          detail: error.message,
+          life: 3000
+        });
+      }
+      localStorage.clear()
+      this.isloading = false;
     }
   }
 })

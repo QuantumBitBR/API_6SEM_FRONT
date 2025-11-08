@@ -9,7 +9,7 @@ interface UserDeleted {
     user_id: number
 }
 
-class UserSerice {
+export class UserService {
     async deleteById(user_id: number): Promise<UserDeleted> {
         try {
             const response: AxiosResponse<responseUserDeleted> = await api.delete<responseUserDeleted>(`/userauth/deletar?user_id=${user_id}`);
