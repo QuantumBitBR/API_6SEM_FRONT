@@ -32,7 +32,8 @@ import {
   MagnifyingGlassIcon,
   CpuChipIcon,
   ArrowRightOnRectangleIcon,
-  DocumentCheckIcon
+  DocumentCheckIcon,
+  UsersIcon
 } from "@heroicons/vue/24/outline";
 
 export default {
@@ -42,6 +43,7 @@ export default {
     BuildingOfficeIcon,
     MagnifyingGlassIcon,
     CpuChipIcon,
+    UsersIcon,
     ArrowRightOnRectangleIcon,
     DocumentCheckIcon
   },
@@ -53,6 +55,7 @@ export default {
         { text: "Pesquisar", href: "/chat", icon:"MagnifyingGlassIcon"},
         { text: "Inteligência Artificial", href: "/ai", icon: "CpuChipIcon"},
         { text: "Termos de Privacidade", href: "/privacy-policy", icon: "DocumentCheckIcon"},
+        { text: "Usuários", href: "/user-management", icon: "UsersIcon"},
         { text: "Sair", href: "/", icon: "ArrowRightOnRectangleIcon"}
       ],
       isSideBarActive: false
@@ -88,7 +91,7 @@ export default {
 }
 
 .sidebar.active {
-  width: 280px;
+  width: 260px;
 }
 
 .sidebar-brand {
