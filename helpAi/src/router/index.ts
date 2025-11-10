@@ -38,6 +38,12 @@ const router = createRouter({
       component: () => import('../views/ProfileView.vue'),
       meta: { requiresAuth: true }
     },
+    {
+      path: '/privacy-policy',
+      name: 'Termo de Privacidade',
+      component: () => import('../views/PrivacyPolicyView.vue'),
+      meta: { requiresAuth: true }
+    },
   ],
 })
 

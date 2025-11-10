@@ -31,7 +31,8 @@ import {
   BuildingOfficeIcon,
   MagnifyingGlassIcon,
   CpuChipIcon,
-  ArrowRightOnRectangleIcon
+  ArrowRightOnRectangleIcon,
+  DocumentCheckIcon
 } from "@heroicons/vue/24/outline";
 
 export default {
@@ -41,7 +42,8 @@ export default {
     BuildingOfficeIcon,
     MagnifyingGlassIcon,
     CpuChipIcon,
-    ArrowRightOnRectangleIcon
+    ArrowRightOnRectangleIcon,
+    DocumentCheckIcon
   },
   data() {
     return {
@@ -50,6 +52,7 @@ export default {
         { text: "Empresas", href: "/companies", icon: "BuildingOfficeIcon"},
         { text: "Pesquisar", href: "/chat", icon:"MagnifyingGlassIcon"},
         { text: "Inteligência Artificial", href: "/ai", icon: "CpuChipIcon"},
+        { text: "Termos de Privacidade", href: "/privacy-policy", icon: "DocumentCheckIcon"},
         { text: "Sair", href: "/", icon: "ArrowRightOnRectangleIcon"}
       ],
       isSideBarActive: false
@@ -85,7 +88,7 @@ export default {
 }
 
 .sidebar.active {
-  width: 230px;
+  width: 280px;
 }
 
 .sidebar-brand {
