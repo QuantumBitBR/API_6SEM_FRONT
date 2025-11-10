@@ -15,7 +15,7 @@
       </span>
     </div>
 
-    <div class="user-avatar">
+    <div class="user-avatar" @click="toUserProfile()">
       <img :src="userAvatar" alt="User Avatar" />
     </div>
   </nav>
@@ -48,9 +48,12 @@ export default {
     capitalize(str) {
       if (!str) return "";
       return str.charAt(0).toUpperCase() + str.slice(1);
+    },
+    toUserProfile() {
+      this.$router.push("/profile");
     }
   }
-};
+}
 </script>
 
 <style scoped>
@@ -75,6 +78,10 @@ export default {
 
 .crumb-link:hover {
   text-decoration: underline;
+}
+
+.user-avatar {
+  cursor: pointer;
 }
 
 .user-avatar img {
