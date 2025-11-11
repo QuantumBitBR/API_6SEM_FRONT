@@ -1,5 +1,6 @@
 <template>
     <DefaultLayout>
+        <FormsPrivacy />
         
     </DefaultLayout>
 
@@ -8,11 +9,13 @@
 <script lang="ts">
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
 import ChartAILine from '@/components/ChartAILine.vue';
+import FormsPrivacy from '@/components/FormsPrivacy.vue';
 export default {
     name: 'PrivacyPolicyView',
     components: {
         DefaultLayout,
-        ChartAILine
+        ChartAILine,
+        FormsPrivacy
     }
 
 }
