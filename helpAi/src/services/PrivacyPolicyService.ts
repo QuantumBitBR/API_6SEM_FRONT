@@ -20,7 +20,7 @@ export class PrivacyPolicyService {
   async create(data: { "text": string, "is_mandatory": boolean }): Promise<string> {
     try {
       const response: AxiosResponse<ResponseCreate> = await api.post('/privacy/create', data);
-
+      console.log(response)
       if (response.status == 201) {
         return response.data.message;
       } else {
