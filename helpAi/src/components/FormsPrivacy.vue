@@ -56,6 +56,15 @@ export default {
   },
   methods: {
     async saveTerm() {
+      if (this.text == ""){
+        showToast({
+          severity: 'warn',
+          summary: 'Termo de privacidade',
+          detail: "O campo de texto não pode ser nulo ou vazio.",
+          life: 3000
+        });
+        return
+      }
 
       const payload = {
         is_mandatory: this.is_mandatory,
