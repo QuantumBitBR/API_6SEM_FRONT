@@ -16,95 +16,101 @@
             </div>
         </div>
         <div class="buttons-box">
-            <button>Teste</button>
+            <button @click="abrirTermos">Termos</button>
             <button>Teste2</button>
         </div>
+
+        <!-- Componente de Termos -->
+        <UserPrivacy v-model:visible="showTermos" />
     </div>
 </template>
 
 <script>
 import { EnvelopeIcon, UserGroupIcon } from '@heroicons/vue/16/solid';
+import UserPrivacy from './UserPrivacy.vue';
 
-    export default {
-        name: 'UserDetails',
-        components: {
-            EnvelopeIcon,
-            UserGroupIcon
-        },
-        props: {
-
+export default {
+    name: 'UserDetails',
+    components: {
+        EnvelopeIcon,
+        UserGroupIcon,
+        UserPrivacy
+    },
+    data() {
+        return {
+            showTermos: false
+        };
+    },
+    methods: {
+        abrirTermos() {
+            this.showTermos = true;
         }
     }
+}
 </script>
 
 <style scoped>
-    .details-container {
-        width: 80%;
-        box-sizing: border-box;
-        background-color: #fff;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        height: 400px;
-        /* margin-top: 100px; */
-        border-radius: 30px;
-        padding: 10px 30px;
-        margin: 0 auto;
-    }
-
-    .box-title{
-        font-size: larger;
-    }
-
-    .refresh {
-        width: 40px;
-        height: 40px;
-        margin-right: 25px;
-    }
-
-    .email-box, .role-box {
-        width: 100%;
-        height: 80px;
-        border-radius: 10px;
-        margin-top: 30px;
-        display: flex;
-        align-items: center;
-        padding-left: 20px;
-        box-sizing: border-box;
-    }
-
-    .email-box{
-        background-color: #ccfdfc;
-    }
-
-    .role-box{
-        background-color: #fddbcc;
-    }
-
-    .text-division{
-        display: flex;
-        flex-direction: column;
-    }
-    h3{
-        font-size: large;
-    }
-    h3, #email-text {
-        margin: 2px;
-    }
-
-    .buttons-box{
-        display: flex;
-        width: 100%;
-        justify-content: space-between;
-        margin: 40px 0px;
-    }
-
-    button{
-        width: 200px;
-        height: 50px;
-        border-radius: 10px;
-        border: none;
-        background-color: #34495e;
-        color: white;
-        font-size: large;
-        cursor: pointer;
-    }
+.details-container {
+    width: 80%;
+    box-sizing: border-box;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    height: 400px;
+    border-radius: 30px;
+    padding: 10px 30px;
+    margin: 0 auto;
+}
+.box-title{
+    font-size: larger;
+}
+.refresh {
+    width: 40px;
+    height: 40px;
+    margin-right: 25px;
+}
+.email-box, .role-box {
+    width: 100%;
+    height: 80px;
+    border-radius: 10px;
+    margin-top: 30px;
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+    box-sizing: border-box;
+}
+.email-box{
+    background-color: #ccfdfc;
+}
+.role-box{
+    background-color: #fddbcc;
+}
+.text-division{
+    display: flex;
+    flex-direction: column;
+}
+h3{
+    font-size: large;
+}
+h3, #email-text {
+    margin: 2px;
+}
+.buttons-box{
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    margin: 40px 0px;
+}
+button{
+    width: 200px;
+    height: 50px;
+    border-radius: 10px;
+    border: none;
+    background-color: #34495e;
+    color: white;
+    font-size: large;
+    cursor: pointer;
+}
+button:hover {
+    background-color: #2c3e50;
+}
 </style>
