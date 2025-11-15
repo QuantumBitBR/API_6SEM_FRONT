@@ -14,7 +14,7 @@ interface ResponsePrivacy{
   data: PrivacyPolicy[]
 }
 export class PrivacyPolicyService {
-  async acceptPolicy(data: { userid: number, privacyid: number }): Promise<void> {
+  async acceptPolicy(data: { userid: number, privacyid: number }): Promise<any> {
     try {
 
       const response: AxiosResponse<{}> = await api.post('/privacy/accept', data);
@@ -22,7 +22,7 @@ export class PrivacyPolicyService {
       if (response.status != 201) {
         throw new Error("Houve algum erro ao aceitar o termo")
       }else{
-        return;
+        return response.data;
       }
     } catch (error) {
       throw new Error("Houve algum erro ao aceitar o termo.")

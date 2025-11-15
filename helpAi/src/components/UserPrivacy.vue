@@ -5,7 +5,7 @@
             <div class="privacy-content">
                 <div v-for="(section, index) in policies" :key="index" class="privacy-section">
                     <div class="section-header" @click="toggleSection(index)">
-                        <h3>{{ section.title || `Termo ${index+1}` }}</h3>
+                        <h3>{{ section.title || `Termo ${index + 1}` }}</h3>
                         <span class="toggle-icon" :class="{ 'rotated': section.isExpanded }">
                             &#9660;
                         </span>
@@ -22,15 +22,15 @@
 
                         <div class="toggle-switch-container">
                             <label>Aceito este termo</label>
-                            <ToggleSwitch 
-                                v-model="section.is_accept" 
-                                @update:modelValue="handleToggleChange(section)" 
-                            />
+                            <ToggleSwitch v-model="section.is_accept"
+                                @update:modelValue="handleToggleChange(section)" />
                         </div>
                     </div>
                 </div>
             </div>
         </Dialog>
+        <ConfirmDelete :text="message_delete" v-if="show_confirm_delete" @cancel="cancelDelete" @confirm="confirmDelete"
+            :is_loading="isloading" />
     </div>
 </template>
 
@@ -39,6 +39,9 @@ import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import ToggleSwitch from 'primevue/toggleswitch';
 import { PrivacyPolicyService } from '@/services/PrivacyPolicyService';
+import ConfirmDelete from './ConfirmDelete.vue';
+import { UserService } from '@/services/UserService';
+import { showToast } from '@/eventBus';
 
 export default {
     name: 'UserPrivacyPolicy',
@@ -46,7 +49,8 @@ export default {
     components: {
         Dialog,
         Button,
-        ToggleSwitch
+        ToggleSwitch,
+        ConfirmDelete
     },
 
     props: {
@@ -59,6 +63,10 @@ export default {
     data() {
         return {
             policies: [],
+            show_confirm_delete: false,
+            message_delete: 'Ao negar o termo de privacidade, seu acesso ao sistema será encerrado e seus dados de usuário serão removidos. Deseja realmente continuar?',
+            isloading: false,
+            userService: new UserService(),
         };
     },
 
@@ -77,8 +85,45 @@ export default {
         toggleSection(index) {
             this.policies[index].isExpanded = !this.policies[index].isExpanded;
         },
+        askForDeliting() {
+            this.show_confirm_delete = true
+        },
+        cancelDelete() {
+            this.show_confirm_delete = false
+        },
+        async confirmDelete() {
+            this.isloading = true;
+            try {
+                const id_user = localStorage.getItem('userId')
+                await this.userService.deleteById(Number(id_user))
+                this.router.push('/');
+
+                this.isVisible = false;
+                this.show_confirm_delete = false;
+                showToast({
+                    severity: 'warn',
+                    summary: 'Alerta',
+                    detail: "Usuário deletado",
+                    life: 3000
+                });
+            } catch (error) {
+
+                showToast({
+                    severity: 'error',
+                    summary: 'Erro ao aceitar o termo de privacidade',
+                    detail: error.message,
+                    life: 3000
+                });
+            }
+            localStorage.clear()
+            this.isloading = false;
+        },
 
         handleToggleChange(section) {
+            if (section.is_mandatory && section.is_accept) {
+                this.askForDeliting();
+                return;
+            }
             this.changePolicy(section);
         },
 
@@ -99,12 +144,18 @@ export default {
             }
         },
 
-        async changePolicy(section){
+        async changePolicy(section) {
             try {
                 const service = new PrivacyPolicyService();
                 const change = await service.acceptPolicy({
                     userid: Number(localStorage.getItem('userId')),
                     privacyid: Number(section.id),
+                });
+                showToast({
+                    severity: 'success',
+                    summary: 'Sucesso',
+                    detail: change.message,
+                    life: 3000
                 });
             } catch (error) {
                 console.error("An error occurred while changing privacy policy:", error);
@@ -115,7 +166,7 @@ export default {
             this.$emit('update:visible', false);
         }
     },
-    
+
     async mounted() {
         await this.getAllPolicies();
     },
