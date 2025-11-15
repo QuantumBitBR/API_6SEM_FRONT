@@ -22,7 +22,10 @@
 
                         <div class="toggle-switch-container">
                             <label>Aceito este termo</label>
-                            <ToggleSwitch v-model="section.accepted" />
+                            <ToggleSwitch 
+                                v-model="section.is_accept" 
+                                @update:modelValue="handleToggleChange(section)" 
+                            />
                         </div>
                     </div>
                 </div>
@@ -75,19 +78,36 @@ export default {
             this.policies[index].isExpanded = !this.policies[index].isExpanded;
         },
 
+        handleToggleChange(section) {
+            this.changePolicy(section);
+        },
+
         async getAllPolicies() {
             try {
                 const service = new PrivacyPolicyService();
                 const policies = await service.getAllByUser(Number(localStorage.getItem('userId')));
 
-                // Adiciona isExpanded e accepted em cada política
+                // Adiciona isExpanded em cada política
                 this.policies = policies.map(policy => ({
                     ...policy,
-                    isExpanded: false,
-                    accepted: false
+                    isExpanded: false
                 }));
+
+                console.log('Policies carregadas:', this.policies);
             } catch (error) {
                 console.error("An error occurred while fetching privacy policies:", error);
+            }
+        },
+
+        async changePolicy(section){
+            try {
+                const service = new PrivacyPolicyService();
+                const change = await service.acceptPolicy({
+                    userid: Number(localStorage.getItem('userId')),
+                    privacyid: Number(section.id),
+                });
+            } catch (error) {
+                console.error("An error occurred while changing privacy policy:", error);
             }
         },
 

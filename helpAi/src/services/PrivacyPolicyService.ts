@@ -18,9 +18,11 @@ export class PrivacyPolicyService {
     try {
 
       const response: AxiosResponse<{}> = await api.post('/privacy/accept', data);
-
+      
       if (response.status != 201) {
         throw new Error("Houve algum erro ao aceitar o termo")
+      }else{
+        return;
       }
     } catch (error) {
       throw new Error("Houve algum erro ao aceitar o termo.")
