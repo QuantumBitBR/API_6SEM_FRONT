@@ -79,7 +79,7 @@ export default defineComponent({
       effectiveDate: localStorage.getItem('DataVigenciaTermo'),
       privacyService: new PrivacyPolicyService(),
       isloading: false,
-      is_mandatory: localStorage.getItem("is_mandatory"),
+      is_mandatory: true ? localStorage.getItem("is_mandatory") == "true": false,
       show_confirm_delete: false,
       message_delete: 'Ao negar o termo de privacidade, seu acesso ao sistema será encerrado e seus dados de usuário serão removidos. Deseja realmente continuar?',
       userService: new UserService(),

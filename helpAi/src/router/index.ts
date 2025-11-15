@@ -52,16 +52,21 @@ const router = createRouter({
     },
   ],
 })
-
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem("token");
+  const isAccepted = localStorage.getItem("is_accept_unmandatory");
 
-  if (to.meta.requiresAuth && !token) {
-    next({ name: "login" });
-  } else {
-    next();
+  if (to.meta?.requiresAuth && !token) return next({ name: "login" });
+
+  if (isAccepted === "false") {
+    const rotasPermitidas = ["Perfil", "login", "dashboard"];
+    const rotaAtual = typeof to.name === "string" && to.name ? to.name : (typeof to.path === "string" ? to.path : "");
+
+    if (!rotasPermitidas.includes(rotaAtual)) return next({ name: "Perfil" });
   }
+
+  return next();
 });
 
 
-export default router
+export default router;

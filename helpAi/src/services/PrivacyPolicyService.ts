@@ -3,6 +3,11 @@ import type { AxiosResponse } from "axios";
 interface ResponseCreate {
   message: string
 }
+interface ResponseUnmandatoryAccept{
+  data: {
+    accept: boolean
+  }
+}
 interface PrivacyPolicy {
   id: number,
   text: string,
@@ -46,6 +51,19 @@ export class PrivacyPolicyService {
       const response : AxiosResponse<ResponsePrivacy> = await api.get(`/privacy/get-by-id?userid=${userid}`)
       if(response.status == 200){
         return response.data.data;
+      }else{
+        throw new Error("Houve algum erro ao criar o termo")
+      }
+    }catch(error){
+      throw new Error("Houve algum erro ao criar o termo")
+    }
+  }
+
+  async getUnmandatoryPrivacyAccept(userid: number): Promise<Boolean>{
+    try{
+      const response : AxiosResponse<ResponseUnmandatoryAccept> = await api.get(`/privacy/get-accept-unmandatory?userid=${userid}`)
+      if(response.status == 200){
+        return response.data.data.accept;
       }else{
         throw new Error("Houve algum erro ao criar o termo")
       }
