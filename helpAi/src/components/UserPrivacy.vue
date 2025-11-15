@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Dialog v-model:visible="dialogVisible" modal header="User Privacy Policy" :style="{ width: '50rem' }"
+        <Dialog v-model:visible="dialogVisible" modal header="Termos de Privacidade" :style="{ width: '50rem' }"
             :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <div class="privacy-content">
                 <div v-for="(section, index) in policies" :key="index" class="privacy-section">
@@ -138,7 +138,6 @@ export default {
                     isExpanded: false
                 }));
 
-                console.log('Policies carregadas:', this.policies);
             } catch (error) {
                 console.error("An error occurred while fetching privacy policies:", error);
             }
