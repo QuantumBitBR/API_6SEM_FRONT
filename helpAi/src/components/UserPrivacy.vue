@@ -3,16 +3,16 @@
         <Dialog v-model:visible="dialogVisible" modal header="User Privacy Policy" :style="{ width: '50rem' }"
             :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <div class="privacy-content">
-                <div v-for="(section, index) in privacySections" :key="index" class="privacy-section">
+                <div v-for="(section, index) in policies" :key="index" class="privacy-section">
                     <div class="section-header" @click="toggleSection(index)">
-                        <h3>{{ section.title }}</h3>
+                        <h3>{{ section.title || `Termo ${index+1}` }}</h3>
                         <span class="toggle-icon" :class="{ 'rotated': section.isExpanded }">
                             &#9660;
                         </span>
                     </div>
 
                     <div v-show="section.isExpanded" class="section-content">
-                        <p v-if="section.description">{{ section.description }}</p>
+                        <p v-if="section.text">{{ section.text }}</p>
 
                         <ul v-if="section.items && section.items.length > 0">
                             <li v-for="(item, itemIndex) in section.items" :key="itemIndex">
@@ -27,10 +27,6 @@
                     </div>
                 </div>
             </div>
-
-            <template #footer>
-                <Button label="Close" icon="pi pi-times" @click="closeDialog" autofocus />
-            </template>
         </Dialog>
     </div>
 </template>
@@ -39,6 +35,7 @@
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import ToggleSwitch from 'primevue/toggleswitch';
+import { PrivacyPolicyService } from '@/services/PrivacyPolicyService';
 
 export default {
     name: 'UserPrivacyPolicy',
@@ -58,78 +55,7 @@ export default {
 
     data() {
         return {
-            privacySections: [
-                {
-                    title: 'Termo 1',
-                    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-                    items: [],
-                    isExpanded: false,
-                    accepted: false
-                },
-                {
-                    title: 'Termo 2',
-                    description: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-                    items: [],
-                    isExpanded: false,
-                    accepted: false
-                },
-                {
-                    title: 'Termo 3',
-                    description: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.',
-                    items: [],
-                    isExpanded: false,
-                    accepted: false
-                },
-                {
-                    title: 'Termo 4',
-                    description: 'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-                    items: [],
-                    isExpanded: false,
-                    accepted: false
-                },
-                {
-                    title: 'Termo 5',
-                    description: 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium totam rem aperiam.',
-                    items: [],
-                    isExpanded: false,
-                    accepted: false
-                },
-                {
-                    title: 'Termo 6',
-                    description: 'Eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
-                    items: [],
-                    isExpanded: false,
-                    accepted: false
-                },
-                {
-                    title: 'Termo 7',
-                    description: 'Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores.',
-                    items: [],
-                    isExpanded: false,
-                    accepted: false
-                },
-                {
-                    title: 'Termo 8',
-                    description: 'Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit.',
-                    items: [],
-                    isExpanded: false,
-                    accepted: false
-                },
-                {
-                    title: 'Termo 9',
-                    description: 'Sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.',
-                    items: [],
-                    isExpanded: false,
-                    accepted: false
-                },
-                {
-                    title: 'Termo 10',
-                    description: 'Ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.',
-                    items: [],
-                    isExpanded: false,
-                    accepted: false
-                }
-            ]
+            policies: [],
         };
     },
 
@@ -146,13 +72,33 @@ export default {
 
     methods: {
         toggleSection(index) {
-            this.privacySections[index].isExpanded = !this.privacySections[index].isExpanded;
+            this.policies[index].isExpanded = !this.policies[index].isExpanded;
+        },
+
+        async getAllPolicies() {
+            try {
+                const service = new PrivacyPolicyService();
+                const policies = await service.getAllByUser(Number(localStorage.getItem('userId')));
+
+                // Adiciona isExpanded e accepted em cada política
+                this.policies = policies.map(policy => ({
+                    ...policy,
+                    isExpanded: false,
+                    accepted: false
+                }));
+            } catch (error) {
+                console.error("An error occurred while fetching privacy policies:", error);
+            }
         },
 
         closeDialog() {
             this.$emit('update:visible', false);
         }
-    }
+    },
+    
+    async mounted() {
+        await this.getAllPolicies();
+    },
 };
 </script>
 

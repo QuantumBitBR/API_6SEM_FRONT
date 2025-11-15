@@ -43,7 +43,7 @@ export class PrivacyPolicyService {
 
   async getAllByUser(userid: number): Promise<PrivacyPolicy[]>{
     try{
-      const response : AxiosResponse<ResponsePrivacy> = await api.get(`/privacy/get-by-id?userid=${userid}`)
+      const response : AxiosResponse<ResponsePrivacy> = await api.get(`/privacy/get-by-user?userid=${userid}`)
       if(response.status == 200){
         return response.data.data;
       }else{
