@@ -23,3 +23,28 @@ export class UserAuthService {
         }
     }
 }
+export interface UserAuthResetPassword {
+  id: number,
+  message: string
+}
+
+interface ResponseUserAuthResetPassword {
+  data: UserAuthResetPassword
+}
+
+export class UserAuthResetPasswordService {
+    async resetPassword(userID: number): Promise<UserAuthResetPassword | null> {
+        try {
+            // Endpoint correto, sem body, user_id na query string
+            const response: AxiosResponse<ResponseUserAuthResetPassword> = await api.post(
+                `/userauth/resetar-senha`,
+                null,
+                { params: { user_id: userID } }
+            );
+            return response.data.data;
+        } catch (error) {
+            console.error("Error resetting password:", error);
+            return null;
+        }
+    }
+}
