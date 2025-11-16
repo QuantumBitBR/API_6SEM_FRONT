@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { usePrivacyStore } from '@/stores/privacy';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -54,6 +55,7 @@ const router = createRouter({
 })
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem("token");
+  
   const isAccepted = localStorage.getItem("is_accept_unmandatory");
 
   if (to.meta?.requiresAuth && !token) return next({ name: "login" });

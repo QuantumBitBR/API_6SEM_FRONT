@@ -5,7 +5,7 @@ interface ResponseCreate {
 }
 interface ResponseUnmandatoryAccept{
   data: {
-    accept: boolean
+    is_accept: boolean
   }
 }
 interface PrivacyPolicy {
@@ -64,7 +64,7 @@ export class PrivacyPolicyService {
     try{
       const response : AxiosResponse<ResponseUnmandatoryAccept> = await api.get(`/privacy/get-accept-unmandatory?userid=${userid}`)
       if(response.status == 200){
-        return response.data.data.accept;
+        return response.data.data.is_accept;
       }else{
         throw new Error("Houve algum erro ao criar o termo")
       }
