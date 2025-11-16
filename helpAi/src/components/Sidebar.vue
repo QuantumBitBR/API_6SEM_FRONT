@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import { usePrivacyStore } from "../stores/privacy";
 import {
   ChartBarIcon,
   BuildingOfficeIcon,
@@ -78,7 +79,8 @@ export default {
   },
   computed: {
   filteredLinks() {
-    const isAccepted = localStorage.getItem("is_accept_unmandatory") === "true";
+    const privacyStore = usePrivacyStore();
+    const isAccepted = privacyStore.isAccepted;
 
     if (isAccepted) return this.links;
 

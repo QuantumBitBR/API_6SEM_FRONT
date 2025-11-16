@@ -1,14 +1,9 @@
 <template>
-    <Dialog v-model:visible="dialogVisible" modal header="Termo de Consentimento"
-        :style="{ width: '50rem' }"
+    <Dialog v-model:visible="dialogVisible" modal header="Termo de Consentimento" :style="{ width: '50rem' }"
         :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
 
         <div class="privacy-content">
-
-            <!-- Lista de políticas -->
-            <div v-for="(section, index) in policies"
-                :key="index"
-                class="privacy-section">
+            <div v-for="(section, index) in policies" :key="index" class="privacy-section">
 
                 <div class="header-row">
                     <h3 class="section-title">
@@ -38,10 +33,7 @@
                     <div class="toggle-switch-container">
                         <label>Aceito esta condição</label>
 
-                        <ToggleSwitch 
-                            v-model="section.is_accept"
-                            @update:modelValue="handleToggleChange(section)"
-                        />
+                        <ToggleSwitch v-model="section.is_accept" @update:modelValue="handleToggleChange(section)" />
                     </div>
                 </div>
 
@@ -50,13 +42,8 @@
         </div>
     </Dialog>
 
-    <ConfirmDelete 
-        :text="message_delete"
-        v-if="show_confirm_delete"
-        @cancel="cancelDelete"
-        @confirm="confirmDelete"
-        :is_loading="isloading"
-    />
+    <ConfirmDelete :text="message_delete" v-if="show_confirm_delete" @cancel="cancelDelete" @confirm="confirmDelete"
+        :is_loading="isloading" />
 </template>
 
 <script>
@@ -66,6 +53,7 @@ import ConfirmDelete from './ConfirmDelete.vue';
 import { PrivacyPolicyService } from '@/services/PrivacyPolicyService';
 import { UserService } from '@/services/UserService';
 import { showToast } from '@/eventBus';
+import { usePrivacyStore } from "@/stores/privacy";
 
 export default {
     name: 'PrivacyPolicyUnified',
@@ -87,6 +75,8 @@ export default {
 
             isloading: false,
             userService: new UserService(),
+            privacyStore: usePrivacyStore(),
+
         };
     },
 
@@ -102,48 +92,24 @@ export default {
             const service = new PrivacyPolicyService();
             const list = await service.getAllByUser(Number(localStorage.getItem('userId')));
 
-            // Garante propriedades básicas
             this.policies = list.map(p => ({
                 ...p,
                 is_accept: Boolean(p.is_accept)
             }));
-
-            // Atualiza toggle geral
-            this.acceptAll = this.policies.every(p => p.is_accept);
         },
-
-        // --- Toggle individual
-        handleToggleChange(section) {
-            // Se é obrigatório e está tentando desmarcar → pergunta
+        async handleToggleChange(section) {
             if (section.is_mandatory && !section.is_accept) {
                 this.revertingSection = section;
                 this.show_confirm_delete = true;
                 return;
             }
 
+
             this.changePolicy(section);
-
-            // Atualiza o "Aceitar Todas"
-            this.acceptAll = this.policies.every(p => p.is_accept);
         },
-
-        // --- Toggle em massa
-        handleAcceptAll(value) {
-            this.acceptAll = value;
-
-            this.policies.forEach(section => {
-                // Obrigatórios só podem ser marcados, nunca desmarcados
-                if (section.is_mandatory) return;
-
-                section.is_accept = value;
-                this.changePolicy(section);
-                this.getAllPolicies()
-            });
-        },
-
         cancelDelete() {
             if (this.revertingSection) {
-                this.revertingSection.is_accept = true; // restaura
+                this.revertingSection.is_accept = true;
                 this.revertingSection = null;
             }
             this.show_confirm_delete = false;
@@ -165,12 +131,15 @@ export default {
         async changePolicy(section) {
             const service = new PrivacyPolicyService();
 
+
             try {
                 const result = await service.acceptPolicy({
                     userid: Number(localStorage.getItem('userId')),
                     privacyid: Number(section.id)
                 });
-
+                const response = await service.getUnmandatoryPrivacyAccept(Number(localStorage.getItem('userId')));
+                
+                this.privacyStore.update(response);
                 showToast({
                     severity: 'success',
                     summary: 'Atualizado',

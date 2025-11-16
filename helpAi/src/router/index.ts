@@ -53,22 +53,36 @@ const router = createRouter({
     },
   ],
 })
+
+
 router.beforeEach((to, from, next) => {
+  const privacyStore = usePrivacyStore();
+
   const token = localStorage.getItem("token");
-  
-  const isAccepted = localStorage.getItem("is_accept_unmandatory");
+  const isAccepted = privacyStore.isAccepted; // vem do Pinia
 
-  if (to.meta?.requiresAuth && !token) return next({ name: "login" });
+  // 1. Verifica autenticação
+  if (to.meta?.requiresAuth && !token) {
+    return next({ name: "login" });
+  }
 
-  if (isAccepted === "false") {
+  // 2. Bloqueia rotas enquanto o usuário NÃO aceitou o termo não obrigatório
+  if (isAccepted === false) {
     const rotasPermitidas = ["Perfil", "login", "dashboard"];
-    const rotaAtual = typeof to.name === "string" && to.name ? to.name : (typeof to.path === "string" ? to.path : "");
 
-    if (!rotasPermitidas.includes(rotaAtual)) return next({ name: "Perfil" });
+    const rotaAtual =
+      typeof to.name === "string"
+        ? to.name
+        : typeof to.path === "string"
+        ? to.path
+        : "";
+
+    if (!rotasPermitidas.includes(rotaAtual)) {
+      return next({ name: "Perfil" });
+    }
   }
 
   return next();
 });
-
 
 export default router;

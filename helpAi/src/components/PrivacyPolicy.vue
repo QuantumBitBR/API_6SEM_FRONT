@@ -58,7 +58,7 @@ import ConfirmDelete from './ConfirmDelete.vue';
 import { PrivacyPolicyService } from '@/services/PrivacyPolicyService';
 import { UserService } from '@/services/UserService';
 import { showToast } from '@/eventBus';
-
+import { usePrivacyStore } from "@/stores/privacy";
 export default {
   name: 'PrivacyPolicyUnified',
 
@@ -79,6 +79,7 @@ export default {
 
       isloading: false,
       userService: new UserService(),
+      privacyStore: usePrivacyStore(),
     };
   },
 
@@ -154,6 +155,9 @@ export default {
           userid: Number(localStorage.getItem('userId')),
           privacyid: Number(section.id)
         });
+        const response = await service.getUnmandatoryPrivacyAccept(Number(localStorage.getItem('userId')));
+                
+        this.privacyStore.update(response);
 
         showToast({
           severity: 'success',
