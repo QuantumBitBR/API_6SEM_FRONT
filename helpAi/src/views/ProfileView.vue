@@ -32,7 +32,6 @@ export default {
                 const userId = localStorage.getItem('userId');
                 if (userId) {
                     const userInfo = await this.userService.getUserByID(Number(localStorage.getItem('userId')));
-                    console.log(userInfo);
                     this.userData = userInfo;
                 } else {
                     console.error("User ID not found in localStorage");
@@ -44,7 +43,6 @@ export default {
     },
     async mounted() {
         this.getUserInfo();
-        console.log(this.userData);
     }
 }
 </script>
