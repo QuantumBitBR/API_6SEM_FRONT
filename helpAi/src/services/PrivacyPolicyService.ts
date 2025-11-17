@@ -66,10 +66,23 @@ export class PrivacyPolicyService {
       if(response.status == 200){
         return response.data.data.is_accept;
       }else{
-        throw new Error("Houve algum erro ao criar o termo")
+        throw new Error("Houve algum erro ao retornar o termo")
       }
     }catch(error){
-      throw new Error("Houve algum erro ao criar o termo")
+      throw new Error("Houve algum erro ao retornar o termo")
+    }
+  }
+
+  async getAllPolicies(): Promise<PrivacyPolicy[]>{
+    try{
+      const response : AxiosResponse<ResponsePrivacy> = await api.get(`/privacy/all`)
+      if(response.status == 200){
+        return response.data.data;
+      }else{
+        throw new Error("Houve algum erro ao retornar o termo")
+      }
+    }catch(error){
+      throw new Error("Houve algum erro ao retornar o termo")
     }
   }
 }
