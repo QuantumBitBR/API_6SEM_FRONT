@@ -17,9 +17,23 @@ export default {
       type: String,
       default: "https://cdn-icons-png.flaticon.com/512/847/847969.png"
     },
-    userName: {
-      type: String,
-      default: "Usuário"
+    user: {
+      type: Object,
+      default: null
+    }
+  },
+  data() {
+    return {
+      userName: "...",
+      isLoading: true
+    };
+  },
+  watch: {
+    user: {
+      handler(newVal) {
+        this.userName = newVal.name;
+      },
+      deep: true
     }
   }
 };
@@ -30,7 +44,7 @@ export default {
   display: flex;
   align-items: center;
   gap: 40px;
-    /* margin-top: 30px; */
+  /* margin-top: 30px; */
 }
 
 .user-avatar {

@@ -1,55 +1,87 @@
 <template>
-    <div class="details-container">
-        <p class="box-title">Informações do Usuário</p>
-        <div class="email-box">
-            <EnvelopeIcon class="w-1 h-1 refresh" id="icon" />
-            <div class="text-division">
-                <h3>Email:</h3>
-                <p id="email-text">lindoamadoemail@email.com</p>
+    <template v-if="isLoading">
+        <div class="skeleton-wrapper">
+            <Skeleton width="100%" height="400px" borderRadius="30px" />
+        </div>
+    </template>
+    <template v-else>
+        <div class="details-container">
+            <p class="box-title">Informações do Usuário</p>
+            <div class="email-box">
+                <EnvelopeIcon class="w-1 h-1 refresh" id="icon" />
+                <div class="text-division">
+                    <h3>Email:</h3>
+                    <p id="email-text">{{user.email || "Carregando..."}}</p>
+                </div>
             </div>
-        </div>
-        <div class="role-box">
-            <UserGroupIcon class="w-1 h-1 refresh" id="icon" />
-            <div class="text-division">
-                <h3>Cargo:</h3>
-                <p id="email-text">Admin</p>
+            <div class="role-box">
+                <UserGroupIcon class="w-1 h-1 refresh" id="icon" />
+                <div class="text-division">
+                    <h3>Cargo:</h3>
+                    <p id="email-text">{{user.role || "Carregando..."}}</p>
+                </div>
             </div>
+            <div class="buttons-box">
+                <button @click="abrirTermos">Termos</button>
+                <button>Teste2</button>
+            </div>
+    
+            <!-- Componente de Termos -->
+            <UserPrivacy v-model:visible="showTermos" />
         </div>
-        <div class="buttons-box">
-            <button @click="abrirTermos">Termos</button>
-            <button>Teste2</button>
-        </div>
-
-        <!-- Componente de Termos -->
-        <UserPrivacy v-model:visible="showTermos" />
-    </div>
+    </template>
 </template>
 
 <script>
 import { EnvelopeIcon, UserGroupIcon } from '@heroicons/vue/16/solid';
 import UserPrivacy from './UserPrivacy.vue';
+import { Skeleton } from 'primevue';
 
 export default {
     name: 'UserDetails',
     components: {
         EnvelopeIcon,
         UserGroupIcon,
-        UserPrivacy
+        UserPrivacy,
+        Skeleton
+    },
+    props: {
+        user: {
+            type: Object,
+            default: null
+        }
     },
     data() {
         return {
-            showTermos: false
+            showTermos: false,
+            isLoading: true
         };
     },
     methods: {
         abrirTermos() {
             this.showTermos = true;
         }
+    },
+    watch: {
+        user: {
+            handler(newVal) {
+                this.isLoading = false;
+            },
+            deep: true
+        }
     }
 }
 </script>
 
 <style scoped>
+.skeleton-wrapper {
+    width: 80%;
+    margin: 0 auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border-radius: 30px;
+    overflow: hidden;
+}
+
 .details-container {
     width: 80%;
     box-sizing: border-box;
