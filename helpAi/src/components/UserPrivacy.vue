@@ -29,7 +29,6 @@
                         </li>
                     </ul>
 
-                    <!-- Aceite individual -->
                     <div class="toggle-switch-container">
                         <label>Aceito esta condição</label>
 
@@ -92,10 +91,9 @@ export default {
             const service = new PrivacyPolicyService();
             const list = await service.getAllByUser(Number(localStorage.getItem('userId')));
 
-            this.policies = list.map(p => ({
-                ...p,
-                is_accept: Boolean(p.is_accept)
-            }));
+            this.policies = list.sort((a, b) => {
+                return (b.is_mandatory ? 1 : 0) - (a.is_mandatory ? 1 : 0);
+            })
         },
         async handleToggleChange(section) {
             if (section.is_mandatory && !section.is_accept) {
@@ -138,7 +136,7 @@ export default {
                     privacyid: Number(section.id)
                 });
                 const response = await service.getUnmandatoryPrivacyAccept(Number(localStorage.getItem('userId')));
-                
+
                 this.privacyStore.update(response);
                 showToast({
                     severity: 'success',

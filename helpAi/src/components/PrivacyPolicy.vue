@@ -10,7 +10,6 @@
         <ToggleSwitch v-model="acceptAll" @update:modelValue="handleAcceptAll" />
       </div>
 
-      <!-- Lista de políticas -->
       <div v-for="(section, index) in policies" :key="index" class="privacy-section">
 
         <div class="header-row">
@@ -28,7 +27,7 @@
         </p>
 
         <div class="section-content">
-         <div v-if="section.text" v-html="section.text"></div>
+          <div v-if="section.text" v-html="section.text"></div>
 
 
           <ul v-if="section.items && section.items.length > 0">
@@ -100,10 +99,10 @@ export default {
     async getAllPolicies() {
       const service = new PrivacyPolicyService();
       const list = await service.getAllByUser(Number(localStorage.getItem('userId')));
-      this.policies = list;
+      this.policies = list.sort((a, b) => {
+        return (b.is_mandatory ? 1 : 0) - (a.is_mandatory ? 1 : 0);
+      })
     },
-
-    // --- Toggle individual
     handleToggleChange(section) {
       if (section.is_mandatory && !section.is_accept) {
         this.revertingSection = section;
@@ -112,11 +111,8 @@ export default {
       }
       this.changePolicy(section);
     },
-
-    // --- Toggle em massa
     handleAcceptAll(value) {
       this.policies.forEach(section => {
-        // Obrigatórios não podem ser desmarcados
         if (section.is_mandatory && !value) return;
         if (value === true && section.is_accept === false) {
           section.is_accept = true;
@@ -156,7 +152,7 @@ export default {
           privacyid: Number(section.id)
         });
         const response = await service.getUnmandatoryPrivacyAccept(Number(localStorage.getItem('userId')));
-                
+
         this.privacyStore.update(response);
 
         showToast({
