@@ -2,49 +2,57 @@
   <Dialog v-model:visible="dialogVisible" modal header="Termo de Consentimento" :style="{ width: '50rem' }"
     :closable="canCloseDialog" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
 
-    <div class="privacy-content">
+    <template v-if="is_skeleton">
+      <Skeleton width="100%" height="400px" />
 
-      <!-- Aceitar todas -->
-      <div class="accept-all-container">
-        <label>Aceitar todas as condições</label>
-        <ToggleSwitch v-model="acceptAll" @update:modelValue="handleAcceptAll" />
-      </div>
+    </template>
 
-      <div v-for="(section, index) in policies" :key="index" class="privacy-section">
+    <template v-else>
 
-        <div class="header-row">
-          <h3 class="section-title">
-            {{ section.title || `Condição ${index + 1}` }}
-          </h3>
+      <div class="privacy-content">
 
-          <span class="badge" :class="section.is_mandatory ? 'mandatory' : 'optional'">
-            {{ section.is_mandatory ? 'Obrigatório' : 'Opcional' }}
-          </span>
+        <div class="accept-all-container">
+          <label>Aceitar todas as condições</label>
+          <ToggleSwitch v-model="acceptAll" @update:modelValue="handleAcceptAll" />
         </div>
 
-        <p class="validity-date" v-if="section.validity_date">
-          Vigente a partir de: {{ section.validity_date }}
-        </p>
+        <div v-for="(section, index) in policies" :key="index" class="privacy-section">
 
-        <div class="section-content">
-          <div v-if="section.text" v-html="section.text"></div>
+          <div class="header-row">
+            <h3 class="section-title">
+              {{ section.title || `Condição ${index + 1}` }}
+            </h3>
 
-
-          <ul v-if="section.items && section.items.length > 0">
-            <li v-for="(item, i) in section.items" :key="i">
-              {{ item }}
-            </li>
-          </ul>
-
-          <div class="toggle-switch-container">
-            <label>Aceito esta condição</label>
-            <ToggleSwitch v-model="section.is_accept" @update:modelValue="handleToggleChange(section)" />
+            <span class="badge" :class="section.is_mandatory ? 'mandatory' : 'optional'">
+              {{ section.is_mandatory ? 'Obrigatório' : 'Opcional' }}
+            </span>
           </div>
+
+          <p class="validity-date" v-if="section.validity_date">
+            Vigente a partir de: {{ section.validity_date }}
+          </p>
+
+          <div class="section-content">
+            <div v-if="section.text" v-html="section.text"></div>
+
+
+            <ul v-if="section.items && section.items.length > 0">
+              <li v-for="(item, i) in section.items" :key="i">
+                {{ item }}
+              </li>
+            </ul>
+
+            <div class="toggle-switch-container">
+              <label>Aceito esta condição</label>
+              <ToggleSwitch v-model="section.is_accept" @update:modelValue="handleToggleChange(section)" />
+            </div>
+          </div>
+
         </div>
 
       </div>
 
-    </div>
+    </template>
   </Dialog>
 
   <ConfirmDelete :text="message_delete" v-if="show_confirm_delete" @cancel="cancelDelete" @confirm="confirmDelete"
@@ -58,10 +66,12 @@ import { PrivacyPolicyService } from '@/services/PrivacyPolicyService';
 import { UserService } from '@/services/UserService';
 import { showToast } from '@/eventBus';
 import { usePrivacyStore } from "@/stores/privacy";
+import { Skeleton } from 'primevue';
+
 export default {
   name: 'PrivacyPolicyUnified',
 
-  components: { Dialog, ToggleSwitch, ConfirmDelete },
+  components: { Dialog, ToggleSwitch, ConfirmDelete, Skeleton },
 
   props: {
     visible: { type: Boolean, default: false }
@@ -71,7 +81,7 @@ export default {
     return {
       policies: [],
       acceptAll: false,
-
+      is_skeleton: false,
       revertingSection: null,
       show_confirm_delete: false,
       message_delete: 'Ao negar o termo obrigatório, seu usuário será removido. Deseja continuar?',
@@ -97,11 +107,13 @@ export default {
   methods: {
 
     async getAllPolicies() {
+      this.is_skeleton = true;
       const service = new PrivacyPolicyService();
       const list = await service.getAllByUser(Number(localStorage.getItem('userId')));
       this.policies = list.sort((a, b) => {
         return (b.is_mandatory ? 1 : 0) - (a.is_mandatory ? 1 : 0);
       })
+      this.is_skeleton = false;
     },
     handleToggleChange(section) {
       if (section.is_mandatory && !section.is_accept) {
