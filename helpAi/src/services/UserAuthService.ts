@@ -15,8 +15,8 @@ export interface UserAuthGetUserByID {
 export class UserAuthService {
     async getUserByID(userID: number): Promise<UserAuthGetUserByID | null> {
         try {
-            const response: AxiosResponse<ResponseUserAuthGetUserByID> = await api.get<ResponseUserAuthGetUserByID>(`/userauth/user-authentication/${userID}`);
-            return response.data.data;
+            const response: AxiosResponse<ResponseUserAuthGetUserByID> = await api.get<ResponseUserAuthGetUserByID>(`/userauth/by_id?user_id=${userID}`);
+            return response.data;
         } catch (error) {
             console.error("Error fetching user by ID:", error);
             return null;
