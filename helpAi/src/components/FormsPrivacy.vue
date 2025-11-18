@@ -2,12 +2,12 @@
   <div class="card-full">
     <Card class="custom-card">
       <template #title>
-        <h2>Cadastro de termo de privacidade</h2>
+        <h2>Cadastro de termo de Condições do Termo de Consentimento</h2>
       </template>
 
       <template #content>
         <p class="info-message">
-          Preencha as informações abaixo para cadastrar um novo termo de privacidade. 
+          Preencha as informações abaixo para cadastrar uma nova condição ao termo de consentimento. 
           O campo de texto permite formatação avançada.
         </p>
 
@@ -73,7 +73,7 @@ export default {
 
       try {
         await this.servicePolicy.create(payload);
-
+        this.$emit("create");
         showToast({
           severity: 'success',
           summary: 'Termo de privacidade',
