@@ -37,24 +37,11 @@ export default {
     components: {
         DataTable, Column
     },
-    methods: {
-
-        async getAllPrivacies() {
-            try {
-                this.policies = await this.servicePolicy.getAllPolicies();
-            } catch (error) {
-                showToast({
-                    severity: 'error',
-                    summary: 'Atenção',
-                    detail: 'Erro ao buscar os dados. Entre em contato com seu administrador.',
-                    life: 3000
-                });
-            }
+    props: {
+        policies: {
+            type: Array,
+            required: true
         }
-
-    },
-    async mounted() {
-        await this.getAllPrivacies();
 
     }
 }

@@ -73,7 +73,7 @@ export default {
 
       try {
         await this.servicePolicy.create(payload);
-
+        this.$emit("create");
         showToast({
           severity: 'success',
           summary: 'Termo de privacidade',
