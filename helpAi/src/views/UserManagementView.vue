@@ -1,16 +1,19 @@
 <template>
     <DefaultLayout>
-        <h4>Hello World!</h4>
+        <!-- Adicionar aqui o componente de pesquisa -->
+        <UserList/>
     </DefaultLayout>
 </template>
 
 <script>
+import UserList from '@/components/UserList.vue';
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
 
     export default {
         name: "UserManagementView",
         components: {
-            DefaultLayout
+            DefaultLayout,
+            UserList
         },
         data() {
             return {
