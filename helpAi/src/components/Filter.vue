@@ -5,6 +5,12 @@
                 <div class="title-div">
                     <span class="status_title">Filtros</span>
                     <div class="filter_buttons">
+                         <Button class="button-filter3" @click="dialogAberto = true">
+                            <template #icon>
+                                <TicketIcon class="w-4 h-4 filter" />
+                                Ver relacionados
+                            </template>
+                        </Button>
                         <Button class="button-filter2" @click="cleanFilters()">
                             <template #icon>
                                 <TrashIcon class="w-4 h-4 filter" />
@@ -47,10 +53,14 @@
             </template>
         </Card>
     </div>
+    <DialogTicketsResults 
+      v-model:visible="dialogAberto"
+    />
 
 </template>
 
 <script>
+import DialogTicketsResults from './DialogTicketsResults.vue';
 import { Select, Skeleton } from 'primevue';
 import Card from 'primevue/card';
 import InputNumber from 'primevue/inputnumber';
@@ -62,11 +72,11 @@ import Button from 'primevue/button';
 import { showToast } from '@/eventBus';
 import { CategoryDataService } from '@/services/CategoryDataService';
 import { CompanyDataService } from '@/services/CompanyDataService';
-
+import {TicketIcon} from '@heroicons/vue/24/outline';
 export default {
     name: 'Filter',
     components: {
-        Card, Skeleton, InputNumber, Select, DatePicker, FunnelIcon, TrashIcon, Button
+        Card, Skeleton, InputNumber, Select, DatePicker, FunnelIcon, TrashIcon, Button, TicketIcon, DialogTicketsResults
     },
     data() {
         return {
@@ -78,7 +88,8 @@ export default {
             category: null,
             product_list: null,
             product: null,
-            isLoading: false
+            isLoading: false,
+            dialogAberto: false
         }
     },
     methods: {
@@ -233,6 +244,13 @@ export default {
 
 .button-filter2 {
     width: 120px;
+    height: 40px;
+    background-color: #34495e;
+    border: none;
+    margin-right: 10px;
+}
+.button-filter3{
+    width: 200px;
     height: 40px;
     background-color: #34495e;
     border: none;

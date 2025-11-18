@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { usePrivacyStore } from '@/stores/privacy';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -53,15 +54,35 @@ const router = createRouter({
   ],
 })
 
-router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem("token");
 
-  if (to.meta.requiresAuth && !token) {
-    next({ name: "login" });
-  } else {
-    next();
+router.beforeEach((to, from, next) => {
+  const privacyStore = usePrivacyStore();
+
+  const token = localStorage.getItem("token");
+  const isAccepted = privacyStore.isAccepted; // vem do Pinia
+
+  // 1. Verifica autenticação
+  if (to.meta?.requiresAuth && !token) {
+    return next({ name: "login" });
   }
+
+  // 2. Bloqueia rotas enquanto o usuário NÃO aceitou o termo não obrigatório
+  if (isAccepted === false) {
+    const rotasPermitidas = ["Perfil", "login", "dashboard"];
+
+    const rotaAtual =
+      typeof to.name === "string"
+        ? to.name
+        : typeof to.path === "string"
+        ? to.path
+        : "";
+
+    if (!rotasPermitidas.includes(rotaAtual)) {
+      return next({ name: "Perfil" });
+    }
+  }
+
+  return next();
 });
 
-
-export default router
+export default router;
