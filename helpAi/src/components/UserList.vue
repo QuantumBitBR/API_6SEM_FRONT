@@ -7,12 +7,12 @@
             stripedRows 
             paginator 
             :rows="rows"
-            :totalRecords="totalRecords"
             :lazy="true"
+            :totalRecords="totalRecords"
             @page="onPageChange"
         >
             <Column field="name" header="Nome"></Column>
-            <Column field="position" header="Cargo"></Column>
+            <Column field="role" header="Cargo"></Column>
             <Column header="Ações">
                 <template #body="userData">
                     <div style="display: flex; gap: 0.5rem;">
@@ -35,6 +35,7 @@
 <script>
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
+import { UserAuthService } from '@/services/UserAuthService';
 export default {
     name: "UserList",
     components: {
@@ -45,6 +46,8 @@ export default {
         return {
             users: [],
             rows: 10,
+            totalRecords: 0,
+            userService: new UserAuthService(),
         }
     },
     mounted() {
@@ -65,14 +68,12 @@ export default {
             this.loadUsers({ page: event.page, rows: event.rows });
         },
         async loadUsers(params) {
+            const response = await this.userService.getAllUsers();
             console.log('Carregando página:', params.page);
-            this.users = [
-                { id: 1, name: 'João Silva', position: 'Desenvolvedor Frontend' },
-                { id: 2, name: 'Maria Santos', position: 'Gerente de Projetos' },
-                { id: 3, name: 'Pedro Oliveira', position: 'Designer UI/UX' },
-                { id: 4, name: 'Ana Costa', position: 'Desenvolvedora Backend' },
-                { id: 5, name: 'Carlos Souza', position: 'DevOps Engineer' }
-            ];
+            const data = response.data.data;
+            
+            this.users = data.users;
+            this.totalRecords = data.total; // Usa o 'total' que vem da API
         }
     }
 }
@@ -83,6 +84,8 @@ export default {
     padding: 5px;
     background-color: #fff;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    margin: auto;
 }
 .btn-icon {
     padding: 0.25rem;

@@ -29,6 +29,16 @@ export class UserAuthService {
         }
     }
 
+    async getAllUsers(): Promise<any>{
+        try {
+            const response: AxiosResponse<any> = await api.get(`/userauth/listar`);
+            return response;
+        } catch (error) {
+            console.error("Error getting all users:", error);
+            return null;
+        }
+    }
+
     async modifyUserData(userID: number, name: string, role: string): Promise<any> {
         try {
             const response: AxiosResponse<any> = await api.put<userModifyData>(
