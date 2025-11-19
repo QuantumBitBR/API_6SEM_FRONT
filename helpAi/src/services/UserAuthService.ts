@@ -52,28 +52,22 @@ export class UserAuthService {
     }
 }
 
-export interface UserAuthResetPassword {
-  id: number;
-  message: string;
-}
-
-interface ResponseUserAuthResetPassword {
-  data: UserAuthResetPassword;
-}
-
 export class UserAuthResetPasswordService {
-  async resetPassword(userID: number): Promise<UserAuthResetPassword | null> {
+  async resetPassword(userID: number): Promise<UserAuthResetPasswordService> {
     try {
-      const response: AxiosResponse<ResponseUserAuthResetPassword> = await api.post(
+      const response: AxiosResponse<UserAuthResetPasswordService> = await api.post(
         `/userauth/resetar-senha`,
-        null, // Não envia body, apenas query params
+        null,
         {
           params: {
             user_id: userID
           }
         }
       );
-      return response.data.data;
+
+
+      return response.data ;
+
     } catch (error: any) {
       console.error("Error resetting password:", error);
 
@@ -81,12 +75,14 @@ export class UserAuthResetPasswordService {
       if (error.response?.status === 404) {
         throw new Error("Usuário não encontrado");
       } else if (error.response?.status === 500) {
-        throw new Error("Erro interno ao resetar senha");
+
+        const backendMessage = error.response?.data?.error;
+        throw new Error(backendMessage || "Erro interno ao resetar senha");
+      } else if (error.code === 'NETWORK_ERROR') {
+        throw new Error("Erro de conexão. Verifique sua internet.");
       } else {
-        throw new Error("Erro ao resetar senha");
+        throw new Error(error.response?.data?.error || "Erro ao resetar senha");
       }
     }
   }
 }
-
-
