@@ -81,22 +81,17 @@ export default {
             console.log('Remover usuário:', user);
         },
         onPageChange(event) {
-            console.log('Página atual:', event.page + 1);
-            console.log('Linhas por página:', event.rows);
-            console.log('Offset (first):', event.first);
-            
             this.loadUsers({ page: event.page, rows: event.rows });
         },
         async loadUsers(params) {
-            const response = await this.userService.getAllUsers();
-            console.log('Carregando página:', params.page);
-            const data = response.data.data;
+            const response = await this.userService.getAllUsers(params.page+1);
+            console.log(response);
+            const data = response.data;
             
             this.users = data.users;
             this.totalRecords = data.total;
         },
         handleSave(userData) {
-            console.log('Dados salvos:', userData);
             this.loadUsers({ page: 0, rows: this.rows });
         }
     }

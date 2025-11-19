@@ -12,7 +12,7 @@ export interface UserAuthGetUserByID {
     email: string
 }
 
-interface userModifyData{
+interface userModifyData {
     name: string
     role: string
 }
@@ -29,13 +29,17 @@ export class UserAuthService {
         }
     }
 
-    async getAllUsers(): Promise<any>{
+    async getAllUsers(page: number): Promise<any> {
         try {
-            const response: AxiosResponse<any> = await api.get(`/userauth/listar`);
-            return response;
+            const response: AxiosResponse<any> = await api.get(`/userauth/listar`, {
+                params: {
+                    page: page,
+                },
+            })
+            return response.data
         } catch (error) {
-            console.error("Error getting all users:", error);
-            return null;
+            console.error('Error getting all users:', error)
+            return null
         }
     }
 
