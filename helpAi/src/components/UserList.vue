@@ -31,16 +31,28 @@
             </Column>
         </DataTable>
     </div>
+    
+    <EditUser 
+        :visible="showEditDialog" 
+        :name="selectedUser.name" 
+        :role="selectedUser.role"
+        :id="selectedUser.id"
+        @update:visible="showEditDialog = $event"
+        @save="handleSave"
+    />
 </template>
 <script>
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import { UserAuthService } from '@/services/UserAuthService';
+import EditUser from './EditUser.vue';
+
 export default {
     name: "UserList",
     components: {
         DataTable,
-        Column
+        Column,
+        EditUser
     },
     data() {
         return {
@@ -48,6 +60,12 @@ export default {
             rows: 10,
             totalRecords: 0,
             userService: new UserAuthService(),
+            showEditDialog: false,
+            selectedUser: {
+                name: '',
+                role: '',
+                id:null
+            }
         }
     },
     mounted() {
@@ -56,6 +74,8 @@ export default {
     methods: {
         editUser(user) {
             console.log('Editar usuário:', user);
+            this.selectedUser = { ...user };
+            this.showEditDialog = true;
         },
         deleteUser(user) {
             console.log('Remover usuário:', user);
@@ -73,7 +93,11 @@ export default {
             const data = response.data.data;
             
             this.users = data.users;
-            this.totalRecords = data.total; // Usa o 'total' que vem da API
+            this.totalRecords = data.total;
+        },
+        handleSave(userData) {
+            console.log('Dados salvos:', userData);
+            this.loadUsers({ page: 0, rows: this.rows });
         }
     }
 }
