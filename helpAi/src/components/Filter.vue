@@ -5,7 +5,7 @@
                 <div class="title-div">
                     <span class="status_title">Filtros</span>
                     <div class="filter_buttons">
-                         <Button class="button-filter3" @click="dialogAberto = true">
+                        <Button class="button-filter3" @click="openRelatedTickets()">
                             <template #icon>
                                 <TicketIcon class="w-4 h-4 filter" />
                                 Ver relacionados
@@ -53,9 +53,7 @@
             </template>
         </Card>
     </div>
-    <DialogTicketsResults 
-      v-model:visible="dialogAberto"
-    />
+    <DialogTicketsResults v-model:visible="dialogAberto" :filters="currentFilters" />
 
 </template>
 
@@ -72,7 +70,8 @@ import Button from 'primevue/button';
 import { showToast } from '@/eventBus';
 import { CategoryDataService } from '@/services/CategoryDataService';
 import { CompanyDataService } from '@/services/CompanyDataService';
-import {TicketIcon} from '@heroicons/vue/24/outline';
+import { TicketIcon } from '@heroicons/vue/24/outline';
+import { TicketService } from '@/services/TicketsService';
 export default {
     name: 'Filter',
     components: {
@@ -89,7 +88,8 @@ export default {
             product_list: null,
             product: null,
             isLoading: false,
-            dialogAberto: false
+            dialogAberto: false,
+            currentFilters: {}
         }
     },
     methods: {
@@ -181,6 +181,35 @@ export default {
             };
 
             this.$emit('filter', cleaned_filters);
+        },
+        buildFilters() {
+            const formatDate = (date) => {
+                if (!date) return null;
+                const d = new Date(date);
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
+            let createdat = null;
+            let end_date = null;
+
+            if (this.dateRange && this.dateRange.length === 2) {
+                createdat = formatDate(this.dateRange[0]);
+                end_date = formatDate(this.dateRange[1]);
+            }
+
+            return {
+                company_id: this.company,
+                category_id: this.category,
+                product_id: this.product,
+                createdat,
+                end_date
+            };
+        },
+        openRelatedTickets() {
+            this.currentFilters = this.buildFilters();
+            this.dialogAberto = true;
         }
 
     },
@@ -249,7 +278,8 @@ export default {
     border: none;
     margin-right: 10px;
 }
-.button-filter3{
+
+.button-filter3 {
     width: 200px;
     height: 40px;
     background-color: #34495e;
