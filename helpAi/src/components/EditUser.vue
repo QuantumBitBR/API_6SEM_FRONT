@@ -25,6 +25,8 @@
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
+import { UserAuthService } from '@/services/UserAuthService';
+import { showToast } from '@/eventBus';
 
 export default {
     name: 'UserDialog',
@@ -42,7 +44,8 @@ export default {
         return {
             localName: this.name,
             localRole: this.role,
-            localId: this.id
+            localId: this.id,
+            userService: new UserAuthService()
         };
     },
 
@@ -71,9 +74,25 @@ export default {
             console.log('Cargo:', this.localRole);
             console.log('ID:', this.localId);
             
-            this.$emit('save', { name: this.localName, role: this.localRole, id: this.localId });
+            this.changeUser();            
             
             this.dialogVisible = false;
+        },
+
+        async changeUser(){
+            try {
+                const response = await this.userService.modifyUserData(this.localId, this.localName, this.localRole);
+                if(response){
+                    showToast({
+                        severity: 'success',
+                        summary: 'Alteração de Usuário',
+                        detail: "Dados alterados com sucesso!",
+                        life: 3000
+                    });
+                }
+            } catch (error) {
+                console.error('Erro ao salvar usuário:', error);
+            }
         }
     }
 };
