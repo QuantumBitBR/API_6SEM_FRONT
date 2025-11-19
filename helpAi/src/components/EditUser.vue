@@ -1,7 +1,7 @@
 <template>
     <Dialog v-model:visible="dialogVisible" modal header="Adicionar Usuário" :style="{ width: '30rem' }"
         :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-        
+
         <div class="form-content">
             <div class="field">
                 <label for="name">Nome</label>
@@ -10,7 +10,8 @@
 
             <div class="field">
                 <label for="role">Cargo</label>
-                <InputText id="role" v-model="localRole" placeholder="Digite o cargo" class="w-full" />
+                <Dropdown id="role" v-model="localRole" :options="roles" optionLabel="label" optionValue="value"
+                    placeholder="Selecione o cargo" class="w-full" />
             </div>
 
             <div class="actions">
@@ -27,17 +28,19 @@ import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import { UserAuthService } from '@/services/UserAuthService';
 import { showToast } from '@/eventBus';
+import Dropdown from 'primevue/dropdown';
 
 export default {
     name: 'UserDialog',
 
-    components: { Dialog, InputText, Button },
+    components: { Dialog, InputText, Button, Dropdown },
 
     props: {
         visible: { type: Boolean, default: false },
         name: { type: String, default: '' },
         role: { type: String, default: '' },
-        id: { type: Number, default: null }
+        id: { type: Number, default: null },
+
     },
 
     data() {
@@ -45,7 +48,12 @@ export default {
             localName: this.name,
             localRole: this.role,
             localId: this.id,
-            userService: new UserAuthService()
+            userService: new UserAuthService(),
+            roles: [
+                { label: "ADMIN", value: "ADMIN" },
+                { label: "GESTOR", value: "GESTOR" },
+                { label: "AGENTE", value: "AGENTE" }
+            ],
         };
     },
 
@@ -70,21 +78,17 @@ export default {
 
     methods: {
         async save() {
-            console.log('Nome:', this.localName);
-            console.log('Cargo:', this.localRole);
-            console.log('ID:', this.localId);
-            
-            await this.changeUser();     
-            
-            this.$emit("save"); 
+            await this.changeUser();
+
+            this.$emit("save");
 
             this.dialogVisible = false;
         },
 
-        async changeUser(){
+        async changeUser() {
             try {
                 const response = await this.userService.modifyUserData(this.localId, this.localName, this.localRole);
-                if(response){
+                if (response) {
                     showToast({
                         severity: 'success',
                         summary: 'Alteração de Usuário',

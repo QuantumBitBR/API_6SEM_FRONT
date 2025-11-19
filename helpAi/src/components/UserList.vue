@@ -105,7 +105,6 @@ export default {
             this.isloading = true;
             try {
                 const response = await this.userDefaultService.deleteById(Number(this.selectedUser.id));
-                console.log('Resposta da exclusão:', response);
                 if(response.status === 204){
                     showToast({
                         severity: 'success',
