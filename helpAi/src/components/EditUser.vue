@@ -69,13 +69,15 @@ export default {
     },
 
     methods: {
-        save() {
+        async save() {
             console.log('Nome:', this.localName);
             console.log('Cargo:', this.localRole);
             console.log('ID:', this.localId);
             
-            this.changeUser();            
+            await this.changeUser();     
             
+            this.$emit("save"); 
+
             this.dialogVisible = false;
         },
 
