@@ -5,6 +5,12 @@
                 <div class="title-div">
                     <span class="status_title">Filtros</span>
                     <div class="filter_buttons">
+                         <Button class="button-filter2" @click="showReportDialog = true">
+                            <template #icon>
+                                <TicketIcon class="w-4 h-4 filter" />
+                                Gerar Relatório
+                            </template>
+                        </Button>
                          <Button class="button-filter3" @click="dialogAberto = true">
                             <template #icon>
                                 <TicketIcon class="w-4 h-4 filter" />
@@ -53,8 +59,11 @@
             </template>
         </Card>
     </div>
-    <DialogTicketsResults 
+    <DialogTicketsResults
       v-model:visible="dialogAberto"
+    />
+    <ReportDialog
+      v-model:visible="showReportDialog"
     />
 
 </template>
@@ -73,10 +82,11 @@ import { showToast } from '@/eventBus';
 import { CategoryDataService } from '@/services/CategoryDataService';
 import { CompanyDataService } from '@/services/CompanyDataService';
 import {TicketIcon} from '@heroicons/vue/24/outline';
+import ReportDialog from './ReportDialog.vue';
 export default {
     name: 'Filter',
     components: {
-        Card, Skeleton, InputNumber, Select, DatePicker, FunnelIcon, TrashIcon, Button, TicketIcon, DialogTicketsResults
+        Card, Skeleton, InputNumber, Select, DatePicker, FunnelIcon, TrashIcon, Button, TicketIcon, DialogTicketsResults, ReportDialog
     },
     data() {
         return {
@@ -89,7 +99,8 @@ export default {
             product_list: null,
             product: null,
             isLoading: false,
-            dialogAberto: false
+            dialogAberto: false,
+            showReportDialog: false
         }
     },
     methods: {
