@@ -48,6 +48,7 @@ import { InputText } from "primevue";
 import { Card } from "primevue";
 import { showToast } from "@/eventBus";
 import { UserAuthService } from "@/services/UserAuthService";
+import emitter from "@/eventBus";
 export default {
     name: "CreateUser",
     components: { Button, Select, InputText, Card },
@@ -97,6 +98,7 @@ export default {
             this.is_loading = true;
             try{
                 await this.service.createUser(this.form);
+                emitter.emit("user:created");
                 showToast({
                     severity: 'success',
                     summary: 'Sucesso!',

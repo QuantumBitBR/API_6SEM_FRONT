@@ -43,7 +43,7 @@ import EditUser from './EditUser.vue';
 import { UserService } from '@/services/UserService';
 import ConfirmDelete from './ConfirmDelete.vue';
 import { showToast } from '@/eventBus';
-
+import emitter from '@/eventBus';
 export default {
     name: "UserList",
     components: {
@@ -90,6 +90,12 @@ export default {
     },
     mounted() {
         this.loadUsers({ page: 0, rows: this.rows });
+        emitter.on("user:created", () => {
+            this.loadUsers({ page: 0, rows: this.rows });
+        });
+    },
+    beforeUnmount() {
+        emitter.off("user:created");
     },
     methods: {
         editUser(user) {
