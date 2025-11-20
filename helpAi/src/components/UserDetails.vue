@@ -23,12 +23,13 @@
             </div>
             <div class="buttons-box">
                 <button @click="abrirTermos">Termos</button>
-                <button>Teste2</button>
+                <button @click="abrirReset">Trocar Senha</button>
             </div>
     
             <!-- Componente de Termos -->
             <UserPrivacy v-model:visible="showTermos" />
         </div>
+        <ResetPassword v-model:visible="showReset" />
     </template>
 </template>
 
@@ -36,14 +37,15 @@
 import { EnvelopeIcon, UserGroupIcon } from '@heroicons/vue/16/solid';
 import UserPrivacy from './UserPrivacy.vue';
 import { Skeleton } from 'primevue';
-
+import ResetPassword from './ResetPassword.vue';
 export default {
     name: 'UserDetails',
     components: {
         EnvelopeIcon,
         UserGroupIcon,
         UserPrivacy,
-        Skeleton
+        Skeleton,
+        ResetPassword
     },
     props: {
         user: {
@@ -54,12 +56,16 @@ export default {
     data() {
         return {
             showTermos: false,
-            isLoading: true
+            isLoading: true,
+            showReset: false
         };
     },
     methods: {
         abrirTermos() {
             this.showTermos = true;
+        }, 
+        abrirReset(){
+            this.showReset = true;
         }
     },
     watch: {
