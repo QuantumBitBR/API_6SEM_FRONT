@@ -44,11 +44,11 @@ export class UserAuthService {
             throw new Error("Erro ao criar usuário. Entre contato com o administrador");
         }
     }
-    async getUserByID(userID: number): Promise<UserAuthGetUserByID | null> {
+    async getUserByID(userID: number): Promise<ResponseUserAuthGetUserByID | null> {
         try {
             const response: AxiosResponse<ResponseUserAuthGetUserByID> =
                 await api.get<ResponseUserAuthGetUserByID>(`/userauth/by_id?user_id=${userID}`)
-            return response.data.data;
+            return response.data;
         } catch (error) {
             throw new Error("Erro ao buscar os dados");
         }
