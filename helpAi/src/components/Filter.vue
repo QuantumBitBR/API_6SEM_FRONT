@@ -11,7 +11,7 @@
                                 Gerar Relatório
                             </template>
                         </Button>
-                         <Button class="button-filter3" @click="dialogAberto = true">
+                        <Button class="button-filter3" @click="openRelatedTickets()">
                             <template #icon>
                                 <TicketIcon class="w-4 h-4 filter" />
                                 Ver relacionados
@@ -59,9 +59,7 @@
             </template>
         </Card>
     </div>
-    <DialogTicketsResults
-      v-model:visible="dialogAberto"
-    />
+    <DialogTicketsResults v-model:visible="dialogAberto" :filters="currentFilters" />
     <ReportDialog
       v-model:visible="showReportDialog" :companyId="company" categoryId="category" :productId="product_id" :dateRange="dateRange"
     />
@@ -81,6 +79,7 @@ import { CategoryDataService } from '@/services/CategoryDataService';
 import { CompanyDataService } from '@/services/CompanyDataService';
 import {TicketIcon} from '@heroicons/vue/24/outline';
 import ReportDialog from './ReportDialog.vue';
+import { TicketService } from '@/services/TicketsService';
 export default {
     name: 'Filter',
     components: {
@@ -98,7 +97,8 @@ export default {
             product: null,
             isLoading: false,
             dialogAberto: false,
-            showReportDialog: false
+            showReportDialog: false,
+            currentFilters: {}
         }
     },
     methods: {
@@ -189,6 +189,35 @@ export default {
                 end_date: null
             };
             this.$emit('filter', cleaned_filters);
+        },
+        buildFilters() {
+            const formatDate = (date) => {
+                if (!date) return null;
+                const d = new Date(date);
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
+            let createdat = null;
+            let end_date = null;
+
+            if (this.dateRange && this.dateRange.length === 2) {
+                createdat = formatDate(this.dateRange[0]);
+                end_date = formatDate(this.dateRange[1]);
+            }
+
+            return {
+                company_id: this.company,
+                category_id: this.category,
+                product_id: this.product,
+                createdat,
+                end_date
+            };
+        },
+        openRelatedTickets() {
+            this.currentFilters = this.buildFilters();
+            this.dialogAberto = true;
         }
     },
     async mounted() {
@@ -255,7 +284,8 @@ export default {
     border: none;
     margin-right: 10px;
 }
-.button-filter3{
+
+.button-filter3 {
     width: 200px;
     height: 40px;
     background-color: #34495e;
