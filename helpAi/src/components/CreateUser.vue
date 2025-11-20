@@ -46,6 +46,7 @@ import { Button } from "primevue";
 import { Select } from "primevue";
 import { InputText } from "primevue";
 import { Card } from "primevue";
+import { showToast } from "@/eventBus";
 
 export default {
     name: "CreateUser",
@@ -69,11 +70,31 @@ export default {
 
     methods: {
         submit() {
-            console.log("Usuário criado:", this.form);
-        },
-        cancel() {
-            console.log("Cancelado");
-        },
+            if (this.form.name.trim() == "" || this.form.email.trim() == "" || this.form.role == null) {
+                showToast({
+                    severity: 'warn',
+                    summary: 'Atenção',
+                    detail: "Todos os campos devem estar preenchidos",
+                    life: 3000
+                });
+                return;
+            }
+
+            const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!regexEmail.test(this.form.email.trim())) {
+                showToast({
+                    severity: 'warn',
+                    summary: 'Atenção',
+                    detail: "E-mail inválido!",
+                    life: 3000
+                });
+                return;
+            }
+
+            
+            
+        }
     },
 };
 </script>
@@ -107,17 +128,18 @@ h3 {
 }
 
 .fields-row {
-  display: flex;
-  gap: 1.5rem;
-  align-items: flex-start;
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
 }
 
 .field {
-  flex: 1; /* cada campo ocupa espaço igual */
+    flex: 1;
+    /* cada campo ocupa espaço igual */
 }
 
 .input-default {
-  width: 100%;
+    width: 100%;
 }
 
 .field label {
