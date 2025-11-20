@@ -6,16 +6,25 @@
             <Column field="email" header="Email"></Column> <!-- Adicionei coluna de email -->
             <Column field="role" header="Cargo"></Column>
             <Column header="Ações">
-                <template #body="userData">
+                <template #body="userData" v-if="!isloading">
                     <div style="display: flex; gap: 0.5rem;">
-                        <button @click="editUser(userData.data)" class="btn-icon">
+                        <button @click="editUser(userData.data)" class="btn-icon" v-tooltip="'Editar usuário'">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" class="icon icon-edit">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
                             </svg>
                         </button>
-                        <button @click="deleteUser(userData.data)" class="btn-icon">
+                        <button @click="changePassword(userData.data)" class="btn-icon btn-password"
+                            v-tooltip="'Resetar senha'">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="icon">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M16.5 10.5V7.125a4.125 4.125 0 1 0-8.25 0V10.5m-.75 0h9.75A2.25 2.25 0 0 1 19.5 12.75v6A2.25 2.25 0 0 1 17.25 21h-10.5A2.25 2.25 0 0 1 4.5 18.75v-6A2.25 2.25 0 0 1 6.75 10.5Zm6 4.125a1.125 1.125 0 1 1-2.25 0 1.125 1.125 0 0 1 2.25 0Z" />
+                            </svg>
+                        </button>
+
+                        <button @click="deleteUser(userData.data)" class="btn-icon" v-tooltip="'Excluir usuário'">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" class="icon icon-delete">
                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -23,6 +32,10 @@
                             </svg>
                         </button>
                     </div>
+                </template>
+
+                <template #body="userData" v-else>
+                    <Skeleton width="100%"/>
                 </template>
             </Column>
         </DataTable>
@@ -43,14 +56,16 @@ import EditUser from './EditUser.vue';
 import { UserService } from '@/services/UserService';
 import ConfirmDelete from './ConfirmDelete.vue';
 import { showToast } from '@/eventBus';
-
+import emitter from '@/eventBus';
+import { Skeleton } from 'primevue';
 export default {
     name: "UserList",
     components: {
         DataTable,
         Column,
         EditUser,
-        ConfirmDelete
+        ConfirmDelete,
+        Skeleton
     },
     props: {
         emailFilter: {
@@ -90,6 +105,12 @@ export default {
     },
     mounted() {
         this.loadUsers({ page: 0, rows: this.rows });
+        emitter.on("user:created", () => {
+            this.loadUsers({ page: 0, rows: this.rows });
+        });
+    },
+    beforeUnmount() {
+        emitter.off("user:created");
     },
     methods: {
         editUser(user) {
@@ -128,7 +149,7 @@ export default {
             this.isloading = true;
             try {
                 const response = await this.userDefaultService.deleteById(Number(this.selectedUser.id));
-                if(response.status === 204){
+                if (response.status === 204) {
                     showToast({
                         severity: 'success',
                         summary: 'Exclusão de Usuário',
@@ -145,6 +166,28 @@ export default {
                 this.show_confirm_delete = false;
             }
         },
+        async changePassword(userid) {
+            this.isloading = true;
+            try {
+                const response = await this.userService.resetPassword(Number(userid.id));
+
+                showToast({
+                    severity: 'success',
+                    summary: 'Mudança de senha',
+                    detail: "Uma nova senha foi gerada e enviada para o e-mail do usuário.",
+                    life: 3000
+                });
+
+            } catch (error) {
+                showToast({
+                    severity: 'error',
+                    summary: 'Atenção!',
+                    detail: error,
+                    life: 3000
+                });
+            }
+            this.isloading = false;
+        }
     },
     watch: {
         emailFilter() {
@@ -163,6 +206,10 @@ export default {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     width: 90%;
     margin: auto;
+}
+
+.btn-password {
+    color: rgb(255, 183, 0)
 }
 
 .btn-icon {

@@ -7,6 +7,8 @@ import './main.css'
 import 'primeicons/primeicons.css'
 import App from './App.vue'
 import router from './router'
+import Tooltip from 'primevue/tooltip';
+
 
 const app = createApp(App)
 
@@ -22,7 +24,7 @@ app.use(PrimeVue, {
 
 app.use(router)
 app.use(ToastService)
-
+app.directive('tooltip', Tooltip);
 app.mount('#app')
 
 app.config.globalProperties.$primevue.config.locale = {
