@@ -65,3 +65,38 @@ export class UserAuthService {
         }
     }
 }
+
+export class UserAuthResetPasswordService {
+  async resetPassword(userID: number): Promise<UserAuthResetPasswordService> {
+    try {
+      const response: AxiosResponse<UserAuthResetPasswordService> = await api.post(
+        `/userauth/resetar-senha`,
+        null,
+        {
+          params: {
+            user_id: userID
+          }
+        }
+      );
+
+
+      return response.data ;
+
+    } catch (error: any) {
+      console.error("Error resetting password:", error);
+
+
+      if (error.response?.status === 404) {
+        throw new Error("Usuário não encontrado");
+      } else if (error.response?.status === 500) {
+
+        const backendMessage = error.response?.data?.error;
+        throw new Error(backendMessage || "Erro interno ao resetar senha");
+      } else if (error.code === 'NETWORK_ERROR') {
+        throw new Error("Erro de conexão. Verifique sua internet.");
+      } else {
+        throw new Error(error.response?.data?.error || "Erro ao resetar senha");
+      }
+    }
+  }
+}
