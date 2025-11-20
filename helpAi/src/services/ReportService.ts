@@ -22,3 +22,26 @@ export class ReportService {
     }
   }
 }
+
+export class ReportServicePDF {
+  async getReportPDF(filters?: TicketFilters){
+    try {
+      const response = await api.get('/tickets/report/pdf', {
+        params: filters,
+        paramsSerializer: {
+          indexes: null
+        },
+        responseType: 'blob'
+      });
+
+      if (response.status == 200) {
+        return response.data;
+      }
+      else{
+        throw new Error("Houve algum erro ao gerar o relatório em PDF")
+      }
+    } catch (error) {
+        throw new Error("Erro ao gerar o relatório em PDF: " + error);
+    }
+  }
+}
