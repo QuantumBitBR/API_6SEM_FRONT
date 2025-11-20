@@ -1,8 +1,9 @@
 <template>
     <div class="table-class">
-        <DataTable :value="users" tableStyle="min-width: 50rem" removableSort stripedRows paginator :rows="rows"
+        <DataTable :value="filteredUsers" tableStyle="min-width: 50rem" removableSort stripedRows paginator :rows="rows"
             :lazy="true" :totalRecords="totalRecords" @page="onPageChange">
             <Column field="name" header="Nome"></Column>
+            <Column field="email" header="Email"></Column> <!-- Adicionei coluna de email -->
             <Column field="role" header="Cargo"></Column>
             <Column header="Ações">
                 <template #body="userData">
@@ -29,10 +30,11 @@
 
     <EditUser :visible="showEditDialog" :name="selectedUser.name" :role="selectedUser.role" :id="selectedUser.id"
         @update:visible="showEditDialog = $event" @save="handleSave" />
-    
+
     <ConfirmDelete :text="message_delete" v-if="show_confirm_delete" @cancel="cancelDelete" @confirm="confirmDelete"
         :is_loading="isloading" />
 </template>
+
 <script>
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
@@ -49,6 +51,12 @@ export default {
         Column,
         EditUser,
         ConfirmDelete
+    },
+    props: {
+        emailFilter: {
+            type: String,
+            default: ''
+        }
     },
     data() {
         return {
@@ -68,6 +76,18 @@ export default {
             }
         }
     },
+    computed: {
+        filteredUsers() {
+            if (!this.emailFilter) {
+                return this.users;
+            }
+
+            const filter = this.emailFilter.toLowerCase();
+            return this.users.filter(user =>
+                user.email && user.email.toLowerCase().includes(filter)
+            );
+        }
+    },
     mounted() {
         this.loadUsers({ page: 0, rows: this.rows });
     },
@@ -84,11 +104,15 @@ export default {
             this.loadUsers({ page: event.page, rows: event.rows });
         },
         async loadUsers(params) {
-            const response = await this.userService.getAllUsers(params.page + 1);
-            const data = response.data;
+            try {
+                const response = await this.userService.getAllUsers(params.page + 1);
+                const data = response.data;
 
-            this.users = data.users;
-            this.totalRecords = data.total;
+                this.users = data.users;
+                this.totalRecords = data.total;
+            } catch (error) {
+                console.error('Erro ao carregar usuários:', error);
+            }
         },
         handleSave(userData) {
             this.loadUsers({ page: 0, rows: this.rows });
@@ -100,7 +124,6 @@ export default {
             }
             this.show_confirm_delete = false;
         },
-
         async confirmDelete() {
             this.isloading = true;
             try {
@@ -115,17 +138,23 @@ export default {
                 }
 
                 this.loadUsers({ page: 0, rows: this.rows });
-            }catch (error) {
+            } catch (error) {
                 console.error('Erro ao excluir usuário:', error);
-            }
-            finally {
+            } finally {
                 this.isloading = false;
                 this.show_confirm_delete = false;
             }
         },
+    },
+    watch: {
+        emailFilter() {
+            // Se você quiser fazer a busca no backend em vez de filtrar no frontend,
+            // pode chamar this.loadUsers aqui com o parâmetro de filtro
+        }
     }
 }
 </script>
+
 <style scoped>
 .table-class {
     border-radius: 12px;
