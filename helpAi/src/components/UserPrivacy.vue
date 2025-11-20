@@ -1,264 +1,219 @@
 <template>
-    <div>
-        <Dialog v-model:visible="dialogVisible" modal header="Termos de Privacidade" :style="{ width: '50rem' }"
-            :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <div class="privacy-content">
-                <div v-for="(section, index) in policies" :key="index" class="privacy-section">
-                    <div class="section-header" @click="toggleSection(index)">
-                        <h3>{{ section.title || `Termo ${index + 1}` }}</h3>
-                        <span class="toggle-icon" :class="{ 'rotated': section.isExpanded }">
-                            &#9660;
-                        </span>
-                    </div>
+    <Dialog v-model:visible="dialogVisible" modal header="Termo de Consentimento" :style="{ width: '50rem' }"
+        :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
 
-                    <div v-show="section.isExpanded" class="section-content">
-                        <p v-if="section.text">{{ section.text }}</p>
+        <div class="privacy-content">
+            <div v-for="(section, index) in policies" :key="index" class="privacy-section">
 
-                        <ul v-if="section.items && section.items.length > 0">
-                            <li v-for="(item, itemIndex) in section.items" :key="itemIndex">
-                                {{ item }}
-                            </li>
-                        </ul>
+                <div class="header-row">
+                    <h3 class="section-title">
+                        {{ section.title || `Condição ${index + 1}` }}
+                    </h3>
 
-                        <div class="toggle-switch-container">
-                            <label>Aceito este termo</label>
-                            <ToggleSwitch v-model="section.is_accept"
-                                @update:modelValue="handleToggleChange(section)" />
-                        </div>
+                    <span class="badge" :class="section.is_mandatory ? 'mandatory' : 'optional'">
+                        {{ section.is_mandatory ? 'Obrigatório' : 'Opcional' }}
+                    </span>
+                </div>
+
+                <p class="validity-date" v-if="section.validity_date">
+                    Vigente a partir de: {{ section.validity_date }}
+                </p>
+
+                <div class="section-content">
+                    <div v-if="section.text" v-html="section.text"></div>
+
+
+                    <ul v-if="section.items && section.items.length > 0">
+                        <li v-for="(item, i) in section.items" :key="i">
+                            {{ item }}
+                        </li>
+                    </ul>
+
+                    <div class="toggle-switch-container">
+                        <label>Aceito esta condição</label>
+
+                        <ToggleSwitch v-model="section.is_accept" @update:modelValue="handleToggleChange(section)" />
                     </div>
                 </div>
+
             </div>
-        </Dialog>
-        <ConfirmDelete :text="message_delete" v-if="show_confirm_delete" @cancel="cancelDelete" @confirm="confirmDelete"
-            :is_loading="isloading" />
-    </div>
+
+        </div>
+    </Dialog>
+
+    <ConfirmDelete :text="message_delete" v-if="show_confirm_delete" @cancel="cancelDelete" @confirm="confirmDelete"
+        :is_loading="isloading" />
 </template>
 
 <script>
 import Dialog from 'primevue/dialog';
-import Button from 'primevue/button';
 import ToggleSwitch from 'primevue/toggleswitch';
-import { PrivacyPolicyService } from '@/services/PrivacyPolicyService';
 import ConfirmDelete from './ConfirmDelete.vue';
+import { PrivacyPolicyService } from '@/services/PrivacyPolicyService';
 import { UserService } from '@/services/UserService';
 import { showToast } from '@/eventBus';
+import { usePrivacyStore } from "@/stores/privacy";
 
 export default {
-    name: 'UserPrivacyPolicy',
+    name: 'PrivacyPolicyUnified',
 
-    components: {
-        Dialog,
-        Button,
-        ToggleSwitch,
-        ConfirmDelete
-    },
+    components: { Dialog, ToggleSwitch, ConfirmDelete },
 
     props: {
-        visible: {
-            type: Boolean,
-            default: false
-        }
+        visible: { type: Boolean, default: false }
     },
 
     data() {
         return {
             policies: [],
+            acceptAll: false,
+
+            revertingSection: null,
             show_confirm_delete: false,
-            message_delete: 'Ao negar o termo de privacidade, seu acesso ao sistema será encerrado e seus dados de usuário serão removidos. Deseja realmente continuar?',
+            message_delete: 'Ao negar o termo obrigatório, seu usuário será removido. Deseja continuar?',
+
             isloading: false,
             userService: new UserService(),
+            privacyStore: usePrivacyStore(),
+
         };
     },
 
     computed: {
         dialogVisible: {
-            get() {
-                return this.visible;
-            },
-            set(value) {
-                this.$emit('update:visible', value);
-            }
+            get() { return this.visible; },
+            set(v) { this.$emit("update:visible", v); }
         }
     },
 
     methods: {
-        toggleSection(index) {
-            this.policies[index].isExpanded = !this.policies[index].isExpanded;
-        },
-        askForDeliting() {
-            this.show_confirm_delete = true
-        },
-        cancelDelete() {
-            this.show_confirm_delete = false
-        },
-        async confirmDelete() {
-            this.isloading = true;
-            try {
-                const id_user = localStorage.getItem('userId')
-                await this.userService.deleteById(Number(id_user))
-                this.router.push('/');
+        async getAllPolicies() {
+            const service = new PrivacyPolicyService();
+            const list = await service.getAllByUser(Number(localStorage.getItem('userId')));
 
-                this.isVisible = false;
-                this.show_confirm_delete = false;
-                showToast({
-                    severity: 'warn',
-                    summary: 'Alerta',
-                    detail: "Usuário deletado",
-                    life: 3000
-                });
-            } catch (error) {
-
-                showToast({
-                    severity: 'error',
-                    summary: 'Erro ao aceitar o termo de privacidade',
-                    detail: error.message,
-                    life: 3000
-                });
-            }
-            localStorage.clear()
-            this.isloading = false;
+            this.policies = list.sort((a, b) => {
+                return (b.is_mandatory ? 1 : 0) - (a.is_mandatory ? 1 : 0);
+            })
         },
-
-        handleToggleChange(section) {
-            if (section.is_mandatory && section.is_accept) {
-                this.askForDeliting();
+        async handleToggleChange(section) {
+            if (section.is_mandatory && !section.is_accept) {
+                this.revertingSection = section;
+                this.show_confirm_delete = true;
                 return;
             }
+
+
             this.changePolicy(section);
         },
+        cancelDelete() {
+            if (this.revertingSection) {
+                this.revertingSection.is_accept = true;
+                this.revertingSection = null;
+            }
+            this.show_confirm_delete = false;
+        },
 
-        async getAllPolicies() {
+        async confirmDelete() {
+            this.isloading = true;
+
             try {
-                const service = new PrivacyPolicyService();
-                const policies = await service.getAllByUser(Number(localStorage.getItem('userId')));
-
-                // Adiciona isExpanded em cada política
-                this.policies = policies.map(policy => ({
-                    ...policy,
-                    isExpanded: false
-                }));
-
-            } catch (error) {
-                console.error("An error occurred while fetching privacy policies:", error);
+                await this.userService.deleteById(Number(localStorage.getItem('userId')));
+                localStorage.clear();
+                this.$router.push('/');
+            } finally {
+                this.isloading = false;
+                this.show_confirm_delete = false;
             }
         },
 
         async changePolicy(section) {
+            const service = new PrivacyPolicyService();
+
+
             try {
-                const service = new PrivacyPolicyService();
-                const change = await service.acceptPolicy({
+                const result = await service.acceptPolicy({
                     userid: Number(localStorage.getItem('userId')),
-                    privacyid: Number(section.id),
+                    privacyid: Number(section.id)
                 });
+                const response = await service.getUnmandatoryPrivacyAccept(Number(localStorage.getItem('userId')));
+
+                this.privacyStore.update(response);
                 showToast({
                     severity: 'success',
-                    summary: 'Sucesso',
-                    detail: change.message,
+                    summary: 'Atualizado',
+                    detail: result.message,
                     life: 3000
                 });
-            } catch (error) {
-                console.error("An error occurred while changing privacy policy:", error);
+
+            } catch (err) {
+                console.error(err);
             }
         },
-
-        closeDialog() {
-            this.$emit('update:visible', false);
-        }
     },
 
     async mounted() {
         await this.getAllPolicies();
-    },
+    }
 };
 </script>
-
 <style scoped>
 .privacy-content {
-    max-height: 60vh;
+    max-height: 600px;
     overflow-y: auto;
-    padding: 0.5rem;
+}
+
+.accept-all-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
+    margin-bottom: 16px;
+    background: #f8f9fa;
+    border: 1px solid #e3e3e3;
+    border-radius: 6px;
 }
 
 .privacy-section {
-    margin-bottom: 8px;
+    padding: 16px;
     border: 1px solid #e0e6ed;
     border-radius: 6px;
-    overflow: hidden;
+    background: white;
+    margin-bottom: 16px;
 }
 
-.section-header {
-    padding: 12px 16px;
-    background: #f8f9fa;
+.header-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
 }
 
-.section-header:hover {
-    background: #e9ecef;
-}
-
-.section-header h3 {
-    margin: 0;
-    font-size: 16px;
+.badge {
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-size: 12px;
     font-weight: 600;
-    color: #333;
 }
 
-.toggle-icon {
-    transition: transform 0.3s ease-in-out;
-    font-size: 10px;
-    color: #666;
-    cursor: pointer;
+.mandatory {
+    background: #ffdddd;
+    color: #b52d2d;
 }
 
-.toggle-icon.rotated {
-    transform: rotate(180deg);
+.optional {
+    background: #e7f5ff;
+    color: #005f99;
 }
 
-.section-content {
-    padding: 16px;
-    background: #ffffff;
-    border-top: 1px solid #e0e6ed;
-}
-
-.section-content p {
-    margin: 0 0 12px 0;
-    color: #495057;
-    line-height: 1.6;
-    font-size: 14px;
-}
-
-.section-content ul {
-    margin: 0;
-    padding-left: 20px;
-    color: #495057;
-}
-
-.section-content ul li {
-    margin-bottom: 8px;
-    line-height: 1.5;
-    font-size: 14px;
-}
-
-.section-content ul li:last-child {
-    margin-bottom: 0;
+.validity-date {
+    margin: 4px 0 12px 0;
+    font-size: 13px;
+    color: #6c757d;
 }
 
 .toggle-switch-container {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    margin-top: 16px;
-    padding-top: 16px;
+    padding-top: 10px;
     border-top: 1px solid #e0e6ed;
-}
-
-.toggle-switch-container label {
-    font-size: 14px;
-    font-weight: 500;
-    color: #333;
+    margin-top: 12px;
 }
 </style>

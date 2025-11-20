@@ -62,6 +62,7 @@ export default defineComponent({
           localStorage.setItem('DataVigenciaTermo', String(response.current_policy.policy_date));
           localStorage.setItem('idPolicy', String(response.current_policy.id_policy));
           localStorage.setItem('is_mandatory', String(response.current_policy.is_mandatory))
+          localStorage.setItem('is_accept_unmandatory', String(response.is_accept_unmandatory))
 
           this.router.push('/dashboard');
         }

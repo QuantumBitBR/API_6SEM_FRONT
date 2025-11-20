@@ -12,10 +12,14 @@ interface UserDeleted {
 export class UserService {
     async deleteById(user_id: number): Promise<UserDeleted> {
         try {
-            const response: AxiosResponse<responseUserDeleted> = await api.delete<responseUserDeleted>(`/userauth/deletar?user_id=${user_id}`);
-            return response.data.data;
+            const response: AxiosResponse<responseUserDeleted> = await api.delete(`/userauth/deletar`, {
+                params: { user_id }
+            });
+
+            return response;
         } catch (error: any) {
-            throw new Error("Erro no sistema, tente novamente mais tarde.")
+            throw new Error("Erro no sistema, tente novamente mais tarde.");
         }
     }
 }
+

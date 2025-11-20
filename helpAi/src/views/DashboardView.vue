@@ -21,7 +21,8 @@
       <TicketsBySLAPlan :filter="filtroAtual" />
     </div>
   </DefaultLayout>
-  <PrivacyPolicy :visible="showPolicy" @accept="hidePolicy()" />
+  <PrivacyPolicy v-model:visible="showPolicy" @accept="hidePolicy()" />
+
 </template>
 
 <script>

@@ -5,6 +5,12 @@
                 <div class="title-div">
                     <span class="status_title">Filtros</span>
                     <div class="filter_buttons">
+                        <Button class="button-filter3" @click="openRelatedTickets()">
+                            <template #icon>
+                                <TicketIcon class="w-4 h-4 filter" />
+                                Ver relacionados
+                            </template>
+                        </Button>
                         <Button class="button-filter2" @click="cleanFilters()">
                             <template #icon>
                                 <TrashIcon class="w-4 h-4 filter" />
@@ -47,10 +53,12 @@
             </template>
         </Card>
     </div>
+    <DialogTicketsResults v-model:visible="dialogAberto" :filters="currentFilters" />
 
 </template>
 
 <script>
+import DialogTicketsResults from './DialogTicketsResults.vue';
 import { Select, Skeleton } from 'primevue';
 import Card from 'primevue/card';
 import InputNumber from 'primevue/inputnumber';
@@ -62,11 +70,12 @@ import Button from 'primevue/button';
 import { showToast } from '@/eventBus';
 import { CategoryDataService } from '@/services/CategoryDataService';
 import { CompanyDataService } from '@/services/CompanyDataService';
-
+import { TicketIcon } from '@heroicons/vue/24/outline';
+import { TicketService } from '@/services/TicketsService';
 export default {
     name: 'Filter',
     components: {
-        Card, Skeleton, InputNumber, Select, DatePicker, FunnelIcon, TrashIcon, Button
+        Card, Skeleton, InputNumber, Select, DatePicker, FunnelIcon, TrashIcon, Button, TicketIcon, DialogTicketsResults
     },
     data() {
         return {
@@ -78,7 +87,9 @@ export default {
             category: null,
             product_list: null,
             product: null,
-            isLoading: false
+            isLoading: false,
+            dialogAberto: false,
+            currentFilters: {}
         }
     },
     methods: {
@@ -170,6 +181,35 @@ export default {
             };
 
             this.$emit('filter', cleaned_filters);
+        },
+        buildFilters() {
+            const formatDate = (date) => {
+                if (!date) return null;
+                const d = new Date(date);
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
+            let createdat = null;
+            let end_date = null;
+
+            if (this.dateRange && this.dateRange.length === 2) {
+                createdat = formatDate(this.dateRange[0]);
+                end_date = formatDate(this.dateRange[1]);
+            }
+
+            return {
+                company_id: this.company,
+                category_id: this.category,
+                product_id: this.product,
+                createdat,
+                end_date
+            };
+        },
+        openRelatedTickets() {
+            this.currentFilters = this.buildFilters();
+            this.dialogAberto = true;
         }
 
     },
@@ -233,6 +273,14 @@ export default {
 
 .button-filter2 {
     width: 120px;
+    height: 40px;
+    background-color: #34495e;
+    border: none;
+    margin-right: 10px;
+}
+
+.button-filter3 {
+    width: 200px;
     height: 40px;
     background-color: #34495e;
     border: none;

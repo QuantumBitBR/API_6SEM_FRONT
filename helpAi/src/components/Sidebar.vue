@@ -9,7 +9,7 @@
       <img src="/HelpAI - Agente.svg" alt="Bot Avatar" class="chat-bot"/>
     </div>
     <ul class="sidebar-links">
-      <li v-for="link in links" :key="link.text">
+      <li v-for="link in filteredLinks" :key="link.text">
         <!-- Se for logout, chama o método -->
         <a v-if="link.text === 'Sair'" href="#" @click.prevent="logout" class="a_element">
           <component :is="link.icon" class="icon" />
@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import { usePrivacyStore } from "../stores/privacy";
 import {
   ChartBarIcon,
   BuildingOfficeIcon,
@@ -33,7 +34,8 @@ import {
   CpuChipIcon,
   ArrowRightOnRectangleIcon,
   DocumentCheckIcon,
-  UsersIcon
+  UsersIcon,
+  UserIcon
 } from "@heroicons/vue/24/outline";
 
 export default {
@@ -45,11 +47,13 @@ export default {
     CpuChipIcon,
     UsersIcon,
     ArrowRightOnRectangleIcon,
-    DocumentCheckIcon
+    DocumentCheckIcon,
+    UserIcon
   },
   data() {
     return {
       links: [
+        { text: "Perfil", href: "/profile", icon: "UserIcon" },
         { text: "Dashboard", href: "/dashboard", icon: "ChartBarIcon" },
         { text: "Empresas", href: "/companies", icon: "BuildingOfficeIcon"},
         { text: "Pesquisar", href: "/chat", icon:"MagnifyingGlassIcon"},
@@ -72,7 +76,20 @@ export default {
     handleMouseLeave(){
       this.isSideBarActive = false;
     }
+  },
+  computed: {
+  filteredLinks() {
+    const privacyStore = usePrivacyStore();
+    const isAccepted = privacyStore.isAccepted;
+
+    if (isAccepted) return this.links;
+
+    return this.links.filter(link =>
+      ["/dashboard", "/", "/profile"].includes(link.href)
+    );
   }
+}
+
 };
 </script>
 
