@@ -5,6 +5,7 @@
     modal
     :style="{ width: '700px', height: '800px' }"
   >
+  <div class="buttons-report-container">
     <Button class="button-report" @click="getReport">
       <template #icon>
         <TicketIcon class="w-4 h-4 filter" />
@@ -18,6 +19,7 @@
         Exportar PDF
       </template>
     </Button>
+  </div>
     <div class="report-dialog-content">
       <div v-if="loading" class="report-skeleton">
         <Skeleton animation="wave" height="2rem" width="60%" class="mb-3" />
@@ -49,18 +51,11 @@
         <Skeleton animation="wave" height="1rem" width="55%" class="mb-2" />
         <Skeleton animation="wave" height="1rem" width="45%" class="mb-2" />
     </div>
-  <!-- Conteúdo renderizado -->
-  <div v-else-if="reportHtml" v-html="reportHtml"></div>
-
-  <!-- Mensagem padrão antes de carregar -->
-  <div v-else>
-    <p>O relatório aparecerá aqui após gerar.</p>
+  <div v-else v-html="reportHtml"></div>
   </div>
-</div>
 
   </Dialog>
 </template>
-
 <script>
 import { Dialog } from 'primevue'
 import Button from 'primevue/button'
@@ -70,13 +65,27 @@ import Skeleton from 'primevue/skeleton';
 
 export default {
   name: 'ReportDialog',
-
   components: { Dialog, Button, Skeleton },
-
   props: {
     visible: {
       type: Boolean,
       default: false
+    },
+    companyId: {
+      type: Number,
+      default: null
+    },
+    categoryId: {
+      type: Number,
+      default: null
+  },
+    productId: {
+      type: Number,
+      default: null
+    },
+    dateRange: {
+      type: String,
+      default: null
     }
   },
 
@@ -102,19 +111,18 @@ export default {
 
   methods: {
    async getReport() {
-  this.loading = true;      // mostra o loading
-  this.reportHtml = null;   // evita mostrar conteúdo antigo
+  this.loading = true;
+  this.reportHtml = null;
 
   try {
     const service = new ReportService();
     const markdownResponse = await service.getReport();
-
     this.reportHtml = marked.parse(markdownResponse.data);
 
   } catch (error) {
     console.error("Erro ao gerar o relatório:", error);
   } finally {
-    this.loading = false;   // esconde o loading
+    this.loading = false;
   }
 }
 }
@@ -142,5 +150,11 @@ export default {
 
 .report-skeleton .skeleton-subtitle {
   margin-bottom: 1rem;
+}
+
+.buttons-report-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
 }
 </style>

@@ -63,11 +63,9 @@
       v-model:visible="dialogAberto"
     />
     <ReportDialog
-      v-model:visible="showReportDialog"
+      v-model:visible="showReportDialog" :companyId="company" categoryId="category" :productId="product_id" :dateRange="dateRange"
     />
-
 </template>
-
 <script>
 import DialogTicketsResults from './DialogTicketsResults.vue';
 import { Select, Skeleton } from 'primevue';
@@ -190,17 +188,14 @@ export default {
                 createdat: null,
                 end_date: null
             };
-
             this.$emit('filter', cleaned_filters);
         }
-
     },
     async mounted() {
         await this.getAllCompanies();
         await this.getAllCategories();
         await this.getAllProducts();
     }
-
 }
 </script>
 
