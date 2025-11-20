@@ -6,19 +6,22 @@
     :style="{ width: '700px', height: '800px' }"
   >
   <div class="buttons-report-container">
-    <Button class="button-report" @click="getReport">
+    <Button class="button-report" type="button" @click="getReport">
       <template #icon>
         <TicketIcon class="w-4 h-4 filter" />
         Gerar Relatório
       </template>
     </Button>
 
-    <Button class="button-report" @click="showReportDialog = true">
-      <template #icon>
-        <TicketIcon class="w-4 h-4 filter" />
-        Exportar PDF
-      </template>
-    </Button>
+    <Button
+    class="button-report"
+    type="button"
+    label="Exportar PDF"
+    icon="pi pi-download"
+    @click="getPDF"
+    :loading="loadingPDF"
+  />
+
   </div>
     <div class="report-dialog-content">
       <div v-if="loading" class="report-skeleton">
@@ -94,7 +97,8 @@ export default {
   data() {
     return {
       reportHtml: null,
-      loading: false
+      loading: false,
+      loadingPDF: false
     }
   },
 
@@ -110,21 +114,45 @@ export default {
   },
 
   methods: {
-   async getReport() {
-  this.loading = true;
-  this.reportHtml = null;
+  async getPDF() {
+    this.loadingPDF = true;
 
-  try {
-    const service = new ReportService();
-    const markdownResponse = await service.getReport();
-    this.reportHtml = marked.parse(markdownResponse.data);
+    try {
+      const service = new ReportService();
+      const pdfBlob = await service.getReportPDF();
 
-  } catch (error) {
-    console.error("Erro ao gerar o relatório:", error);
-  } finally {
-    this.loading = false;
+      const url = window.URL.createObjectURL(new Blob([pdfBlob], { type: 'application/pdf' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'relatorio.pdf');
+      document.body.appendChild(link);
+
+      link.click();
+
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+    } catch (error) {
+      console.error("Erro ao gerar o PDF:", error);
+    } finally {
+      this.loadingPDF = false;
+    }
+  },
+  async getReport() {
+    this.loading = true;
+    this.reportHtml = null;
+
+    try {
+      const service = new ReportService();
+      const markdownResponse = await service.getReport();
+      this.reportHtml = marked.parse(markdownResponse.data);
+
+    } catch (error) {
+      console.error("Erro ao gerar o relatório:", error);
+    } finally {
+      this.loading = false;
+    }
   }
-}
 }
 }
 </script>
