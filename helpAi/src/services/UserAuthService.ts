@@ -120,3 +120,50 @@ export class UserAuthService {
         }
     }
 }
+
+interface ChangePasswordRequest {
+  old_password: string;
+  new_password: string;
+}
+
+interface ChangePasswordResponse {
+  data?: any;
+  error?: string;
+}
+
+async function changeUserPassword(
+  userId: number,
+  oldPassword: string,
+  newPassword: string
+): Promise<ChangePasswordResponse> {
+  try {
+
+    if (oldPassword === newPassword) {
+      throw new Error('A nova senha não pode ser igual à senha antiga');
+    }
+
+    const changePasswordData: ChangePasswordRequest = {
+      old_password: oldPassword,
+      new_password: newPassword
+    };
+
+    const response = await fetch(`/userauth/trocar-senha?user_id=${userId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(changePasswordData)
+    });
+
+    const data: ChangePasswordResponse = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Erro ao alterar senha');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Erro na requisição de trocar senha:', error);
+    throw error;
+  }
+}
