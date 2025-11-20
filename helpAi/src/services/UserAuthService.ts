@@ -26,7 +26,10 @@ interface userModifyData {
     name: string
     role: string
 }
-
+interface ResponseResetPasswordEmail{
+    id: number, 
+    message: String
+}
 export class UserAuthService {
     async createUser(user: UserAuthCreateUser): Promise<String> {
         try {
@@ -86,12 +89,10 @@ export class UserAuthService {
             return null
         }
     }
-}
 
-export class UserAuthResetPasswordService {
-    async resetPassword(userID: number): Promise<UserAuthResetPasswordService> {
+    async resetPassword(userID: number): Promise<String> {
         try {
-            const response: AxiosResponse<UserAuthResetPasswordService> = await api.post(
+            const response: AxiosResponse<ResponseResetPasswordEmail> = await api.post(
                 `/userauth/resetar-senha`,
                 null,
                 {
@@ -102,12 +103,9 @@ export class UserAuthResetPasswordService {
             );
 
 
-            return response.data;
+            return response.data.message;
 
         } catch (error: any) {
-            console.error("Error resetting password:", error);
-
-
             if (error.response?.status === 404) {
                 throw new Error("Usuário não encontrado");
             } else if (error.response?.status === 500) {
