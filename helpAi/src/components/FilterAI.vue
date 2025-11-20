@@ -33,6 +33,10 @@
                             placeholder="Selecione o produto" class="w-full md:w-56" option-value="ProductID"
                             :showClear="true" />
                     </div>
+                    <div>
+                        <label for="">Ver dados a partir de</label>
+                        <DatePicker v-model="start_date" showIcon fluid :showOnFocus="false" />
+                    </div>
                 </div>
             </template>
         </Card>
