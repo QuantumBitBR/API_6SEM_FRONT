@@ -32,7 +32,7 @@
 
 
                     <div class="btn-area">
-                        <Button label="Criar Usuário" icon="pi pi-check" @click="submit" />
+                        <Button label="Criar Usuário" icon="pi pi-check" @click="submit" :loading="is_loading" />
                     </div>
 
                 </div>
@@ -47,7 +47,7 @@ import { Select } from "primevue";
 import { InputText } from "primevue";
 import { Card } from "primevue";
 import { showToast } from "@/eventBus";
-
+import { UserAuthService } from "@/services/UserAuthService";
 export default {
     name: "CreateUser",
     components: { Button, Select, InputText, Card },
@@ -59,6 +59,8 @@ export default {
                 email: "",
                 role: null,
             },
+            service: new UserAuthService(),
+            is_loading: false,
 
             roles: [
                 { label: "AGENTE", value: "AGENTE" },
@@ -69,7 +71,8 @@ export default {
     },
 
     methods: {
-        submit() {
+        async submit() {
+            
             if (this.form.name.trim() == "" || this.form.email.trim() == "" || this.form.role == null) {
                 showToast({
                     severity: 'warn',
@@ -91,9 +94,27 @@ export default {
                 });
                 return;
             }
-
-            
-            
+            this.is_loading = true;
+            try{
+                await this.service.createUser(this.form);
+                showToast({
+                    severity: 'success',
+                    summary: 'Sucesso!',
+                    detail: "Usuário criado com sucesso!",
+                    life: 3000
+                });
+                this.form.email = "";
+                this.form.name = "";
+                this.form.role = null;
+            }catch(error){
+                showToast({
+                    severity: 'error',
+                    summary: 'Atenção!',
+                    detail: error.message,
+                    life: 3000
+                });
+            }
+            this.is_loading = false;
         }
     },
 };
