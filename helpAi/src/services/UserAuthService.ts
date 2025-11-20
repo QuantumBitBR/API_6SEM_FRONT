@@ -12,19 +12,6 @@ export interface UserAuthCreateUser {
     password: string
 }
 
-export class UserAuthService {
-    async createUser(user: UserAuthCreateUser): Promise<AxiosResponse<ResponseUserAuthCreateUser>> {
-      try {
-          return await api.post<ResponseUserAuthCreateUser>("/criar", user);
-      } catch {
-          throw new Error("Erro ao criar usuário");
-      }
-    }
-}
-
-import { api } from '@/services/apiConfig'
-import type { AxiosResponse } from 'axios'
-
 interface ResponseUserAuthGetUserByID {
     data: UserAuthGetUserByID
 }
@@ -42,14 +29,20 @@ interface userModifyData {
 }
 
 export class UserAuthService {
+    async createUser(user: UserAuthCreateUser): Promise<AxiosResponse<ResponseUserAuthCreateUser>> {
+      try {
+          return await api.post<ResponseUserAuthCreateUser>("/criar", user);
+      } catch {
+          throw new Error("Erro ao criar usuário");
+      }
+    }
     async getUserByID(userID: number): Promise<UserAuthGetUserByID | null> {
         try {
             const response: AxiosResponse<ResponseUserAuthGetUserByID> =
                 await api.get<ResponseUserAuthGetUserByID>(`/userauth/by_id?user_id=${userID}`)
-            return response.data
+            return response.data.data;
         } catch (error) {
-            console.error('Error fetching user by ID:', error)
-            return null
+            throw new Error("Erro ao buscar os dados");
         }
     }
 
