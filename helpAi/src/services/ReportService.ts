@@ -12,7 +12,7 @@ export class ReportService {
       });
 
       if (response.status == 200) {
-        return response.data;
+        return response.data.data;
       }
       else{
         throw new Error("Houve algum erro ao gerar o relatório")
@@ -21,9 +21,7 @@ export class ReportService {
         throw new Error("Erro ao gerar o relatório: " + error);
     }
   }
-}
 
-export class ReportServicePDF {
   async getReportPDF(filters?: TicketFilters){
     try {
       const response = await api.get('/tickets/report/pdf', {

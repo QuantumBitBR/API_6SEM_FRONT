@@ -5,6 +5,12 @@
                 <div class="title-div">
                     <span class="status_title">Filtros</span>
                     <div class="filter_buttons">
+                         <Button class="button-filter4" @click="openReportDialog()">
+                            <template #icon>
+                                <TicketIcon class="w-4 h-4 filter" />
+                                Gerar Relatório
+                            </template>
+                        </Button>
                         <Button class="button-filter3" @click="openRelatedTickets()">
                             <template #icon>
                                 <TicketIcon class="w-4 h-4 filter" />
@@ -54,9 +60,10 @@
         </Card>
     </div>
     <DialogTicketsResults v-model:visible="dialogAberto" :filters="currentFilters" />
-
+    <ReportDialog
+      v-model:visible="showReportDialog" :currentFilters="currentFilters"
+    />
 </template>
-
 <script>
 import DialogTicketsResults from './DialogTicketsResults.vue';
 import { Select, Skeleton } from 'primevue';
@@ -70,12 +77,13 @@ import Button from 'primevue/button';
 import { showToast } from '@/eventBus';
 import { CategoryDataService } from '@/services/CategoryDataService';
 import { CompanyDataService } from '@/services/CompanyDataService';
-import { TicketIcon } from '@heroicons/vue/24/outline';
+import {TicketIcon} from '@heroicons/vue/24/outline';
+import ReportDialog from './ReportDialog.vue';
 import { TicketService } from '@/services/TicketsService';
 export default {
     name: 'Filter',
     components: {
-        Card, Skeleton, InputNumber, Select, DatePicker, FunnelIcon, TrashIcon, Button, TicketIcon, DialogTicketsResults
+        Card, Skeleton, InputNumber, Select, DatePicker, FunnelIcon, TrashIcon, Button, TicketIcon, DialogTicketsResults, ReportDialog
     },
     data() {
         return {
@@ -89,6 +97,7 @@ export default {
             product: null,
             isLoading: false,
             dialogAberto: false,
+            showReportDialog: false,
             currentFilters: {}
         }
     },
@@ -179,7 +188,6 @@ export default {
                 createdat: null,
                 end_date: null
             };
-
             this.$emit('filter', cleaned_filters);
         },
         buildFilters() {
@@ -210,15 +218,17 @@ export default {
         openRelatedTickets() {
             this.currentFilters = this.buildFilters();
             this.dialogAberto = true;
+        },
+        openReportDialog() {
+          this.currentFilters = this.buildFilters();
+          this.showReportDialog = true;
         }
-
     },
     async mounted() {
         await this.getAllCompanies();
         await this.getAllCategories();
         await this.getAllProducts();
     }
-
 }
 </script>
 
@@ -280,6 +290,14 @@ export default {
 }
 
 .button-filter3 {
+    width: 200px;
+    height: 40px;
+    background-color: #34495e;
+    border: none;
+    margin-right: 10px;
+}
+
+.button-filter4 {
     width: 200px;
     height: 40px;
     background-color: #34495e;
