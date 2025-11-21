@@ -12,7 +12,8 @@ import type { AxiosResponse } from "axios";
     is_mandatory: boolean | null;
     
   };
-  is_accept_unmandatory: boolean | null
+  is_accept_unmandatory: boolean | null,
+  role: string | null
 }
 
 export class LoginDataService {

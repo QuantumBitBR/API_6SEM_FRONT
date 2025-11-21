@@ -83,8 +83,7 @@ export default {
     },
 
     async resetPassword() {
-      const storedData = JSON.parse(localStorage.getItem("user_data"));
-      const userId = storedData?.id;
+      const userId = Number(localStorage.getItem("userId"));
 
       if (!userId) {
         showToast({
@@ -119,20 +118,20 @@ export default {
       this.loading = true;
 
       try {
-        await this.service.resetPassword({
-          userId,
-          oldPassword: this.form.oldPassword,
-          newPassword: this.form.newPassword
-        });
-
+        
+        await this.service.changeUserPassword(
+          userId,this.form.oldPassword,
+         this.form.newPassword
+        );
+        this.form.oldPassword = "";
+        this.form.newPassword = "";
+        this.form.confirmPassword = "";
         showToast({
           severity: "success",
           summary: "Sucesso",
           detail: "Senha atualizada!",
           life: 3000
         });
-
-        this.close();
       } catch (error) {
         showToast({
           severity: "error",

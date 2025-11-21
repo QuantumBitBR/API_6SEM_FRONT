@@ -8,7 +8,6 @@
   <div class="buttons-report-container">
     <Button class="button-report" type="button" @click="getReport">
       <template #icon>
-        <TicketIcon class="w-4 h-4 filter" />
         Gerar Relatório
       </template>
     </Button>
@@ -125,14 +124,16 @@ export default {
       this.loadingPDF = false;
     }
   },
-  async getReport() {
+ async getReport() {
     this.loading = true;
     this.reportHtml = null;
 
     try {
       const service = new ReportService();
       const markdownResponse = await service.getReport(this.currentFilters);
-      this.reportHtml = marked.parse(markdownResponse);
+      const markdownText = markdownResponse.data ?? markdownResponse;
+
+      this.reportHtml = marked.parse(markdownText);
 
     } catch (error) {
       console.error("Erro ao gerar o relatório:", error);
@@ -140,8 +141,12 @@ export default {
       this.loading = false;
     }
   }
+},
+  mounted() {
+    this.getReport();
+  }
 }
-}
+
 </script>
 
 <style scoped>

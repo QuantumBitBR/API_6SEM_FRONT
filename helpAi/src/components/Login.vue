@@ -63,6 +63,8 @@ export default defineComponent({
           localStorage.setItem('idPolicy', String(response.current_policy.id_policy));
           localStorage.setItem('is_mandatory', String(response.current_policy.is_mandatory))
           localStorage.setItem('is_accept_unmandatory', String(response.is_accept_unmandatory))
+          console.log(response.role)
+          localStorage.setItem('role', String(response.role))
 
           this.router.push('/dashboard');
         }

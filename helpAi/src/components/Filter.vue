@@ -5,7 +5,7 @@
                 <div class="title-div">
                     <span class="status_title">Filtros</span>
                     <div class="filter_buttons">
-                         <Button class="button-filter2" @click="openReportDialog()">
+                         <Button class="button-filter4" @click="openReportDialog()">
                             <template #icon>
                                 <TicketIcon class="w-4 h-4 filter" />
                                 Gerar Relatório
@@ -290,6 +290,14 @@ export default {
 }
 
 .button-filter3 {
+    width: 200px;
+    height: 40px;
+    background-color: #34495e;
+    border: none;
+    margin-right: 10px;
+}
+
+.button-filter4 {
     width: 200px;
     height: 40px;
     background-color: #34495e;

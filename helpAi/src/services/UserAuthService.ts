@@ -26,10 +26,18 @@ interface userModifyData {
     name: string
     role: string
 }
-interface ResponseResetPasswordEmail{
-    id: number, 
+interface ResponseResetPasswordEmail {
+    id: number,
     message: String
 }
+
+
+interface ChangePasswordResponse {
+    id: number;
+    message: string
+}
+
+
 export class UserAuthService {
     async createUser(user: UserAuthCreateUser): Promise<String> {
         try {
@@ -119,4 +127,28 @@ export class UserAuthService {
             }
         }
     }
+    async changeUserPassword(
+        userId: number,
+        oldPassword: string,
+        newPassword: string
+    ): Promise<String> {
+        try {
+
+            const changePasswordData = {
+                old_password: oldPassword,
+                new_password: newPassword
+            };
+
+            const response = await api.patch(`/userauth/trocar-senha?user_id=${userId}`, changePasswordData);
+            return response.data.message;
+            
+        } catch (error: any) {
+            if(error.status == 401){
+                throw new Error("A senha atual não é válida.");
+            }
+            throw new Error(String(error.message));
+        }
+    }
+
 }
+

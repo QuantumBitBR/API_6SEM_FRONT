@@ -12,7 +12,7 @@ export class ReportService {
       });
 
       if (response.status == 200) {
-        return response.data;
+        return response.data.data;
       }
       else{
         throw new Error("Houve algum erro ao gerar o relatório")
