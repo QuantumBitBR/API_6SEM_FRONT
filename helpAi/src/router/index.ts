@@ -53,36 +53,49 @@ const router = createRouter({
     },
   ],
 })
+type UserRole = 'AGENTE' | 'GESTOR' | 'ADMIN'
 
-
+// --- PERMISSÕES POR ROLE ---
+const permissoes: Record<UserRole, string[]> = {
+  AGENTE: ['dashboard', 'chat', 'Perfil',],
+  GESTOR: ['dashboard', 'chat', 'Perfil', 'ai',],
+  ADMIN: [
+    'dashboard','chat','Perfil','ai',
+    'companies','privacy-policy','Gerenciamento de Usuários'
+  ]
+}
 router.beforeEach((to, from, next) => {
-  const privacyStore = usePrivacyStore();
+  const privacyStore = usePrivacyStore()
 
-  const token = localStorage.getItem("token");
-  const isAccepted = privacyStore.isAccepted; // vem do Pinia
+  const token = localStorage.getItem('token')
+  const role = localStorage.getItem('role')?.toUpperCase() as UserRole | null
+  const isAccepted = privacyStore.isAccepted
 
-  // 1. Verifica autenticação
+  // 1 — Verifica autenticação
   if (to.meta?.requiresAuth && !token) {
-    return next({ name: "login" });
+    return next({ name: 'login' })
   }
 
-  // 2. Bloqueia rotas enquanto o usuário NÃO aceitou o termo não obrigatório
-  if (isAccepted === false) {
-    const rotasPermitidas = ["Perfil", "login", "dashboard"];
+  // 2 — Controle de ROLE
+  if (role && role !== 'ADMIN') {
+    const rotasPermitidas = permissoes[role]
+    const nomeRota = String(to.name)
 
-    const rotaAtual =
-      typeof to.name === "string"
-        ? to.name
-        : typeof to.path === "string"
-        ? to.path
-        : "";
-
-    if (!rotasPermitidas.includes(rotaAtual)) {
-      return next({ name: "Perfil" });
+    if (!rotasPermitidas.includes(nomeRota)) {
+      return next({ name: 'dashboard' })
     }
   }
 
-  return next();
-});
+  // 3 — Verifica se o termo não obrigatório foi aceito
+  if (isAccepted === false) {
+    const rotasPermitidas = ['profile', 'login', 'dashboard']
+    const rotaAtual = String(to.name)
 
+    if (!rotasPermitidas.includes(rotaAtual)) {
+      return next({ name: 'profile' })
+    }
+  }
+
+  next()
+})
 export default router;
