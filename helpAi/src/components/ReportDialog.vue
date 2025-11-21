@@ -106,7 +106,7 @@ export default {
 
     try {
       const service = new ReportService();
-      const pdfBlob = await service.getReportPDF();
+      const pdfBlob = await service.getReportPDF(this.currentFilters);
 
       const url = window.URL.createObjectURL(new Blob([pdfBlob], { type: 'application/pdf' }));
       const link = document.createElement('a');
