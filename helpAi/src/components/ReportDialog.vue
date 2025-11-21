@@ -21,7 +21,6 @@
     @click="getPDF"
     :loading="loadingPDF"
   />
-
   </div>
     <div class="report-dialog-content">
       <div v-if="loading" class="report-skeleton">
@@ -74,20 +73,8 @@ export default {
       type: Boolean,
       default: false
     },
-    companyId: {
-      type: Number,
-      default: null
-    },
-    categoryId: {
-      type: Number,
-      default: null
-  },
-    productId: {
-      type: Number,
-      default: null
-    },
-    dateRange: {
-      type: String,
+    currentFilters: {
+      type: Object,
       default: null
     }
   },
@@ -144,8 +131,8 @@ export default {
 
     try {
       const service = new ReportService();
-      const markdownResponse = await service.getReport();
-      this.reportHtml = marked.parse(markdownResponse.data);
+      const markdownResponse = await service.getReport(this.currentFilters);
+      this.reportHtml = marked.parse(markdownResponse);
 
     } catch (error) {
       console.error("Erro ao gerar o relatório:", error);

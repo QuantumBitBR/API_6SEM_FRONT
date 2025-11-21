@@ -21,6 +21,7 @@ export class ReportService {
         throw new Error("Erro ao gerar o relatório: " + error);
     }
   }
+
   async getReportPDF(filters?: TicketFilters){
     try {
       const response = await api.get('/tickets/report/pdf', {

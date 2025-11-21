@@ -5,7 +5,7 @@
                 <div class="title-div">
                     <span class="status_title">Filtros</span>
                     <div class="filter_buttons">
-                         <Button class="button-filter2" @click="showReportDialog = true">
+                         <Button class="button-filter2" @click="openReportDialog()">
                             <template #icon>
                                 <TicketIcon class="w-4 h-4 filter" />
                                 Gerar Relatório
@@ -61,7 +61,7 @@
     </div>
     <DialogTicketsResults v-model:visible="dialogAberto" :filters="currentFilters" />
     <ReportDialog
-      v-model:visible="showReportDialog" :companyId="company" categoryId="category" :productId="product_id" :dateRange="dateRange"
+      v-model:visible="showReportDialog" :currentFilters="currentFilters"
     />
 </template>
 <script>
@@ -218,6 +218,10 @@ export default {
         openRelatedTickets() {
             this.currentFilters = this.buildFilters();
             this.dialogAberto = true;
+        },
+        openReportDialog() {
+          this.currentFilters = this.buildFilters();
+          this.showReportDialog = true;
         }
     },
     async mounted() {
