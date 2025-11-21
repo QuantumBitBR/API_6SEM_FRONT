@@ -26,10 +26,18 @@ interface userModifyData {
     name: string
     role: string
 }
-interface ResponseResetPasswordEmail{
+interface ResponseResetPasswordEmail {
     id: number,
     message: String
 }
+
+
+interface ChangePasswordResponse {
+    id: number;
+    message: string
+}
+
+
 export class UserAuthService {
     async createUser(user: UserAuthCreateUser): Promise<String> {
         try {
@@ -119,51 +127,28 @@ export class UserAuthService {
             }
         }
     }
-}
+    async changeUserPassword(
+        userId: number,
+        oldPassword: string,
+        newPassword: string
+    ): Promise<String> {
+        try {
 
-interface ChangePasswordRequest {
-  old_password: string;
-  new_password: string;
-}
+            const changePasswordData = {
+                old_password: oldPassword,
+                new_password: newPassword
+            };
 
-interface ChangePasswordResponse {
-  data?: any;
-  error?: string;
-}
-
-async function changeUserPassword(
-  userId: number,
-  oldPassword: string,
-  newPassword: string
-): Promise<ChangePasswordResponse> {
-  try {
-
-    if (oldPassword === newPassword) {
-      throw new Error('A nova senha não pode ser igual à senha antiga');
+            const response = await api.patch(`/userauth/trocar-senha?user_id=${userId}`, changePasswordData);
+            return response.data.message;
+            
+        } catch (error: any) {
+            if(error.status == 401){
+                throw new Error("A senha atual não é válida.");
+            }
+            throw new Error(String(error.message));
+        }
     }
 
-    const changePasswordData: ChangePasswordRequest = {
-      old_password: oldPassword,
-      new_password: newPassword
-    };
-
-    const response = await fetch(`/userauth/trocar-senha?user_id=${userId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(changePasswordData)
-    });
-
-    const data: ChangePasswordResponse = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || 'Erro ao alterar senha');
-    }
-
-    return data;
-  } catch (error) {
-    console.error('Erro na requisição de trocar senha:', error);
-    throw error;
-  }
 }
+
