@@ -58,9 +58,9 @@ type UserRole = 'AGENTE' | 'GESTOR' | 'ADMIN'
 // --- PERMISSÕES POR ROLE ---
 const permissoes: Record<UserRole, string[]> = {
   AGENTE: ['dashboard', 'chat', 'Perfil',],
-  GESTOR: ['dashboard', 'chat', 'Perfil', 'ai',],
+  GESTOR: ['dashboard', 'chat', 'Perfil', 'Inteligência Artificial',],
   ADMIN: [
-    'dashboard','chat','Perfil','ai',
+    'dashboard','chat','Perfil','Inteligência Artificial',
     'companies','privacy-policy','Gerenciamento de Usuários'
   ]
 }
