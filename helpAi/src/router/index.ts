@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { usePrivacyStore } from '@/stores/privacy';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -32,18 +33,69 @@ const router = createRouter({
       component: () => import('../views/AIDashboardView.vue'),
       meta: { requiresAuth: true }
     },
+    {
+      path: '/profile',
+      name: 'Perfil',
+      component: () => import('../views/ProfileView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/privacy-policy',
+      name: 'Termo de Privacidade',
+      component: () => import('../views/PrivacyPolicyView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/user-management',
+      name: 'Gerenciamento de Usuários',
+      component: () => import('../views/UserManagementView.vue'),
+      meta: { requiresAuth: true }
+    },
   ],
 })
+type UserRole = 'AGENTE' | 'GESTOR' | 'ADMIN'
 
+// --- PERMISSÕES POR ROLE ---
+const permissoes: Record<UserRole, string[]> = {
+  AGENTE: ['dashboard', 'chat', 'Perfil',],
+  GESTOR: ['dashboard', 'chat', 'Perfil', 'ai',],
+  ADMIN: [
+    'dashboard','chat','Perfil','ai',
+    'companies','privacy-policy','Gerenciamento de Usuários'
+  ]
+}
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem("token");
+  const privacyStore = usePrivacyStore()
 
-  if (to.meta.requiresAuth && !token) {
-    next({ name: "login" });
-  } else {
-    next();
+  const token = localStorage.getItem('token')
+  const role = localStorage.getItem('role')?.toUpperCase() as UserRole | null
+  const isAccepted = privacyStore.isAccepted
+
+  // 1 — Verifica autenticação
+  if (to.meta?.requiresAuth && !token) {
+    return next({ name: 'login' })
   }
-});
 
+  // 2 — Controle de ROLE
+  if (role && role !== 'ADMIN') {
+    const rotasPermitidas = permissoes[role]
+    const nomeRota = String(to.name)
 
-export default router
+    if (!rotasPermitidas.includes(nomeRota)) {
+      return next({ name: 'dashboard' })
+    }
+  }
+
+  // 3 — Verifica se o termo não obrigatório foi aceito
+  if (isAccepted === false) {
+    const rotasPermitidas = ['profile', 'login', 'dashboard']
+    const rotaAtual = String(to.name)
+
+    if (!rotasPermitidas.includes(rotaAtual)) {
+      return next({ name: 'profile' })
+    }
+  }
+
+  next()
+})
+export default router;

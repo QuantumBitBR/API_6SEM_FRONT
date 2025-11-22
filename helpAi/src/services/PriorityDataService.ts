@@ -14,8 +14,6 @@ interface PrioritiesResponse {
 export class PriorityDataService {
   async getPriorityData(filters?: TicketFilters): Promise<Priority[]> {
     try {
-      console.log("FILTROS FILTROS!!!!!!!!!!!!!!!!!!!:", filters)
-
       const response: AxiosResponse<PrioritiesResponse> = await api.get<PrioritiesResponse>("/tickets/tickets-by-priority", {
         params: filters,
         paramsSerializer: {

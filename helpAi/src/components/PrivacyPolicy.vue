@@ -1,219 +1,248 @@
 <template>
-  <Dialog v-model:visible="isVisible" modal :closable="false" :style="{ width: '50rem' }"
-    :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" class="p-dialog-mask">
-    <template #header>
-      <div class="header-content">
-        <h2>Termo de Privacidade</h2>
-      </div>
+  <Dialog v-model:visible="dialogVisible" modal header="Termo de Consentimento" :style="{ width: '50rem' }"
+    :closable="canCloseDialog" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+
+    <template v-if="is_skeleton">
+      <Skeleton width="100%" height="400px" />
+
     </template>
 
-    <div class="privacy-content">
+    <template v-else>
 
-      <div v-html="privacyText"></div>
+      <div class="privacy-content">
 
-      <div v-if="effectiveDate" class="effective-date">
-        <strong>Data de vigência:</strong> {{ formatDate(effectiveDate) }}
-      </div>
-      <div class="checkbox-container">
-        <Checkbox v-model="hasAccepted" :binary="true" input-id="accept-terms" />
-        <label for="accept-terms" class="checkbox-label">
-          Li e aceito os termos de privacidade
-        </label>
-      </div>
-    </div>
-
-    <template #footer>
-      <div class="footer-content">
-
-
-        <div class="footer-buttons">
-
-          <Button label="Aceitar" icon="pi pi-check" :disabled="!hasAccepted" @click="acceptTerms"
-            :loading="isloading" />
+        <div class="accept-all-container">
+          <label>Aceitar todas as condições</label>
+          <ToggleSwitch v-model="acceptAll" @update:modelValue="handleAcceptAll" />
         </div>
+
+        <div v-for="(section, index) in policies" :key="index" class="privacy-section">
+
+          <div class="header-row">
+            <h3 class="section-title">
+              {{ section.title || `Condição ${index + 1}` }}
+            </h3>
+
+            <span class="badge" :class="section.is_mandatory ? 'mandatory' : 'optional'">
+              {{ section.is_mandatory ? 'Obrigatório' : 'Opcional' }}
+            </span>
+          </div>
+
+          <p class="validity-date" v-if="section.validity_date">
+            Vigente a partir de: {{ section.validity_date }}
+          </p>
+
+          <div class="section-content">
+            <div v-if="section.text" v-html="section.text"></div>
+
+
+            <ul v-if="section.items && section.items.length > 0">
+              <li v-for="(item, i) in section.items" :key="i">
+                {{ item }}
+              </li>
+            </ul>
+
+            <div class="toggle-switch-container">
+              <label>Aceito esta condição</label>
+              <ToggleSwitch v-model="section.is_accept" @update:modelValue="handleToggleChange(section)" />
+            </div>
+          </div>
+
+        </div>
+
       </div>
+
     </template>
   </Dialog>
+
+  <ConfirmDelete :text="message_delete" v-if="show_confirm_delete" @cancel="cancelDelete" @confirm="confirmDelete"
+    :is_loading="isloading" />
 </template>
+<script>
+import Dialog from 'primevue/dialog';
+import ToggleSwitch from 'primevue/toggleswitch';
+import ConfirmDelete from './ConfirmDelete.vue';
+import { PrivacyPolicyService } from '@/services/PrivacyPolicyService';
+import { UserService } from '@/services/UserService';
+import { showToast } from '@/eventBus';
+import { usePrivacyStore } from "@/stores/privacy";
+import { Skeleton } from 'primevue';
 
-<script lang="ts">
-import { defineComponent } from 'vue'
-import Dialog from 'primevue/dialog'
-import Button from 'primevue/button'
-import Checkbox from 'primevue/checkbox'
-import { PrivacyPolicyService } from '@/services/PrivacyPolicyService'
-import { showToast } from '@/eventBus'
+export default {
+  name: 'PrivacyPolicyUnified',
 
-export default defineComponent({
-  name: 'PrivacyModal',
-  components: {
-    Dialog,
-    Button,
-    Checkbox
+  components: { Dialog, ToggleSwitch, ConfirmDelete, Skeleton },
+
+  props: {
+    visible: { type: Boolean, default: false }
   },
+
   data() {
     return {
-      privacyText: localStorage.getItem('TextoTermoAtual'),
-      hasAccepted: false,
-      effectiveDate: localStorage.getItem('DataVigenciaTermo'),
-      privacyService: new PrivacyPolicyService(),
-      isloading: false
-    }
+      policies: [],
+      acceptAll: false,
+      is_skeleton: false,
+      revertingSection: null,
+      show_confirm_delete: false,
+      message_delete: 'Ao negar o termo obrigatório, seu usuário será removido. Deseja continuar?',
+
+      isloading: false,
+      userService: new UserService(),
+      privacyStore: usePrivacyStore(),
+    };
   },
-  props: {
-    visible: {
-      type: Boolean,
-      default: false
-    }
-  },
-  emits: ['update:visible', 'accept'],
+
   computed: {
-    isVisible: {
-      get(): boolean {
-        return this.visible
-      },
-      set(value: boolean) {
-        this.$emit('update:visible', value)
-        localStorage.setItem('termoExpirado', String(false));
-        if (!value) {
-          this.hasAccepted = false
-        }
-      }
+    dialogVisible: {
+      get() { return this.visible; },
+      set(v) { this.$emit("update:visible", v); }
+    },
+    canCloseDialog() {
+      return this.policies
+        .filter(p => p.is_mandatory)
+        .every(p => p.is_accept === true);
     }
   },
+
   methods: {
-    async acceptTerms() {
+
+    async getAllPolicies() {
+      this.is_skeleton = true;
+      const service = new PrivacyPolicyService();
+      const list = await service.getAllByUser(Number(localStorage.getItem('userId')));
+      this.policies = list.sort((a, b) => {
+        return (b.is_mandatory ? 1 : 0) - (a.is_mandatory ? 1 : 0);
+      })
+      this.is_skeleton = false;
+    },
+    handleToggleChange(section) {
+      if (section.is_mandatory && !section.is_accept) {
+        this.revertingSection = section;
+        this.show_confirm_delete = true;
+        return;
+      }
+      this.changePolicy(section);
+    },
+    handleAcceptAll(value) {
+      this.policies.forEach(section => {
+        if (section.is_mandatory && !value) return;
+        if (value === true && section.is_accept === false) {
+          section.is_accept = true;
+          this.changePolicy(section);
+        }
+
+      });
+    },
+
+    cancelDelete() {
+      if (this.revertingSection) {
+        this.revertingSection.is_accept = true;
+        this.revertingSection = null;
+      }
+      this.show_confirm_delete = false;
+    },
+
+    async confirmDelete() {
       this.isloading = true;
+
       try {
-        await this.privacyService.acceptPolicy({
+        await this.userService.deleteById(Number(localStorage.getItem('userId')));
+        localStorage.clear();
+        this.$router.push('/');
+      } finally {
+        this.isloading = false;
+        this.show_confirm_delete = false;
+      }
+    },
+
+    async changePolicy(section) {
+      const service = new PrivacyPolicyService();
+
+      try {
+        const result = await service.acceptPolicy({
           userid: Number(localStorage.getItem('userId')),
-          privacyid: Number(localStorage.getItem('idPolicy'))
-        })
-        this.$emit('accept')
-        this.isVisible = false;
+          privacyid: Number(section.id)
+        });
+        const response = await service.getUnmandatoryPrivacyAccept(Number(localStorage.getItem('userId')));
+
+        this.privacyStore.update(response);
+
         showToast({
           severity: 'success',
-          summary: 'Termo de privacidade',
-          detail:  "Termo aceito com sucesso!",
+          summary: 'Atualizado',
+          detail: result.message,
           life: 3000
         });
-      }catch(error: any){
-        showToast({
-          severity: 'error',
-          summary: 'Erro ao aceitar o termo de privacidade',
-          detail: error.message,
-          life: 3000
-        });
+
+      } catch (err) {
+        console.error(err);
       }
-      
-      this.isloading = false;
     },
-    formatDate(date: string | Date): string {
-      if (!date) return ''
+  },
 
-      const dateObj = typeof date === 'string' ? new Date(date) : date
-
-      return new Intl.DateTimeFormat('pt-BR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      }).format(dateObj)
-    }
+  async mounted() {
+    await this.getAllPolicies();
   }
-})
+};
 </script>
-
 <style scoped>
-* {
-  font-family: 'Inter', sans-serif;
-}
-
-.header-content h2 {
-  margin: 0;
-  color: #2c3e50;
-  font-weight: 600;
-}
-
-.effective-date {
-  background-color: #f8f9fa;
-  padding: 0.75rem;
-  border-radius: 4px;
-  margin-bottom: 1rem;
-  border-left: 4px solid #007bff;
-  font-size: 0.9rem;
-}
-
 .privacy-content {
-  line-height: 1.6;
-  max-height: 400px;
+  max-height: 600px;
   overflow-y: auto;
 }
 
-.privacy-content h3 {
-  color: #34495e;
-  font-size: 1.1rem;
-  margin: 1.5rem 0 0.5rem 0;
+.accept-all-container {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+  margin-bottom: 16px;
+  background: #f8f9fa;
+  border: 1px solid #e3e3e3;
+  border-radius: 6px;
+}
+
+.privacy-section {
+  padding: 16px;
+  border: 1px solid #e0e6ed;
+  border-radius: 6px;
+  background: white;
+  margin-bottom: 16px;
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.badge {
+  padding: 4px 10px;
+  border-radius: 10px;
+  font-size: 12px;
   font-weight: 600;
 }
 
-.privacy-content h3:first-child {
-  margin-top: 0;
+.mandatory {
+  background: #ffdddd;
+  color: #b52d2d;
 }
 
-.privacy-content p {
-  margin: 0 0 1rem 0;
-  color: #555;
-  text-align: justify;
+.optional {
+  background: #e7f5ff;
+  color: #005f99;
 }
 
-.footer-content {
+.validity-date {
+  margin: 4px 0 12px 0;
+  font-size: 13px;
+  color: #6c757d;
+}
+
+.toggle-switch-container {
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.checkbox-container {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem;
-  background-color: #f8f9fa;
-  border-radius: 4px;
-  border: 1px solid #dee2e6;
-}
-
-.checkbox-label {
-  font-size: 0.95rem;
-  color: #495057;
-  cursor: pointer;
-  user-select: none;
-}
-
-.footer-buttons {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
-}
-
-.footer-buttons :deep(.p-button:not(.p-button-secondary)) {
-  background: linear-gradient(135deg, #2196F3, #21CBF3);
-  border-color: #2196F3;
-}
-
-.footer-buttons :deep(.p-button:not(.p-button-secondary):hover:not(:disabled)) {
-  background: linear-gradient(135deg, #1976D2, #1BB5E0);
-  border-color: #1976D2;
-}
-
-:global(.p-dialog-mask) {
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  background-color: rgba(0, 0, 0, 0.3) !important;
-}
-
-:global(.p-dialog) {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  background-color: white !important;
+  justify-content: space-between;
+  padding-top: 10px;
+  border-top: 1px solid #e0e6ed;
+  margin-top: 12px;
 }
 </style>

@@ -1,24 +1,20 @@
 <template>
-  <aside 
-    @mouseenter="handleMouseEnter"
-    @mouseleave="handleMouseLeave"
-    class="sidebar"
-    :class="{ active: isSideBarActive }"
-  >
+  <aside @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave" class="sidebar"
+    :class="{ active: isSideBarActive }">
     <div class="sidebar-brand">
-      <img src="/HelpAI - Agente.svg" alt="Bot Avatar" class="chat-bot"/>
+      <img src="/HelpAI - Agente.svg" alt="Bot Avatar" class="chat-bot" />
     </div>
     <ul class="sidebar-links">
-      <li v-for="link in links" :key="link.text">
+      <li v-for="link in filteredLinks" :key="link.text">
         <!-- Se for logout, chama o método -->
         <a v-if="link.text === 'Sair'" href="#" @click.prevent="logout" class="a_element">
           <component :is="link.icon" class="icon" />
-          <span class="link-text">{{link.text}}</span>
+          <span class="link-text">{{ link.text }}</span>
         </a>
         <!-- Se não for logout, usa router-link normalmente -->
         <router-link v-else :to="link.href" class="a_element">
           <component :is="link.icon" class="icon" />
-          <span class="link-text">{{link.text}}</span>
+          <span class="link-text">{{ link.text }}</span>
         </router-link>
       </li>
     </ul>
@@ -26,12 +22,16 @@
 </template>
 
 <script>
+import { usePrivacyStore } from "../stores/privacy";
 import {
   ChartBarIcon,
   BuildingOfficeIcon,
   MagnifyingGlassIcon,
   CpuChipIcon,
-  ArrowRightOnRectangleIcon
+  ArrowRightOnRectangleIcon,
+  DocumentCheckIcon,
+  UsersIcon,
+  UserIcon
 } from "@heroicons/vue/24/outline";
 
 export default {
@@ -41,16 +41,22 @@ export default {
     BuildingOfficeIcon,
     MagnifyingGlassIcon,
     CpuChipIcon,
-    ArrowRightOnRectangleIcon
+    UsersIcon,
+    ArrowRightOnRectangleIcon,
+    DocumentCheckIcon,
+    UserIcon
   },
   data() {
     return {
       links: [
+        { text: "Perfil", href: "/profile", icon: "UserIcon" },
         { text: "Dashboard", href: "/dashboard", icon: "ChartBarIcon" },
-        { text: "Empresas", href: "/companies", icon: "BuildingOfficeIcon"},
-        { text: "Pesquisar", href: "/chat", icon:"MagnifyingGlassIcon"},
-        { text: "Inteligência Artificial", href: "/ai", icon: "CpuChipIcon"},
-        { text: "Sair", href: "/", icon: "ArrowRightOnRectangleIcon"}
+        { text: "Empresas", href: "/companies", icon: "BuildingOfficeIcon" },
+        { text: "Pesquisar", href: "/chat", icon: "MagnifyingGlassIcon" },
+        { text: "Inteligência Artificial", href: "/ai", icon: "CpuChipIcon" },
+        { text: "Termos de Privacidade", href: "/privacy-policy", icon: "DocumentCheckIcon" },
+        { text: "Usuários", href: "/user-management", icon: "UsersIcon" },
+        { text: "Sair", href: "/", icon: "ArrowRightOnRectangleIcon" }
       ],
       isSideBarActive: false
     };
@@ -60,13 +66,57 @@ export default {
       localStorage.clear();
       this.$router.replace("/");
     },
-    handleMouseEnter(){
+    handleMouseEnter() {
       this.isSideBarActive = true;
     },
-    handleMouseLeave(){
+    handleMouseLeave() {
       this.isSideBarActive = false;
     }
+  },
+  computed: {
+    filteredLinks() {
+      const privacyStore = usePrivacyStore();
+      const isAccepted = privacyStore.isAccepted;
+      const role = localStorage.getItem("role")?.toUpperCase();
+
+      // Caso não tenha role, retorna só login
+      if (!role) {
+        return this.links.filter(l => l.name === "login");
+      }
+
+      // PERMISSÕES POR ROLE (idêntico ao router)
+      const permissoes = {
+        AGENTE: ["/dashboard", "/chat", "/profile", "/"],
+        GESTOR: ["/dashboard", "/chat", "/profile", "/ai", "/"],
+        ADMIN: [
+          "/dashboard", "/chat", "/profile", "/ai",
+          "/companies", "/privacy-policy", "/user-management", "/"
+        ]
+      };
+      console.log(role)
+      let linksPermitidos = this.links;
+
+      // BLOQUEIO POR ROLE (ADMIN vê tudo)
+      if (role !== "ADMIN") {
+        const permitido = permissoes[role] || [];
+
+        linksPermitidos = linksPermitidos.filter(link =>
+          permitido.includes(link.href)
+        );
+      }
+
+      // BLOQUEIA POR TERMO NÃO OBRIGATÓRIO
+      if (isAccepted === false) {
+        const permitidasSemTermo = ["profile", "dashboard", "login"];
+        linksPermitidos = linksPermitidos.filter(link =>
+          permitidasSemTermo.includes(link.name)
+        );
+      }
+      console.log(linksPermitidos)
+      return linksPermitidos;
+    }
   }
+
 };
 </script>
 
@@ -85,7 +135,7 @@ export default {
 }
 
 .sidebar.active {
-  width: 230px;
+  width: 260px;
 }
 
 .sidebar-brand {
@@ -153,7 +203,7 @@ export default {
   opacity: 0;
   white-space: nowrap;
   transform: translateX(-10px);
-  transition: 
+  transition:
     opacity 0.15s ease,
     transform 0.15s ease;
 }
